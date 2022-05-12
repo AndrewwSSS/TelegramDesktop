@@ -25,7 +25,7 @@ namespace MessageLibrary
             if (listener != null)
                 return;
 
-            if (port < 10000 || port > 99999 || backlog <= 0)
+            if (port < 0 || port > ushort.MaxValue || backlog <= 0)
                 throw new ArgumentOutOfRangeException("Invalid parameter");
 
     
@@ -39,18 +39,17 @@ namespace MessageLibrary
             ListenerThread = new Thread(() => {
                 do
                 {
-                    TcpClient client = listener.AcceptTcpClient();
+                    TcpClientWrap client = new TcpClientWrap(listener.AcceptTcpClient());
+                    ClientConnected?.Invoke(client);
                     ReceiveAsync(client);
                 } while (true);
             });
 
             ListenerThread.IsBackground = true;
             ListenerThread.Start();
-
-
         }
 
-        private void Receive(TcpClient client)
+        private void Receive(TcpClientWrap client)
         {
             TcpClientWrap user = new TcpClientWrap(client);
 
@@ -61,18 +60,16 @@ namespace MessageLibrary
             do
             {
                 user.Receive();
-            }while(user.Tcp.Client.Available > 0);
+            } while (user.Tcp.Client.Available > 0);
         }
 
-        private void ReceiveAsync(TcpClient client)
+        private void ReceiveAsync(TcpClientWrap client)
         {
-            TcpClientWrap user = new TcpClientWrap(client);
-            ClientConnected?.Invoke(user);
+            
+            client.Disconnected += ClientDisconnected;
+            client.MessageReceived += OnMessageReceived;
 
-            user.Disconnected += ClientDisconnected;
-            user.MessageReceived += OnMessageReceived;
-
-            user.ReceiveAsync();
+            client.ReceiveAsync();
         }
 
         private void OnMessageReceived(TcpClientWrap client, Message msg)

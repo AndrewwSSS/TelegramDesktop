@@ -2,6 +2,7 @@
 using MessageLibrary;
 using System;
 using System.Collections.ObjectModel;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -54,6 +55,9 @@ namespace Telegram
             CloseLeftMenuAnimation.From = LeftMenu.BorderThickness;
             CloseLeftMenuAnimation.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnimation.Duration = TimeSpan.FromMilliseconds(200);
+
+
+            client = new TcpClientWrap(IPAddress.Parse("26.246.72.11"), 5000);
 
 
             DataContext = this;
