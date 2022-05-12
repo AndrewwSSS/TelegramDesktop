@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CommonLibrary;
+using MessageLibrary;
+using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,19 +19,30 @@ namespace Telegram
 
     public partial class MainWindow : Window
     {
-        public const int LeftMenuWidth = 280;
+        private TcpClientWrap client ;
 
+        public const int LeftMenuWidth = 280;
         public MenuState RighMenuState { get; set; }
         public MenuState LeftMenuState { get; set; }
 
+        public DoubleAnimation OpenLeftMenuDark = new DoubleAnimation(0.5, new Duration(TimeSpan.FromSeconds(0.3)));
+        public DoubleAnimation OpenLeftMenuReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.3)));
         public ThicknessAnimation OpenLeftMenuAnimation = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnimation = new ThicknessAnimation();
-
+        private static readonly User andrey = new User("Andrey Fedorov");
+        private static readonly User ivan = new User("Ivan Dovgolutsky");
+        public ObservableCollection<ChatMessage> Messages { get; set; } 
+            = new ObservableCollection<ChatMessage>()
+            {
+                new ChatMessage("Damn!").SetFrom(andrey).SetResendUser(ivan),
+                new ChatMessage("Sheesh").SetFrom(andrey)    
+            };
 
         public MainWindow()
         {
             InitializeComponent();
-            HideRightManu();
+            HideRightMenu();
+
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
@@ -42,6 +56,7 @@ namespace Telegram
             CloseLeftMenuAnimation.Duration = TimeSpan.FromMilliseconds(200);
 
 
+            DataContext = this;
         }
 
 
@@ -59,12 +74,12 @@ namespace Telegram
         private void ShowOrOpenRightMenu_Click(object sender, RoutedEventArgs e)
         {
             if (RighMenuState == MenuState.Open)
-                HideRightManu();
+                HideRightMenu();
             else
                 OpenRightMenu();
         }
 
-        public void HideRightManu()
+        public void HideRightMenu()
         {
             this.Width -= ColumnRightMenu.ActualWidth;
 
@@ -102,13 +117,13 @@ namespace Telegram
         {
             if (MainContent.MinWidth == e.NewSize.Width)
                 if (RighMenuState != MenuState.Hidden)
-                    HideRightManu();
+                    HideRightMenu();
         }
 
         private void BTNOpenLeftMenu_Click(object sender, RoutedEventArgs e)
         {
             LeftMenu.BeginAnimation(Border.MarginProperty, OpenLeftMenuAnimation);
-            MainGrid.Opacity = 0.5;
+            MainGrid.BeginAnimation(Border.OpacityProperty, OpenLeftMenuDark);
             LeftMenuState = MenuState.Open;
         }
 
@@ -116,7 +131,7 @@ namespace Telegram
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftMenuAnimation);
-            MainGrid.Opacity = 1;
+            MainGrid.BeginAnimation(Border.OpacityProperty, OpenLeftMenuReverse);
         }
 
         private void Border_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -124,7 +139,7 @@ namespace Telegram
             if (LeftMenuState == MenuState.Open)
             {
                 LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftMenuAnimation);
-                MainGrid.Opacity = 1;
+                MainGrid.BeginAnimation(Border.OpacityProperty, OpenLeftMenuReverse);
                 LeftMenuState = MenuState.Hidden;
             }
         }

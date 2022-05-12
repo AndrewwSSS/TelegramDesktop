@@ -9,6 +9,12 @@ namespace CommonLibrary
 {
     public class User
     {
+
+        public User(string name)
+        {
+            Name = name;
+        }
+
         public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
         public string Name { get; set; }
         public string Email { get; set; }
@@ -20,6 +26,6 @@ namespace CommonLibrary
         public List<User> Friends { get; set; }
         public List<GroupChat> Chats { get; set; }
 
-        public bool Banned { get; set; }
+        public bool Banned { get; set; } = false;
     }
 }
