@@ -8,12 +8,21 @@ using System.Windows.Media.Effects;
 namespace Telegram
 {
 
+    public enum MenuState
+    {
+        Hidden,
+        Open
+    }
+
     public partial class MainWindow : Window
     {
+        public const int LeftMenuWidth = 280;
+
         public MenuState RighMenuState { get; set; }
         public MenuState LeftMenuState { get; set; }
-        public ThicknessAnimation OpenLeftmenuAnim = new ThicknessAnimation();
-        public ThicknessAnimation CloseLeftmenuAnim = new ThicknessAnimation();
+
+        public ThicknessAnimation OpenLeftMenuAnimation = new ThicknessAnimation();
+        public ThicknessAnimation CloseLeftMenuAnimation = new ThicknessAnimation();
 
 
         public MainWindow()
@@ -21,17 +30,18 @@ namespace Telegram
             InitializeComponent();
             HideRightManu();
 
-
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
 
-            OpenLeftmenuAnim.From = new Thickness(-280, 0, 0, 0);
-            OpenLeftmenuAnim.To = new Thickness(0, 0, 0, 0);
-            OpenLeftmenuAnim.Duration = TimeSpan.FromMilliseconds(200);
+            OpenLeftMenuAnimation.From = new Thickness(-LeftMenuWidth, 0, 0, 0);
+            OpenLeftMenuAnimation.To = new Thickness(0, 0, 0, 0);
+            OpenLeftMenuAnimation.Duration = TimeSpan.FromMilliseconds(200);
 
-            CloseLeftmenuAnim.From = LeftMenu.BorderThickness;
-            CloseLeftmenuAnim.To = new Thickness(-280, 0, 0, 0);
-            CloseLeftmenuAnim.Duration = TimeSpan.FromMilliseconds(200);
+            CloseLeftMenuAnimation.From = LeftMenu.BorderThickness;
+            CloseLeftMenuAnimation.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
+            CloseLeftMenuAnimation.Duration = TimeSpan.FromMilliseconds(200);
+
+
         }
 
 
@@ -48,21 +58,16 @@ namespace Telegram
 
         private void ShowOrOpenRightMenu_Click(object sender, RoutedEventArgs e)
         {
-            showOrOpenRightMenu();
-        }
-
-        public void showOrOpenRightMenu()
-        {
             if (RighMenuState == MenuState.Open)
                 HideRightManu();
             else
                 OpenRightMenu();
-
         }
 
         public void HideRightManu()
         {
             this.Width -= ColumnRightMenu.ActualWidth;
+
             Spliter.Visibility = Visibility.Collapsed;
             RightMenu.Visibility = Visibility.Collapsed;
 
@@ -75,28 +80,21 @@ namespace Telegram
             this.Width += 280;
             Spliter.Visibility = Visibility.Visible;
             RightMenu.Visibility = Visibility.Visible;
-
-
             RighMenuState = MenuState.Open;
         }
-
-
 
         private void TopPanel_MouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
         {
             if (this.WindowState == WindowState.Maximized)
                 this.WindowState = WindowState.Normal;
+
             this.DragMove();
         }
 
-        private void BTNClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+        private void BTNClose_Click(object sender, RoutedEventArgs e) => this.Close();
 
 
-        private void BTNHiDEWindow_Click(object sender, RoutedEventArgs e)
-        {
+        private void BTNHiDEWindow_Click(object sender, RoutedEventArgs e) {
             this.WindowState = WindowState.Minimized;
         }
 
@@ -109,7 +107,7 @@ namespace Telegram
 
         private void BTNOpenLeftMenu_Click(object sender, RoutedEventArgs e)
         {
-            LeftMenu.BeginAnimation(Border.MarginProperty, OpenLeftmenuAnim);
+            LeftMenu.BeginAnimation(Border.MarginProperty, OpenLeftMenuAnimation);
             MainGrid.Opacity = 0.5;
             LeftMenuState = MenuState.Open;
         }
@@ -117,7 +115,7 @@ namespace Telegram
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftmenuAnim);
+            LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftMenuAnimation);
             MainGrid.Opacity = 1;
         }
 
@@ -125,7 +123,7 @@ namespace Telegram
         {
             if (LeftMenuState == MenuState.Open)
             {
-                LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftmenuAnim);
+                LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftMenuAnimation);
                 MainGrid.Opacity = 1;
                 LeftMenuState = MenuState.Hidden;
             }
@@ -133,5 +131,5 @@ namespace Telegram
 
     }
 
-    public enum MenuState { Hidden, Open }
+    
 }
