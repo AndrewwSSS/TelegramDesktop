@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace CommonLibrary
 {
     public class User
     {
-        public User(string name) => Name = name;
+
+        public User(string name)
+        {
+            Name = name;
+        }
 
         public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
         public string Name { get; set; }
@@ -27,6 +27,11 @@ namespace CommonLibrary
             x.AddRange(y);
             return x;
         });
+
         public bool Banned { get; set; } = false;
+
+        public User(string name) => Name = name;
+        
+
     }
 }

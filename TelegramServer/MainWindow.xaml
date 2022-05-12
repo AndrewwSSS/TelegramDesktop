@@ -23,15 +23,16 @@
             <Button Grid.Column="0"
                     Margin="5"
                     Content="Start server"
-                    x:Name="StartServer"
-                    FontSize="20"/>
+                    x:Name="BtnStartServer"
+                    FontSize="20"
+                    Click="BtnStartServer_Click"/>
 
             <Button Grid.Column="2"
                     Margin="5"
                     Content="Stop server"
-                    x:Name="StopServer"
                     FontSize="20"
-                    />
+                    IsEnabled="False"
+                    x:Name="BtnStopServer"/>
 
 
             <Grid Grid.Column="1" Margin="5">
@@ -49,7 +50,8 @@
                 <TextBox Grid.Column="1"
                          VerticalContentAlignment="Center"
                          HorizontalContentAlignment="Center"
-                         FontSize="20"/>
+                         FontSize="20"
+                         x:Name="TB_ListenerPort"/>
 
             </Grid>
 

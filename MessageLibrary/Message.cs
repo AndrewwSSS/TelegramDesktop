@@ -19,16 +19,19 @@ namespace MessageLibrary
             ms.Position = 0;
             return ms.ToArray();
         }
+
         public void SendTo(TcpClientWrap client)
         {
             byte[] buf = ToByteArray();
             client.Tcp.Client.Send(buf, 0, buf.Length, SocketFlags.None);
         }
+
         public void SendTo(Socket socket)
         {
             byte[] buf = ToByteArray();
             socket.Send(buf, 0, buf.Length, SocketFlags.None);
         }
+
         public void SendToAsync(Socket socket, AsyncCallback cb)
         {
             StateObject stateObject = new StateObject
@@ -38,6 +41,7 @@ namespace MessageLibrary
             };
             socket.BeginSend(stateObject.Buffer, 0, stateObject.Buffer.Length, SocketFlags.None, cb, stateObject);
         }
+
         public void StreamTo(Stream stream) => bf.Serialize(stream, this);
 
         public static void ReceiveFromSocket(Socket socket, AsyncCallback cb)

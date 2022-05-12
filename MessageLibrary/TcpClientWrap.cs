@@ -157,16 +157,43 @@ namespace MessageLibrary
         {
             StateObject state = (StateObject)ar.AsyncState;
             Socket socket = state.Socket;
+
             try
             {
                 if (Tcp == null)
                     return;
+
                 int bytesRead = Tcp.Client.EndReceive(ar);
+
                 if (bytesRead > 0)
                 {
+                    if(socket.Available > 0)
+                    {
+                        MemoryStream ms = new MemoryStream();
+
+                        byte[] tmp = new byte[StateObject.BufferSize];
+                        ms.Write(state.Buffer, 0, state.Buffer.Length);
+
+
+                        do
+                        {
+                            int br = socket.Receive(tmp, StateObject.BufferSize, 0);
+
+                            if (br == 0)
+                                continue;
+
+                            ms.Write(tmp, 0, br);
+
+                        } while(socket.Available > 0);
+
+                        state.Buffer = ms.ToArray();
+
+                    }
+
                     Message msg = Message.FromByteArray(state.Buffer);
                     MessageReceived?.Invoke(this, msg);
                     
+
                     socket.BeginReceive(state.Buffer, 0, StateObject.BufferSize, SocketFlags.None, ReceiveCB, state);
                 }
             }

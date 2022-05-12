@@ -1,30 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MessageLibrary;
+using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MessageLibrary;
+using CommonLibrary;
 
 namespace TelegramServer
 {
-   
-    TcpSerc
+
+
     public partial class MainWindow : Window
     {
         
+        private ObservableCollection<User> UsersOnline = new ObservableCollection<User>();
+        private ObservableCollection<User> UsersOffline = new ObservableCollection<User>();
+        
+
+        private TcpServerWrap Server;
+        
+
+
 
         public MainWindow()
         {
+      
             InitializeComponent();
+
+
+            LB_UsersOffline.ItemsSource = UsersOffline;
+            LB_UsersOnline.ItemsSource = UsersOnline;   
+
+
+            Server = new TcpServerWrap();
+
+            Server.Started += OnServerStarted;
+            Server.Stopped += OnServerStopped;
+            Server.MessageReceived += ClientMessageRecived;
+
         }
+
+
+        private void BtnStartServer_Click(object sender, RoutedEventArgs e)
+        {
+            int port;
+            if(int.TryParse(TB_ListenerPort.Text, out port) && port > 9999 && port < 100000)
+            {
+                BtnStartServer.IsEnabled = false;
+                Server.Start(port, 1000);
+            }
+        }
+
+        private void OnServerStarted(TcpServerWrap client)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                BtnStopServer.IsEnabled = true;
+            });
+        }
+
+        private void OnServerStopped(TcpServerWrap client)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                BtnStopServer.IsEnabled = false;
+                BtnStartServer.IsEnabled = true;
+            });
+        }
+
+        private void ClientMessageRecived(TcpClientWrap client, Message msg)
+        {
+            
+
+        }
+
     }
 }

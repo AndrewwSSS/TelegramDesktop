@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace MessageLibrary
 {
@@ -18,7 +14,7 @@ namespace MessageLibrary
         public event ServerHandler Started;
         public event ClientHandler ClientConnected;
         public event ClientHandler ClientDisconnected;
-        public event ServerHandler Disconnected;
+        public event ServerHandler Stopped;
         private TcpListener listener;
         private Thread ListenerThread;
         public event ClientMessageHandler MessageReceived;
@@ -55,13 +51,16 @@ namespace MessageLibrary
 
         private void Receive(TcpClientWrap client)
         {
+            TcpClientWrap user = new TcpClientWrap(client);
 
-            client.Disconnected += ClientDisconnected;
-            client.MessageReceived += OnMessageReceived;
+            ClientConnected?.Invoke(user);
+            user.Disconnected += ClientDisconnected;
+            user.MessageReceived += OnMessageReceived;
+
             do
             {
-                client.Receive();
-            } while (client.Tcp.Client.Available > 0);
+                user.Receive();
+            } while (user.Tcp.Client.Available > 0);
         }
 
         private void ReceiveAsync(TcpClientWrap client)
@@ -76,6 +75,7 @@ namespace MessageLibrary
         private void OnMessageReceived(TcpClientWrap client, Message msg)
         {
             MessageReceived?.Invoke(client, msg);
+            
         }
 
         public void Shutdown()
@@ -85,7 +85,7 @@ namespace MessageLibrary
             {
                 listener?.Stop();
                 ListenerThread.Abort();
-                Disconnected?.Invoke(this);
+                Stopped?.Invoke(this);
             }            
         }
     }
