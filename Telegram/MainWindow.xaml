@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Telegram"
         mc:Ignorable="d"
-        Title="MainWindow" Height="617.9" Width="988" WindowStyle="None" Background="Transparent"  AllowsTransparency="True" ResizeMode="CanResizeWithGrip"
+        Title="MainWindow" Height="600" Width="1000" WindowStyle="None" Background="Transparent"  AllowsTransparency="True" ResizeMode="CanResizeWithGrip"
         x:Name="MainWin">
 
 
@@ -163,7 +163,10 @@
                     </Grid>
 
 
-                    <ListBox  Background="#19191D" BorderThickness="0" Grid.Row="1"></ListBox>
+                    <ListBox  Background="#19191D" BorderThickness="0" Grid.Row="1">
+                        
+                        
+                    </ListBox>
 
                     <Grid Grid.Row="2" >
                         <Grid.ColumnDefinitions>
