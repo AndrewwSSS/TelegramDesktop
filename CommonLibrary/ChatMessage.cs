@@ -11,7 +11,7 @@ namespace CommonLibrary
         public User ToUser { get; set; }
         public User ResendUser { get; set; }
         public List<ImageSource> Images { get; set; }
-
+        public List<ChatFile> Files { get; set; }
 
         public ChatMessage(string text) : base(text) => Type = MessageType.Custom;
 
