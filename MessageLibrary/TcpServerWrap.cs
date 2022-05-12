@@ -51,36 +51,31 @@ namespace MessageLibrary
 
         private void Receive(TcpClientWrap client)
         {
-            TcpClientWrap user = new TcpClientWrap(client);
-
-            ClientConnected?.Invoke(user);
-            user.Disconnected += ClientDisconnected;
-            user.MessageReceived += OnMessageReceived;
+         
+            ClientConnected?.Invoke(client);
+            client.Disconnected += ClientDisconnected;
+            client.MessageReceived += OnMessageReceived;
 
             do
             {
-                user.Receive();
-            } while (user.Tcp.Client.Available > 0);
+                client.Receive();
+            } while (client.Tcp.Client.Available > 0);
         }
 
         private void ReceiveAsync(TcpClientWrap client)
         {
-            
             client.Disconnected += ClientDisconnected;
             client.MessageReceived += OnMessageReceived;
 
             client.ReceiveAsync();
         }
 
-        private void OnMessageReceived(TcpClientWrap client, Message msg)
-        {
+        private void OnMessageReceived(TcpClientWrap client, Message msg){
             MessageReceived?.Invoke(client, msg);
-            
         }
 
         public void Shutdown()
         {
-
             if(listener != null)
             {
                 listener?.Stop();

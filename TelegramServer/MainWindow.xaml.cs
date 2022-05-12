@@ -9,21 +9,18 @@ namespace TelegramServer
 
     public partial class MainWindow : Window
     {
-        
-        private ObservableCollection<User> UsersOnline = new ObservableCollection<User>();
-        private ObservableCollection<User> UsersOffline = new ObservableCollection<User>();
-        
-
+        private ObservableCollection<User> UsersOnline;
+        private ObservableCollection<User> UsersOffline;
+    
         private TcpServerWrap Server;
         
-
-
-
         public MainWindow()
         {
       
             InitializeComponent();
 
+            UsersOnline = new ObservableCollection<User>();
+            UsersOffline = new ObservableCollection<User>();
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;   
