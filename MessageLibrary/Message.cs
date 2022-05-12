@@ -9,7 +9,7 @@ namespace MessageLibrary
     public abstract class Message
     {
         public MessageType Type { get; protected set; } = MessageType.Undefined;
-        public DateTime Time { get; protected set; }
+        public DateTime Time { get; protected set; } = DateTime.Now;
 
         private static BinaryFormatter bf = new BinaryFormatter();
         public byte[] ToByteArray()
@@ -57,6 +57,7 @@ namespace MessageLibrary
         public static Message FromMemoryStream(MemoryStream ms) => bf.Deserialize(ms) as Message;
 
         public static Message FromByteArray(byte[] buffer) => bf.Deserialize(new MemoryStream(buffer)) as Message;
+        
         public static T FromByteArray<T>(byte[] buffer) where T : Message => bf.Deserialize(new MemoryStream(buffer)) as T;
     }
 }

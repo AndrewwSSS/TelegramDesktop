@@ -9,11 +9,7 @@ namespace CommonLibrary
 {
     public class User
     {
-
-        public User(string name)
-        {
-            Name = name;
-        }
+        public User(string name) => Name = name;
 
         public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
         public string Name { get; set; }
@@ -23,9 +19,14 @@ namespace CommonLibrary
         public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0];
         public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }
-        public List<User> Friends { get; set; }
         public List<GroupChat> Chats { get; set; }
-
+        public List<ChatMessage> Messages 
+            => Chats.Select(chat => chat.Messages)
+            .Aggregate((x, y) => 
+            {
+            x.AddRange(y);
+            return x;
+        });
         public bool Banned { get; set; } = false;
     }
 }

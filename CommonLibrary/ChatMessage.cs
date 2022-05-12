@@ -16,7 +16,7 @@ namespace CommonLibrary
         public User ToUser { get; set; }
         public User ResendUser { get; set; }
         public List<ImageSource> Images { get; set; }
-
+        public List<ChatFile> Files { get; set; }
 
         public ChatMessage SetFrom(User user)
         {

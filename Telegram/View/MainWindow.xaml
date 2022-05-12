@@ -15,295 +15,295 @@
         MinHeight="500" MinWidth="700">
 
 
-    <Canvas x:Name="MainCanvas" Background="Black">
-        <Canvas.Resources>
+        <Canvas x:Name="MainCanvas" Background="Black">
+            <Canvas.Resources>
 
-            <Style TargetType="TextBox" x:Key="SearchBoxStyle">
-                <Style.Setters>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="TextBox">
-                                <Border CornerRadius="3" Background="#3D444B">
+                <Style TargetType="TextBox" x:Key="SearchBoxStyle">
+                    <Style.Setters>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border CornerRadius="3" Background="#3D444B">
 
-                                    <TextBox BorderThickness="0"
+                                        <TextBox BorderThickness="0"
                                              Background="Transparent"
                                              Foreground="White"
                                              FontSize="20"
                                              VerticalContentAlignment="Center"
                                              CaretBrush="White"/>
 
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style.Setters>
-            </Style>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style.Setters>
+                </Style>
 
-            <Style TargetType="Button">
-                <Style.Setters>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="Button">
-                                <Border  x:Name="border"
+                <Style TargetType="Button">
+                    <Style.Setters>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border  x:Name="border"
                                          BorderThickness="0">
 
-                                    <TextBlock Text="{TemplateBinding Property=Content}"
+                                        <TextBlock Text="{TemplateBinding Property=Content}"
                                                Foreground="White" 
                                                FontSize="{TemplateBinding FontSize}"
                                                TextAlignment="Center"
                                                VerticalAlignment="Center"/>
-                                </Border>
+                                    </Border>
 
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="true">
-                                        <Setter TargetName="border"
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="border"
                                                 Property="Background"
                                                 Value="#313B43"/>
-                                    </Trigger>
+                                        </Trigger>
 
-                                </ControlTemplate.Triggers>
+                                    </ControlTemplate.Triggers>
 
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style.Setters>
-            </Style>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style.Setters>
+                </Style>
 
 
-            <ControlTemplate TargetType="Button" x:Key="BTNClose">
+                <ControlTemplate TargetType="Button" x:Key="BTNClose">
 
-                <Border  x:Name="BTNClose"
+                    <Border  x:Name="BTNClose"
                          BorderThickness="0">
 
-                    <TextBlock Text="{TemplateBinding Property=Content}"
+                        <TextBlock Text="{TemplateBinding Property=Content}"
                                Foreground="White" 
                                FontSize="{TemplateBinding FontSize}"
                                TextAlignment="Center"
                                VerticalAlignment="Center"/>
-                </Border>
+                    </Border>
 
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsMouseOver" Value="true">
-                        <Setter TargetName="BTNClose"
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="BTNClose"
                                 Property="Background"
                                 Value="Red"/>
-                    </Trigger>
-                </ControlTemplate.Triggers>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
 
-            </ControlTemplate>
+                </ControlTemplate>
 
-            <ControlTemplate TargetType="Button" x:Key="BaseButtonTopPanel">
+                <ControlTemplate TargetType="Button" x:Key="BaseButtonTopPanel">
 
-                <Border  x:Name="border"
+                    <Border  x:Name="border"
                          Height="{TemplateBinding Height}"
                          Width="{TemplateBinding Width}"
                          Background="Transparent"
                          BorderThickness="0">
 
-                    <TextBlock Text="{TemplateBinding Property=Content}"
+                        <TextBlock Text="{TemplateBinding Property=Content}"
                                x:Name="textblock"
                                Foreground="White"
                                FontSize="{TemplateBinding FontSize}"
                                TextAlignment="Center"
                                VerticalAlignment="Center"/>
-                </Border>
+                    </Border>
 
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsMouseOver" Value="true">
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
 
-                        <Setter TargetName="border"
+                            <Setter TargetName="border"
                                 Property="Background"
                                 Value="#434D57"/>
 
-                        <Setter TargetName="textblock"
+                            <Setter TargetName="textblock"
                                 Property="Foreground"
                                 Value="White"/>
 
-                    </Trigger>
-                </ControlTemplate.Triggers>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
 
-            </ControlTemplate>
-            <SolidColorBrush x:Key="GreyBrush">#c0c0c0</SolidColorBrush>
-            <SolidColorBrush x:Key="BlueBrush">#50B4FA</SolidColorBrush>
-            <SolidColorBrush x:Key="MsgBgBrush">#285078</SolidColorBrush>
-        </Canvas.Resources>
+                </ControlTemplate>
+                <SolidColorBrush x:Key="GreyBrush">#f0f0f0</SolidColorBrush>
+                <SolidColorBrush x:Key="BlueBrush">#50B4FA</SolidColorBrush>
+                <SolidColorBrush x:Key="MsgBgBrush">#285078</SolidColorBrush>
+            </Canvas.Resources>
 
-        <Grid x:Name="MainGrid"
+            <Grid x:Name="MainGrid"
               Width="{Binding ElementName=MainWin, Path=Width, UpdateSourceTrigger=PropertyChanged}"
               Height="{Binding ElementName=MainWin, Path=Height, UpdateSourceTrigger=PropertyChanged}">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="23.5"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 
-                <Border Grid.ColumnSpan="5"
+                    <Border Grid.ColumnSpan="5"
                         x:Name="TopPanel"
                         Background="#3A4047"
                         MouseLeftButtonDown="TopPanel_MouseLeftButtonDown_1">
 
-                    <DockPanel>
-                        <Button Content="✖"
+                        <DockPanel>
+                            <Button Content="✖"
                                 DockPanel.Dock="Right"
                                 Width="20"
                                 BorderThickness="0"
                                 x:Name="BTNClose"
                                 Click="BTNClose_Click"/>
 
-                        <Button Content="▭"
+                            <Button Content="▭"
                                 DockPanel.Dock="Right"
                                 Width="20"
                                 BorderThickness="0"
                                 x:Name="BTNAllScreen"
                                 Click="BTNAllScreen_Click"/>
 
-                        <Button Content="_"
+                            <Button Content="_"
                                 DockPanel.Dock="Right"
                                 Width="20"
                                 BorderThickness="0"
                                 x:Name="BTNHiDEWindow"
                                 Click="BTNHiDEWindow_Click"/>
 
-                        <TextBlock Text="Telegram"
+                            <TextBlock Text="Telegram"
                                    Margin="10, 0, 0, 0"
                                    FontSize="10"
                                    VerticalAlignment="Center"
                                    Foreground="White"/>
-                    </DockPanel>
-                </Border>
-            </Grid>
+                        </DockPanel>
+                    </Border>
+                </Grid>
 
-            <Grid Grid.Row="1"
+                <Grid Grid.Row="1"
                   PreviewMouseDown="Border_PreviewMouseDown">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70" x:Name="ColumnLeftPanel"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*" x:Name="ColumnMain"/>
-                    <!--<ColumnDefinition Width="Auto" x:Name="ColumnSpliter"/>-->
-                    <ColumnDefinition Width="Auto" x:Name="ColumnRightMenu"/>
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70" x:Name="ColumnLeftPanel"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" x:Name="ColumnMain"/>
+                        <!--<ColumnDefinition Width="Auto" x:Name="ColumnSpliter"/>-->
+                        <ColumnDefinition Width="Auto" x:Name="ColumnRightMenu"/>
+                    </Grid.ColumnDefinitions>
 
-                <!--<GridSplitter Grid.Column="3"
+                    <!--<GridSplitter Grid.Column="3"
                               Width="4"
                               BorderThickness="5"
                               BorderBrush="#313B43"
                               x:Name="Spliter" />-->
 
-                <StackPanel Grid.Column="0"
+                    <StackPanel Grid.Column="0"
                             Orientation="Vertical"
                             Background="#19191D"
                             Grid.RowSpan="2">
 
-                    <Button Height="60"
+                        <Button Height="60"
                             Width="70"
                             FontSize="30"
                             x:Name="BTNOpenLeftMenu"
                             Click="BTNOpenLeftMenu_Click"
                             Content="8"/>
 
-                    <Button Height="60"
+                        <Button Height="60"
                             Width="70"
                             FontSize="30"
                             Content="9"/>
 
-                    <Button Height="60"
+                        <Button Height="60"
                             Width="70"
                             FontSize="30"
                             Content="10"/>
 
-                    <Button Height="60"
+                        <Button Height="60"
                             Width="70"
                             FontSize="30"
                             Content="11"/>
 
-                    <Button Height="60"
+                        <Button Height="60"
                             Width="70"
                             FontSize="30"
                             Content="12"/>
 
-                    <Button Height="60"
+                        <Button Height="60"
                             Width="70"
                             FontSize="30"
                             Content="13"/>
 
-                </StackPanel>
+                    </StackPanel>
 
-                <Grid Grid.Column="1"
+                    <Grid Grid.Column="1"
                       Background="#282E33"
                       Grid.RowSpan="2"
                       MinWidth="240"
                       MaxWidth="250">
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="45"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="45"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0"
+                        <Grid Grid.Row="0"
                           Grid.Column="0"
                           Margin="3">
 
-                        <TextBox Margin="2"
+                            <TextBox Margin="2"
                                  Style="{StaticResource SearchBoxStyle}"/>
+                        </Grid>
                     </Grid>
-                </Grid>
 
-                <Grid Grid.Column="2"
+                    <Grid Grid.Column="2"
                       Background="#282E33"
                       x:Name="MainContent"
                       SizeChanged="MainContent_SizeChanged"
                       MinWidth="300">
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="45"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="45"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
 
 
-                    <Grid Grid.Row="0" >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition  Width="200"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="0" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition  Width="200"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Vertical" Grid.Column="0">
+                            <StackPanel Orientation="Vertical" Grid.Column="0">
 
-                            <TextBlock Margin="4"
+                                <TextBlock Margin="4"
                                        Foreground="White"
                                        x:Name="TBName"/>
 
-                            <TextBlock Margin="4"
+                                <TextBlock Margin="4"
                                        Foreground="White"
                                        x:Name="TBDateLeft"/>
 
-                        </StackPanel>
+                            </StackPanel>
 
-                        <UniformGrid Grid.Column="2" Columns="4">
+                            <UniformGrid Grid.Column="2" Columns="4">
 
-                            <Button Grid.Column="0"
+                                <Button Grid.Column="0"
                                     Foreground="White"
                                     FontSize="30"
                                     Content="1"
                                     Width="45"/>
 
 
-                            <Button Grid.Column="1"
+                                <Button Grid.Column="1"
                                     Foreground="White"
                                     FontSize="30"
                                     Content="2"
                                     Width="45"/>
 
 
-                            <Button Grid.Column="2"
+                                <Button Grid.Column="2"
                                     x:Name="BTN"
                                     Foreground="White" 
                                     FontSize="30" 
@@ -311,7 +311,7 @@
                                     Content="3"/>
 
 
-                            <Button x:Name="ShowOrOpenRightMenu"
+                                <Button x:Name="ShowOrOpenRightMenu"
                                     Click="ShowOrOpenRightMenu_Click"
                                     Foreground="White"
                                     FontSize="30"
@@ -319,51 +319,51 @@
                                     Grid.Column="3"
                                     Width="45"/>
 
-                        </UniformGrid>
-                    </Grid>
+                            </UniformGrid>
+                        </Grid>
 
 
-                    <ListBox ItemsSource="{Binding Messages}" Background="#19191D"
+                        <ListBox ItemsSource="{Binding Messages}" Background="#19191D"
                              BorderThickness="0"
                              Grid.Row="1"
                              IsHitTestVisible="False">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{StaticResource MsgBgBrush}" CornerRadius="8">
-                                    <Grid Margin="9" >
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                        </Grid.RowDefinitions>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource MsgBgBrush}" CornerRadius="8">
+                                        <Grid Margin="9" >
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
 
-                                        <TextBlock Margin="0,0,0,5" Text="{Binding ResendUser.Name, StringFormat={}переслано от {0}}" 
+                                            <TextBlock Margin="0,0,0,5" Text="{Binding ResendUser.Name, StringFormat={}переслано от {0}}" 
                                                    Foreground="{StaticResource BlueBrush}" FontSize="12" Grid.Row="0">
 
-                                        </TextBlock>
-                                        <StackPanel Grid.Row="1" >
-                                            <TextBlock FontSize="12" Foreground="LightGray" Text="{Binding FromUser.Name}"></TextBlock>
-                                            <TextBlock FontSize="15" Foreground="White" Text="{Binding Text}"></TextBlock>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                        <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding ResendUser}" Value="{x:Null}">
-                        <Setter TargetName="resend" Property="Height" Value="0" />
-                    </DataTrigger>
-                </DataTemplate.Triggers>
-                </DataTemplate>
-                </ListBox.ItemTemplate>
-                </ListBox>
+                                            </TextBlock>
+                                            <StackPanel Grid.Row="1" >
+                                                <TextBlock FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.Name}"></TextBlock>
+                                                <TextBlock FontSize="15" Foreground="{StaticResource GreyBrush}" Text="{Binding Text}"></TextBlock>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding ResendUser}" Value="{x:Null}">
+                                            <Setter TargetName="resend" Property="Height" Value="0" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
-                <Grid Grid.Row="2" >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="40"/>
-                    </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="2" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="1"
+                            <TextBox Grid.Column="1"
                                  Background="#282E33"
                                  TextAlignment="Left"
                                  VerticalAlignment="Center"
@@ -371,63 +371,65 @@
                                  Foreground="White"
                                  BorderThickness="0"/>
 
-                    <Button Grid.Column="2"
+                            <Button Grid.Column="2"
                                 Background="#282E33"
                                 FontSize="30"
                                 Content="6"/>
 
 
-                    <Button Grid.Column="3"
+                            <Button Grid.Column="3"
                                 Background="#282E33"
                                 FontSize="30"
                                 Content="7"/>
 
-                </Grid>
-            </Grid>
-        </Grid >
-        </Grid>
+                        </Grid>
+                    </Grid>
 
-        <Border Margin="-280, 0, 0, 0"
+                    <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280"></Grid>
+                </Grid >
+            </Grid>
+
+            <Border Margin="-280, 0, 0, 0"
                 Width="280"
                 Height="{Binding ElementName=MainWin, Path=Height}"
                 x:Name="LeftMenu"
                 Background="#282E33">
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="130"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0" Background="#1E0096">
+                <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition Height="130"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                </Grid>
 
-                <Grid Grid.Row="1">
-                    <StackPanel Orientation="Vertical">
+                    <Grid Grid.Row="0" Background="#1E0096">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                    </Grid>
 
-                        <Button Height="40"
+                    <Grid Grid.Row="1">
+                        <StackPanel Orientation="Vertical">
+
+                            <Button Height="40"
                                 Content="Создать группу"/>
 
-                        <Button Height="40"
+                            <Button Height="40"
                                 Content="Создать канал"/>
 
-                        <Button Height="40"
+                            <Button Height="40"
                                 Content="Контакты"/>
 
-                        <Button Height="40" 
+                            <Button Height="40" 
                                 Content="Звонки"/>
 
-                        <Button Height="40"
+                            <Button Height="40"
                                 Content="Настройки"/>
 
-                    </StackPanel>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
 
-        </Border>
-    </Canvas>
+            </Border>
+        </Canvas>
 </Window>
