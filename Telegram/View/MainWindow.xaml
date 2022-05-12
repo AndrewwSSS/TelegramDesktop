@@ -185,15 +185,15 @@
                     <ColumnDefinition Width="70" x:Name="ColumnLeftPanel"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*" x:Name="ColumnMain"/>
-                    <ColumnDefinition Width="Auto" x:Name="ColumnSpliter"/>
+                    <!--<ColumnDefinition Width="Auto" x:Name="ColumnSpliter"/>-->
                     <ColumnDefinition Width="Auto" x:Name="ColumnRightMenu"/>
                 </Grid.ColumnDefinitions>
 
-                <GridSplitter Grid.Column="3"
+                <!--<GridSplitter Grid.Column="3"
                               Width="4"
                               BorderThickness="5"
                               BorderBrush="#313B43"
-                              x:Name="Spliter" />
+                              x:Name="Spliter" />-->
 
                 <StackPanel Grid.Column="0"
                             Orientation="Vertical"
@@ -252,14 +252,6 @@
                         <TextBox Margin="2"
                                  Style="{StaticResource SearchBoxStyle}"/>
                     </Grid>
-                </Grid>
-
-                <Grid Grid.Column="4"
-                      Background="#313B43"
-                      x:Name="RightMenu"
-                      MinWidth="280"
-                      Width="280">
-
                 </Grid>
 
                 <Grid Grid.Column="2"
@@ -329,9 +321,9 @@
                     </Grid>
 
 
-                    <ListBox Background="#19191D"
-                             BorderThickness="0"
-                             Grid.Row="1"/>
+                    <ListBox Grid.Row="1" 
+                             Background="#19191D"
+                             BorderThickness="0"/>
 
                     <Grid Grid.Row="2" >
                         <Grid.ColumnDefinitions>
@@ -362,6 +354,16 @@
 
                     </Grid>
                 </Grid>
+
+                <Grid Grid.Column="3"
+                      Background="#313B43"
+                      x:Name="RightMenu"
+                      MinWidth="280"
+                      Width="280">
+
+                </Grid>
+
+             
             </Grid >
         </Grid>
 
