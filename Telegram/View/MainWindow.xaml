@@ -1,0 +1,411 @@
+﻿<Window x:Class="Telegram.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Telegram"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="778" Width="942"
+        WindowStyle="None"
+        Background="Transparent"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        x:Name="MainWin"
+        MinHeight="500" MinWidth="700">
+
+
+    <Canvas x:Name="MainCanvas" Background="Black">
+        <Canvas.Resources>
+
+            <Style TargetType="TextBox" x:Key="SearchBoxStyle">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TextBox">
+                                <Border CornerRadius="3" Background="#3D444B">
+
+                                    <TextBox BorderThickness="0"
+                                             Background="Transparent"
+                                             Foreground="White"
+                                             FontSize="20"
+                                             VerticalContentAlignment="Center"
+                                             CaretBrush="White"/>
+
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
+
+            <Style TargetType="Button">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border  x:Name="border"
+                                         BorderThickness="0">
+
+                                    <TextBlock Text="{TemplateBinding Property=Content}"
+                                               Foreground="White" 
+                                               FontSize="{TemplateBinding FontSize}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="true">
+                                        <Setter TargetName="border"
+                                                Property="Background"
+                                                Value="#313B43"/>
+                                    </Trigger>
+
+                                </ControlTemplate.Triggers>
+
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
+
+
+            <ControlTemplate TargetType="Button" x:Key="BTNClose">
+
+                <Border  x:Name="BTNClose"
+                         BorderThickness="0">
+
+                    <TextBlock Text="{TemplateBinding Property=Content}"
+                               Foreground="White" 
+                               FontSize="{TemplateBinding FontSize}"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="true">
+                        <Setter TargetName="BTNClose"
+                                Property="Background"
+                                Value="Red"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+
+            </ControlTemplate>
+
+            <ControlTemplate TargetType="Button" x:Key="BaseButtonTopPanel">
+
+                <Border  x:Name="border"
+                         Height="{TemplateBinding Height}"
+                         Width="{TemplateBinding Width}"
+                         Background="Transparent"
+                         BorderThickness="0">
+
+                    <TextBlock Text="{TemplateBinding Property=Content}"
+                               x:Name="textblock"
+                               Foreground="White"
+                               FontSize="{TemplateBinding FontSize}"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="true">
+
+                        <Setter TargetName="border"
+                                Property="Background"
+                                Value="#434D57"/>
+
+                        <Setter TargetName="textblock"
+                                Property="Foreground"
+                                Value="White"/>
+
+                    </Trigger>
+                </ControlTemplate.Triggers>
+
+            </ControlTemplate>
+
+        </Canvas.Resources>
+
+        <Grid x:Name="MainGrid"
+              Width="{Binding ElementName=MainWin, Path=Width, UpdateSourceTrigger=PropertyChanged}"
+              Height="{Binding ElementName=MainWin, Path=Height, UpdateSourceTrigger=PropertyChanged}">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="23.5"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.ColumnSpan="5"
+                        x:Name="TopPanel"
+                        Background="#3A4047"
+                        MouseLeftButtonDown="TopPanel_MouseLeftButtonDown_1">
+
+                    <DockPanel>
+                        <Button Content="✖"
+                                DockPanel.Dock="Right"
+                                Width="20"
+                                BorderThickness="0"
+                                x:Name="BTNClose"
+                                Click="BTNClose_Click"/>
+
+                        <Button Content="▭"
+                                DockPanel.Dock="Right"
+                                Width="20"
+                                BorderThickness="0"
+                                x:Name="BTNAllScreen"
+                                Click="BTNAllScreen_Click"/>
+
+                        <Button Content="_"
+                                DockPanel.Dock="Right"
+                                Width="20"
+                                BorderThickness="0"
+                                x:Name="BTNHiDEWindow"
+                                Click="BTNHiDEWindow_Click"/>
+
+                        <TextBlock Text="Telegram"
+                                   Margin="10, 0, 0, 0"
+                                   FontSize="10"
+                                   VerticalAlignment="Center"
+                                   Foreground="White"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="1"
+                  PreviewMouseDown="Border_PreviewMouseDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70" x:Name="ColumnLeftPanel"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" x:Name="ColumnMain"/>
+                    <ColumnDefinition Width="Auto" x:Name="ColumnSpliter"/>
+                    <ColumnDefinition Width="Auto" x:Name="ColumnRightMenu"/>
+                </Grid.ColumnDefinitions>
+
+                <GridSplitter Grid.Column="3"
+                              Width="4"
+                              BorderThickness="5"
+                              BorderBrush="#313B43"
+                              x:Name="Spliter" />
+
+                <StackPanel Grid.Column="0"
+                            Orientation="Vertical"
+                            Background="#19191D"
+                            Grid.RowSpan="2">
+
+                    <Button Height="60"
+                            Width="70"
+                            FontSize="30"
+                            x:Name="BTNOpenLeftMenu"
+                            Click="BTNOpenLeftMenu_Click"
+                            Content="8"/>
+
+                    <Button Height="60"
+                            Width="70"
+                            FontSize="30"
+                            Content="9"/>
+
+                    <Button Height="60"
+                            Width="70"
+                            FontSize="30"
+                            Content="10"/>
+
+                    <Button Height="60"
+                            Width="70"
+                            FontSize="30"
+                            Content="11"/>
+
+                    <Button Height="60"
+                            Width="70"
+                            FontSize="30"
+                            Content="12"/>
+
+                    <Button Height="60"
+                            Width="70"
+                            FontSize="30"
+                            Content="13"/>
+
+                </StackPanel>
+
+                <Grid Grid.Column="1"
+                      Background="#282E33"
+                      Grid.RowSpan="2"
+                      MinWidth="240"
+                      MaxWidth="250">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0"
+                          Grid.Column="0"
+                          Margin="3">
+
+                        <TextBox Margin="2"
+                                 Style="{StaticResource SearchBoxStyle}"/>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Column="4"
+                      Background="#313B43"
+                      x:Name="RightMenu"
+                      MinWidth="280"
+                      Width="280">
+
+                </Grid>
+
+                <Grid Grid.Column="2"
+                      Background="#282E33"
+                      x:Name="MainContent"
+                      SizeChanged="MainContent_SizeChanged"
+                      MinWidth="300">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+
+
+                    <Grid Grid.Row="0" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition  Width="200"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Vertical" Grid.Column="0">
+
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       x:Name="TBName"/>
+
+                            <TextBlock Margin="4"
+                                       Foreground="White"
+                                       x:Name="TBDateLeft"/>
+
+                        </StackPanel>
+
+                        <UniformGrid Grid.Column="2" Columns="4">
+
+                            <Button Grid.Column="0"
+                                    Foreground="White"
+                                    FontSize="30"
+                                    Content="1"
+                                    Width="45"/>
+
+
+                            <Button Grid.Column="1"
+                                    Foreground="White"
+                                    FontSize="30"
+                                    Content="2"
+                                    Width="45"/>
+
+
+                            <Button Grid.Column="2"
+                                    x:Name="BTN"
+                                    Foreground="White" 
+                                    FontSize="30" 
+                                    Width="45"
+                                    Content="3"/>
+
+
+                            <Button x:Name="ShowOrOpenRightMenu"
+                                    Click="ShowOrOpenRightMenu_Click"
+                                    Foreground="White"
+                                    FontSize="30"
+                                    Content="4"
+                                    Grid.Column="3"
+                                    Width="45"/>
+
+                        </UniformGrid>
+                    </Grid>
+
+
+                    <ListBox Background="#19191D"
+                             BorderThickness="0"
+                             Grid.Row="1"/>
+
+                    <Grid Grid.Row="2" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="1"
+                                 Background="#282E33"
+                                 TextAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 FontSize="20"
+                                 Foreground="White"
+                                 BorderThickness="0"/>
+
+                        <Button Grid.Column="2"
+                                Background="#282E33"
+                                FontSize="30"
+                                Content="6"/>
+
+
+                        <Button Grid.Column="3"
+                                Background="#282E33"
+                                FontSize="30"
+                                Content="7"/>
+
+                    </Grid>
+                </Grid>
+            </Grid >
+        </Grid>
+
+        <Border Margin="-280, 0, 0, 0"
+                Width="280"
+                Height="{Binding ElementName=MainWin, Path=Height}"
+                x:Name="LeftMenu"
+                Background="#282E33">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="130"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Background="#1E0096">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <StackPanel Orientation="Vertical">
+
+                        <Button Height="40"
+                                Content="Создать группу"/>
+
+                        <Button Height="40"
+                                Content="Создать канал"/>
+
+                        <Button Height="40"
+                                Content="Контакты"/>
+
+                        <Button Height="40" 
+                                Content="Звонки"/>
+
+                        <Button Height="40"
+                                Content="Настройки"/>
+
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+        </Border>
+    </Canvas>
+</Window>

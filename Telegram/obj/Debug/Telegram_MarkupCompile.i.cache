@@ -9,12 +9,21 @@ Telegram
 none
 false
 DEBUG;TRACE
+<<<<<<< HEAD
 A:\Visual Studio Projects\Telegram\Telegram\App.xaml
 11151548125
 
 61434861427
 13-1505183044
 MainWindow.xaml;
+=======
+C:\Programming\Study\C#\WPF\TelegramDesktop\Telegram\App.xaml
+1871162140
 
-True
+61527344704
+13-1310406943
+View\MainWindow.xaml;
+>>>>>>> 65c0dca89f7f3cdaaf2954dbf4249bbd518f8ddf
+
+False
 
