@@ -23,11 +23,13 @@ namespace CommonLibrary
             FromUser = user;
             return this;
         }
+
         public ChatMessage SetTo(User user)
         {
             ToUser = user;
             return this;
         }
+
         public ChatMessage SetResendUser(User user)
         {
             ResendUser = user;
