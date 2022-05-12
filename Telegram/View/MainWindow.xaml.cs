@@ -83,7 +83,7 @@ namespace Telegram
         {
             this.Width -= ColumnRightMenu.ActualWidth;
 
-            Spliter.Visibility = Visibility.Collapsed;
+            //Spliter.Visibility = Visibility.Collapsed;
             RightMenu.Visibility = Visibility.Collapsed;
 
 
@@ -93,7 +93,7 @@ namespace Telegram
         public void OpenRightMenu()
         {
             this.Width += 280;
-            Spliter.Visibility = Visibility.Visible;
+            //Spliter.Visibility = Visibility.Visible;
             RightMenu.Visibility = Visibility.Visible;
             RighMenuState = MenuState.Open;
         }

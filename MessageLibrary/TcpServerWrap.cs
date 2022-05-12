@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MessageLibrary
@@ -19,25 +20,40 @@ namespace MessageLibrary
         public event ClientHandler ClientDisconnected;
         public event ServerHandler Disconnected;
         private TcpListener listener;
+        private Thread ListenerThread;
+        public event ClientMessageHandler MessageReceived;
 
-        public void Start(int port)
+
+        public void Start(int port, int backlog)
         {
             if (listener != null)
                 return;
 
+            if (port < 10000 || port > 99999 || backlog <= 0)
+                throw new ArgumentOutOfRangeException("Invalid parameter");
+
+    
+
+
             listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
-            listener.Start(10);
+            listener.Start(backlog);
             Started?.Invoke(this);
 
-            Task.Run(() => {
+
+            ListenerThread = new Thread(() => {
                 do
                 {
                     TcpClient client = listener.AcceptTcpClient();
                     ReceiveAsync(client);
                 } while (true);
             });
+
+            ListenerThread.IsBackground = true;
+            ListenerThread.Start();
+
+
         }
-        public event ClientMessageHandler MessageReceived;
+
         private void Receive(TcpClient client)
         {
             TcpClientWrap user = new TcpClientWrap(client);
@@ -49,10 +65,12 @@ namespace MessageLibrary
                 user.Receive();
             } while (user.Tcp.Client.Available > 0);
         }
+
         private void ReceiveAsync(TcpClient client)
         {
             TcpClientWrap user = new TcpClientWrap(client);
             ClientConnected?.Invoke(user);
+
             user.Disconnected += ClientDisconnected;
             user.MessageReceived += OnMessageReceived;
 
@@ -66,8 +84,13 @@ namespace MessageLibrary
 
         public void Shutdown()
         {
-            Disconnected?.Invoke(this);
-            listener?.Stop();
+
+            if(listener != null)
+            {
+                listener?.Stop();
+                ListenerThread.Abort();
+                Disconnected?.Invoke(this);
+            }            
         }
     }
 }
