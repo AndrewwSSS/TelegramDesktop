@@ -8,7 +8,6 @@
         Title="MainWindow"
         Height="800" Width="1000"
         WindowStyle="None"
-        Background="Transparent"
         AllowsTransparency="True"
         ResizeMode="CanResizeWithGrip"
         x:Name="MainWin"
@@ -336,19 +335,22 @@
                                                 <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
                                                 <RowDefinition Height="Auto"></RowDefinition>
                                             </Grid.RowDefinitions>
+                                            
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="32"></ColumnDefinition>
                                             <ColumnDefinition Width="*"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="1" Margin="0,0,0,5" Text="{Binding ResendUser.Name, StringFormat={}переслано от {0}}" 
-                                                   Foreground="{StaticResource BlueBrush}" FontSize="12" Grid.Row="0">
 
-                                            </TextBlock>
+                                        <TextBlock Grid.Column="1" Margin="0,0,0,5" Text="{Binding ResendUser.Name, StringFormat={}переслано от {0}}" 
+                                                   Foreground="{StaticResource BlueBrush}" FontSize="12" Grid.Row="0"/>
+
+
                                         <StackPanel Grid.Column="1" Grid.Row="1" >
                                                 <TextBlock FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.Name}"></TextBlock>
                                                 <TextBlock FontSize="15" Foreground="{StaticResource GreyBrush}" Text="{Binding Text}"></TextBlock>
                                             </StackPanel>
                                         </Grid>
+
                                     </Border>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding ResendUser}" Value="{x:Null}">

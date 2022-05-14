@@ -11,12 +11,32 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-    
+        private DataBaseContext DbContext;
+
         private TcpServerWrap Server;
         
         public MainWindow()
         {
-      
+            
+            DbContext = new DataBaseContext();
+  
+
+            User newUser = new User()
+            {
+                Name = "Dmitro Osipov",
+                DateRegistration = System.DateTime.Now,
+                Email = "DmitroOsipov@gmail.com",
+                Password = "aboba",
+                ProfileDescription = "Ich bin",
+            };
+
+            DbContext.Users.Add(newUser);
+          
+
+            DbContext.SaveChanges();
+
+           
+
             InitializeComponent();
 
             UsersOnline = new ObservableCollection<User>();
