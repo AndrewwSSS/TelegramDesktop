@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using CommonLibrary;
+using System.Data.Entity;
+using System.Linq;
 
 namespace TelegramServer
 {
@@ -17,25 +19,7 @@ namespace TelegramServer
         
         public MainWindow()
         {
-            
-            DbContext = new DataBaseContext();
-  
-
-            User newUser = new User()
-            {
-                Name = "Dmitro Osipov",
-                DateRegistration = System.DateTime.Now,
-                Email = "DmitroOsipov@gmail.com",
-                Password = "aboba",
-                ProfileDescription = "Ich bin",
-            };
-
-            DbContext.Users.Add(newUser);
-          
-
-            DbContext.SaveChanges();
-
-           
+            Database.SetInitializer<DataBaseContext>(null);
 
             InitializeComponent();
 
@@ -43,8 +27,17 @@ namespace TelegramServer
             UsersOffline = new ObservableCollection<User>();
 
             LB_UsersOffline.ItemsSource = UsersOffline;
-            LB_UsersOnline.ItemsSource = UsersOnline;   
+            LB_UsersOnline.ItemsSource = UsersOnline;
 
+
+            DbContext = new DataBaseContext();
+
+            foreach (var user in DbContext.Users)
+                UsersOffline.Add(user);
+
+
+            LB_UsersOffline.ItemsSource = UsersOffline;
+            LB_UsersOnline.ItemsSource = UsersOnline;
 
             Server = new TcpServerWrap();
 

@@ -2,14 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
 
 namespace CommonLibrary
 {
     [Serializable]
     public class ChatMessage : Message, INotifyPropertyChanged
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
         private string text;
         private bool showAvatar =false;
 
@@ -26,7 +31,9 @@ namespace CommonLibrary
         public User ToUser { get; set; }
         public User ResendUser { get; set; }
         public ChatMessage RespondingTo { get; set; }
+        [Key]
         public List<ImageContainer> Images { get; set; }
+        [Key]
         public List<FileContainer> Files { get; set; }
 
         public ChatMessage(string text)
