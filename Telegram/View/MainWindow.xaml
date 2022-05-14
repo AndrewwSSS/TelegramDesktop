@@ -131,8 +131,8 @@
             </Canvas.Resources>
 
             <Grid x:Name="MainGrid"
-              Width="{Binding ElementName=MainWin, Path=Width, UpdateSourceTrigger=PropertyChanged}"
-              Height="{Binding ElementName=MainWin, Path=Height, UpdateSourceTrigger=PropertyChanged}">
+                  Width="{Binding ElementName=MainWin, Path=Width, UpdateSourceTrigger=PropertyChanged}"
+                  Height="{Binding ElementName=MainWin, Path=Height, UpdateSourceTrigger=PropertyChanged}">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="24"></RowDefinition>
@@ -148,17 +148,17 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.ColumnSpan="5"
-                        x:Name="TopPanel"
-                        Background="#3A4047"
-                        MouseLeftButtonDown="TopPanel_MouseLeftButtonDown_1">
+                            x:Name="TopPanel"
+                            Background="#3A4047"
+                            MouseLeftButtonDown="TopPanel_MouseLeftButtonDown_1">
 
                         <DockPanel>
                             <Button Content="✖"
-                                DockPanel.Dock="Right"
-                                Width="20"
-                                BorderThickness="0"
-                                x:Name="BTNClose"
-                                Click="BTNClose_Click"/>
+                                    DockPanel.Dock="Right"
+                                    Width="20"
+                                    BorderThickness="0"
+                                    x:Name="BTNClose"
+                                    Click="BTNClose_Click"/>
 
                             <Button Content="▭"
                                 DockPanel.Dock="Right"
@@ -250,11 +250,11 @@
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0"
-                          Grid.Column="0"
-                          Margin="3">
+                              Grid.Column="0"
+                              Margin="3">
 
                             <TextBox Margin="2"
-                                 Style="{StaticResource SearchBoxStyle}"/>
+                                     Style="{StaticResource SearchBoxStyle}"/>
                         </Grid>
                     </Grid>
 
@@ -280,46 +280,46 @@
                             <StackPanel Orientation="Vertical" Grid.Column="0">
 
                                 <TextBlock Margin="4"
-                                       Foreground="White"
-                                       x:Name="TBName"/>
+                                           Foreground="White"
+                                           x:Name="TBName"/>
 
                                 <TextBlock Margin="4"
-                                       Foreground="White"
-                                       x:Name="TBDateLeft"/>
+                                           Foreground="White"
+                                           x:Name="TBDateLeft"/>
 
                             </StackPanel>
 
                             <UniformGrid Grid.Column="2" Columns="4">
 
                                 <Button Grid.Column="0"
-                                    Foreground="White"
-                                    FontSize="30"
-                                    Content="1"
-                                    Width="45"/>
+                                        Foreground="White"
+                                        FontSize="30"
+                                        Content="1"
+                                        Width="45"/>
 
 
                                 <Button Grid.Column="1"
-                                    Foreground="White"
-                                    FontSize="30"
-                                    Content="2"
-                                    Width="45"/>
+                                        Foreground="White"
+                                        FontSize="30"
+                                        Content="2"
+                                        Width="45"/>
 
 
                                 <Button Grid.Column="2"
-                                    x:Name="BTN"
-                                    Foreground="White" 
-                                    FontSize="30" 
-                                    Width="45"
-                                    Content="3"/>
+                                        x:Name="BTN"
+                                        Foreground="White" 
+                                        FontSize="30" 
+                                        Width="45"
+                                        Content="3"/>
 
 
                                 <Button x:Name="ShowOrOpenRightMenu"
-                                    Click="ShowOrOpenRightMenu_Click"
-                                    Foreground="White"
-                                    FontSize="30"
-                                    Content="4"
-                                    Grid.Column="3"
-                                    Width="45"/>
+                                        Click="ShowOrOpenRightMenu_Click"
+                                        Foreground="White"
+                                        FontSize="30"
+                                        Content="4"
+                                        Grid.Column="3"
+                                        Width="45"/>
 
                             </UniformGrid>
                         </Grid>

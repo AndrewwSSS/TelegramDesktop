@@ -17,6 +17,7 @@ namespace CommonLibrary
         public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
+
         public List<ChatMessage> Messages 
             => Chats.Select(chat => chat.Messages)
             .Aggregate((x, y) => 
