@@ -3,16 +3,16 @@ using System.IO;
 
 namespace CommonLibrary
 {
-    public class ChatFile
+    public class FileContainer
     {
         public string Name { get; set; }
         public byte[] Data { get; set; }
         
-        public static ChatFile FromFile(string path)
+        public static FileContainer FromFile(string path)
         {
             if (!File.Exists(path))
-                throw new ArgumentException($"Не удалось создать ChatFile: файл {path} не существует");
-            ChatFile result = new ChatFile
+                throw new ArgumentException($"Не удалось создать FileContainer: файл {path} не существует");
+            FileContainer result = new FileContainer
             {
                 Name = Path.GetFileName(path),
                 Data = File.ReadAllBytes(path)

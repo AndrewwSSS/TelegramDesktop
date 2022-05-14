@@ -56,6 +56,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="WPF Entities\AndConverter.cs" />
+    <Compile Include="WPF Entities\IsLastMessageConverter.cs" />
+    <Compile Include="WPF Entities\NotNullConverter.cs" />
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -104,6 +107,12 @@
       <Project>{1FB16189-8D14-4C0C-AF9D-AF26B57E19A0}</Project>
       <Name>MessageLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\darkl1ght.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ivan.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

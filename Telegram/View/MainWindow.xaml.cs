@@ -2,12 +2,17 @@
 using MessageLibrary;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 
 namespace Telegram
 {
@@ -30,20 +35,17 @@ namespace Telegram
         public DoubleAnimation OpenLeftMenuReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.3)));
         public ThicknessAnimation OpenLeftMenuAnimation = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnimation = new ThicknessAnimation();
-        private static readonly User andrey = new User("Andrey Fedorov");
-        private static readonly User ivan = new User("Ivan Dovgolutsky");
+        private static readonly User me = new User("Дмитрий Осипов")
+            .AddImage("Resources/darkl1ght.png");
+        private static readonly User ivan = new User("Иван Довголуцкий")
+            .AddImage("Resources/ivan.jpg");
         public ObservableCollection<ChatMessage> Messages { get; set; } 
-            = new ObservableCollection<ChatMessage>()
-            {
-                new ChatMessage("Damn!").SetFrom(andrey).SetResendUser(ivan),
-                new ChatMessage("Sheesh").SetFrom(andrey)    
-            };
+            
 
         public MainWindow()
         {
             InitializeComponent();
             HideRightMenu();
-
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
@@ -56,16 +58,35 @@ namespace Telegram
             CloseLeftMenuAnimation.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnimation.Duration = TimeSpan.FromMilliseconds(200);
 
-
             client = new TcpClientWrap(IPAddress.Parse("26.246.72.11"), 5000);
-
-
             DataContext = this;
+
+            Messages = new ObservableCollection<ChatMessage>();
+            AddMessage(new ChatMessage("Скоро командный проект").SetFrom(me).SetResendUser(ivan));
+            AddMessage(new ChatMessage("Всем привет, это телеграм").SetFrom(me));
+            AddMessage(new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(Messages[1]));
+            AddMessage(new ChatMessage("тест").SetFrom(me));
+            AddMessage(new ChatMessage("тест").SetFrom(me));
+            AddMessage(new ChatMessage("тест").SetFrom(me));
+            AddMessage(new ChatMessage("тест").SetFrom(me));
         }
 
+        private void AddMessage(ChatMessage msg)
+        {
+            if(Messages.Count != 0 && Messages.Last().FromUser == msg.FromUser)
+            {
+                Messages.Last().ShowAvatar = false;
+                msg.ShowAvatar = true;
+                Messages.Add(msg);
+            }
+            else
+            {
+                msg.ShowAvatar = true;
+                Messages.Add(msg);
+            }
+        }
 
-
-        private void BTNAllScreen_Click(object sender, RoutedEventArgs e)
+        private void BTNFullScreen_Click(object sender, RoutedEventArgs e)
         {
             if (this.WindowState == WindowState.Maximized)
                 this.WindowState = WindowState.Normal;
@@ -138,7 +159,7 @@ namespace Telegram
             MainGrid.BeginAnimation(Border.OpacityProperty, OpenLeftMenuReverse);
         }
 
-        private void Border_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void HideLeftMenu(object sender, MouseButtonEventArgs e)
         {
             if (LeftMenuState == MenuState.Open)
             {
@@ -148,6 +169,9 @@ namespace Telegram
             }
         }
 
+        private void Responce_OnClick(object sender, MouseButtonEventArgs e)
+        {
+        }
     }
 
     

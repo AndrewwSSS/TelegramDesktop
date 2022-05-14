@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
@@ -11,8 +12,8 @@ namespace CommonLibrary
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public List<ImageSource> Images { get; set; }
-        public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0];
+        public List<ImageContainer> Images { get; set; }
+        public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0].ImageSource;
         public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
@@ -28,6 +29,13 @@ namespace CommonLibrary
 
         public User(string name) => Name = name;
         
+        public User AddImage(string path)
+        {
+            if (Images == null)
+                Images = new List<ImageContainer>();
+            Images.Add(ImageContainer.FromFile(path));
+            return this;
+        }
 
     }
 }
