@@ -62,8 +62,8 @@ namespace Telegram
             DataContext = this;
 
             Messages = new ObservableCollection<ChatMessage>();
-            AddMessage(new ChatMessage("Скоро командный проект").SetFrom(me).SetResendUser(ivan));
             AddMessage(new ChatMessage("Всем привет, это телеграм").SetFrom(me));
+            AddMessage(new ChatMessage("Скоро командный проект").SetFrom(me).SetResendUser(ivan));
             AddMessage(new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(Messages[1]));
             AddMessage(new ChatMessage("тест").SetFrom(me));
             AddMessage(new ChatMessage("тест").SetFrom(me));

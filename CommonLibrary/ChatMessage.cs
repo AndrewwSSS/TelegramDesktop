@@ -11,7 +11,7 @@ namespace CommonLibrary
     public class ChatMessage : Message, INotifyPropertyChanged
     {
         private string text;
-        private bool showAvatar =false;
+        private bool showAvatar = false;
 
         public string Text
         {
@@ -28,6 +28,7 @@ namespace CommonLibrary
         public ChatMessage RespondingTo { get; set; }
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
+        public string FormattedTime => Time.ToString("HH:mm");
 
         public ChatMessage(string text)
         {
@@ -68,7 +69,8 @@ namespace CommonLibrary
             return this;
         }
 
-        public bool ShowAvatar { 
+        public bool ShowAvatar
+        {
             get => showAvatar;
             set
             {

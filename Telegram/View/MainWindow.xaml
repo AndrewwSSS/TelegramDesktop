@@ -14,61 +14,19 @@
         ResizeMode="CanResizeWithGrip"
         x:Name="MainWin"
         MinHeight="500" MinWidth="700">
-
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="BrushDictionary.xaml"/>
+                <ResourceDictionary Source="StyleDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
         <Canvas x:Name="MainCanvas" Background="Black">
             <Canvas.Resources>
 
-                <Style TargetType="TextBox" x:Key="SearchBoxStyle">
-                    <Style.Setters>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="TextBox">
-                                    <Border CornerRadius="3" Background="#3D444B">
 
-                                        <TextBox BorderThickness="0"
-                                             Background="Transparent"
-                                             Foreground="White"
-                                             FontSize="20"
-                                             VerticalContentAlignment="Center"
-                                             CaretBrush="White"/>
-
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style.Setters>
-                </Style>
-
-                <Style TargetType="Button">
-                    <Style.Setters>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border  x:Name="border"
-                                         BorderThickness="0">
-
-                                        <TextBlock Text="{TemplateBinding Property=Content}"
-                                               Foreground="White" 
-                                               FontSize="{TemplateBinding FontSize}"
-                                               TextAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                    </Border>
-
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter TargetName="border"
-                                                Property="Background"
-                                                Value="#313B43"/>
-                                        </Trigger>
-
-                                    </ControlTemplate.Triggers>
-
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style.Setters>
-                </Style>
 
 
                 <ControlTemplate TargetType="Button" x:Key="BTNClose">
@@ -123,11 +81,8 @@
                         </Trigger>
                     </ControlTemplate.Triggers>
 
-                </ControlTemplate>
-                <SolidColorBrush x:Key="GreyBrush">#f0f0f0</SolidColorBrush>
-            <SolidColorBrush x:Key="BlueBrush">#50B4FA</SolidColorBrush>
-            <SolidColorBrush x:Key="LightBlueBrush">#72D4FA</SolidColorBrush>
-            <SolidColorBrush x:Key="MsgBgBrush">#285078</SolidColorBrush>
+            </ControlTemplate>
+            
             </Canvas.Resources>
 
             <Grid x:Name="MainGrid"
@@ -239,7 +194,7 @@
                     </StackPanel>
 
                     <Grid Grid.Column="1"
-                      Background="#282E33"
+                      Background="{StaticResource BgBrush}"
                       Grid.RowSpan="2"
                       MinWidth="240"
                       MaxWidth="250">
@@ -325,7 +280,7 @@
                         </Grid>
 
 
-                        <ListBox ItemsSource="{Binding Messages}" Background="#19191D"
+                        <ListBox ItemsSource="{Binding Messages}" Background="{StaticResource DarkBgBrush}"
                              BorderThickness="0"
                              Grid.Row="1"
                              IsHitTestVisible="False">
@@ -435,8 +390,14 @@
                                                     <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Text}"/>
                                                 </StackPanel>
                                             </Grid>
-                                            <StackPanel Grid.Column="1" Grid.Row="3" >
+                                            <StackPanel Grid.Column="1" Grid.Row="3">
+                                                
                                                 <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding Text}"></TextBlock>
+                                                <TextBlock HorizontalAlignment="Right" 
+                                                           Margin="9,0,0,0" 
+                                                           FontSize="12" 
+                                                           Foreground="{StaticResource DarkGreyBrush}" 
+                                                           Text="{Binding FormattedTime}"></TextBlock>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
