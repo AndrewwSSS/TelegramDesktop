@@ -21,8 +21,8 @@ namespace CommonLibrary
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public DateTime RegistrationDate { get; set; }
-        public DateTime LastVisitDate { get; set; }
+        public DateTime RegistrationDate { get; set; } = new DateTime(1970, 1, 1);
+        public DateTime LastVisitDate { get; set; } = new DateTime(1970, 1, 1);
         public List<ImageContainer> Images { get; set; }
         public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }

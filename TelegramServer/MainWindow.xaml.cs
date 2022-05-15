@@ -14,13 +14,13 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-        private DataBaseContext DbContext;
+        private TelegramDb DbContext;
 
         private TcpServerWrap Server;
 
         public MainWindow()
         {
-            Database.SetInitializer<DataBaseContext>(null);
+            
 
             InitializeComponent();
 
@@ -31,10 +31,11 @@ namespace TelegramServer
             LB_UsersOnline.ItemsSource = UsersOnline;
 
 
-            DbContext = new DataBaseContext();
+            DbContext = new TelegramDb();
+            DbContext.Users.Add(new User("Andrey"));
+            DbContext.SaveChanges();
 
 
-            MessageBox.Show(DbContext.Users.Count().ToString());
 
      
 

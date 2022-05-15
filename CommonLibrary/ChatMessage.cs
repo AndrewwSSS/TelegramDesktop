@@ -23,6 +23,7 @@ namespace CommonLibrary
         public ChatMessage RespondingTo { get; set; }
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
+        public string FormattedTime => Time.ToString("HH:mm");
         public bool ShowAvatar
         {
             get => showAvatar;
@@ -45,13 +46,6 @@ namespace CommonLibrary
    
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
-        public User FromUser { get; set; }
-        public User ToUser { get; set; }
-        public User ResendUser { get; set; }
-        public ChatMessage RespondingTo { get; set; }
-        public List<ImageContainer> Images { get; set; }
-        public List<FileContainer> Files { get; set; }
-        public string FormattedTime => Time.ToString("HH:mm");
 
         public ChatMessage(string text)
         {
@@ -91,17 +85,8 @@ namespace CommonLibrary
         }
 
        
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "") {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        public bool ShowAvatar
-        {
-            get => showAvatar;
-            set
-            {
-                showAvatar = value;
-                OnPropertyChanged();
-            }
-        }
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
 
     }
 }
