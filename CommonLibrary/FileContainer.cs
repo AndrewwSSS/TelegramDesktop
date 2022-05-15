@@ -26,6 +26,7 @@ namespace CommonLibrary
             };
             return result;
         }
+
         /// <summary>
         /// Сохраняет этот файл на устройстве
         /// </summary>

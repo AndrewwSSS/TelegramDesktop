@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Windows.Media;
+using MessageLibrary;
 
 namespace CommonLibrary
 {
@@ -15,6 +16,8 @@ namespace CommonLibrary
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
+
+        public string Login { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -24,8 +27,13 @@ namespace CommonLibrary
         public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
+        public bool Banned { get; set; } = false;
+        //public List<KeyValuePair<GroupChat, List<Message>>> MessageQueue { get; set; }
+        public List<ChatMessage> MessagesToSend { get; set; }
 
-        [NotMapped]
+
+
+       [NotMapped]
         public List<ChatMessage> Messages 
             => Chats.Select(chat => chat.Messages)
             .Aggregate((x, y) => 
@@ -38,7 +46,7 @@ namespace CommonLibrary
         public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0].ImageSource;
 
 
-        public bool Banned { get; set; } = false;
+      
 
         public User(string name) => Name = name;
         

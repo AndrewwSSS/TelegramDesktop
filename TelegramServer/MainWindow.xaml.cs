@@ -4,6 +4,7 @@ using System.Windows;
 using CommonLibrary;
 using System.Data.Entity;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TelegramServer
 {
@@ -16,7 +17,7 @@ namespace TelegramServer
         private DataBaseContext DbContext;
 
         private TcpServerWrap Server;
-        
+
         public MainWindow()
         {
             Database.SetInitializer<DataBaseContext>(null);
@@ -32,18 +33,27 @@ namespace TelegramServer
 
             DbContext = new DataBaseContext();
 
-            foreach (var user in DbContext.Users)
-                UsersOffline.Add(user);
+
+            MessageBox.Show(DbContext.Users.Count().ToString());
+
+     
+
+            //foreach (var item in DbContext.Users)
+            //{
+            //    UsersOffline.Add(item);
+            //}
+
+            //LB_UsersOnline.ItemsSource = DbContext.Users.First().MessagesToSend;
 
 
-            LB_UsersOffline.ItemsSource = UsersOffline;
-            LB_UsersOnline.ItemsSource = UsersOnline;
+            //LB_UsersOffline.ItemsSource = UsersOffline;
+            ////LB_UsersOnline.ItemsSource = UsersOnline;
 
-            Server = new TcpServerWrap();
+            //Server = new TcpServerWrap();
 
-            Server.Started += OnServerStarted;
-            Server.Stopped += OnServerStopped;
-            Server.MessageReceived += ClientMessageRecived;
+            //Server.Started += OnServerStarted;
+            //Server.Stopped += OnServerStopped;
+            //Server.MessageReceived += ClientMessageRecived;
 
         }
 

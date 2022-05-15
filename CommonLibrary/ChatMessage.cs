@@ -11,13 +11,27 @@ namespace CommonLibrary
     [Serializable]
     public class ChatMessage : Message, INotifyPropertyChanged
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         private string text;
         private bool showAvatar =false;
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; private set; }
+        public User FromUser { get; set; }
+        public User ToUser { get; set; }
+        public User ResendUser { get; set; }
+        public ChatMessage RespondingTo { get; set; }
+        public List<ImageContainer> Images { get; set; }
+        public List<FileContainer> Files { get; set; }
+        public bool ShowAvatar
+        {
+            get => showAvatar;
+            set
+            {
+                showAvatar = value;
+                OnPropertyChanged();
+            }
+        }
         public string Text
         {
             get => text;
@@ -27,28 +41,16 @@ namespace CommonLibrary
                 OnPropertyChanged();
             }
         }
-        public User FromUser { get; set; }
-        public User ToUser { get; set; }
-        public User ResendUser { get; set; }
-        public ChatMessage RespondingTo { get; set; }
-        [Key]
-        public List<ImageContainer> Images { get; set; }
-        [Key]
-        public List<FileContainer> Files { get; set; }
+        public GroupChat Chat { get; set; }
+   
+        [field: NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ChatMessage(string text)
         {
 
             Text = text;
             Type = MessageType.Custom;
-        }
-
-        [field: NonSerialized]
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public ChatMessage SetFrom(User user)
@@ -75,13 +77,15 @@ namespace CommonLibrary
             return this;
         }
 
-        public bool ShowAvatar { 
-            get => showAvatar;
-            set
-            {
-                showAvatar = value;
-                OnPropertyChanged();
-            }
+        public ChatMessage SetGroupChat(GroupChat gchat)
+        {
+            Chat = gchat;
+            return this;
+        }
+
+       
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "") {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
     }

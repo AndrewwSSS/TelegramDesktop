@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
 using CommonLibrary;
 
-namespace TelegramServer
+namespace Server
 {
     public class DataBaseContext : DbContext
     {

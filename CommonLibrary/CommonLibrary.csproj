@@ -45,10 +45,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthenticationResult.cs" />
+    <Compile Include="DictionaryWrap.cs" />
     <Compile Include="FileContainer.cs" />
     <Compile Include="ChatMessage.cs" />
     <Compile Include="GroupChat.cs" />
     <Compile Include="ImageContainer.cs" />
+    <Compile Include="LoginMessage.cs" />
+    <Compile Include="LoginResultMessage.cs" />
+    <Compile Include="SignUpResultMessage.cs" />
+    <Compile Include="SignUpMessage.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

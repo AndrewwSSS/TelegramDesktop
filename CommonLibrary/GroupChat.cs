@@ -15,7 +15,7 @@ namespace CommonLibrary
     [Serializable]
     public class GroupChat
     {
-       
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
@@ -25,7 +25,7 @@ namespace CommonLibrary
         public DateTime DateCreated { get; set; }
 
 
-        [Key]
+
         public List<ImageContainer> Images { get; set; }
         public List<ChatMessage> Messages { get; set; }
         public List<User> Members { get; set; }
