@@ -16,21 +16,22 @@ namespace CommonLibrary
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-
         public string Login { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public DateTime RegistrationDate { get; set; } = new DateTime(1970, 1, 1);
-        public DateTime LastVisitDate { get; set; } = new DateTime(1970, 1, 1);
+        public DateTime RegistrationDate { get; set; }
+        public DateTime LastVisitDate { get; set; } 
         public List<ImageContainer> Images { get; set; }
         public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
         public bool Banned { get; set; } = false;
-        //public List<KeyValuePair<GroupChat, List<Message>>> MessageQueue { get; set; }
         public List<ChatMessage> MessagesToSend { get; set; }
 
+
+        [NotMapped]
+        public TcpClientWrap client { get; set; }
 
 
        [NotMapped]
