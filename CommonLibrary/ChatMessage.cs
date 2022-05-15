@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
 
 namespace CommonLibrary
 {
@@ -13,6 +14,24 @@ namespace CommonLibrary
         private string text;
         private bool showAvatar = false;
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; private set; }
+        public User FromUser { get; set; }
+        public User ToUser { get; set; }
+        public User ResendUser { get; set; }
+        public ChatMessage RespondingTo { get; set; }
+        public List<ImageContainer> Images { get; set; }
+        public List<FileContainer> Files { get; set; }
+        public bool ShowAvatar
+        {
+            get => showAvatar;
+            set
+            {
+                showAvatar = value;
+                OnPropertyChanged();
+            }
+        }
         public string Text
         {
             get => text;
@@ -22,6 +41,10 @@ namespace CommonLibrary
                 OnPropertyChanged();
             }
         }
+        public GroupChat Chat { get; set; }
+   
+        [field: NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
         public User FromUser { get; set; }
         public User ToUser { get; set; }
         public User ResendUser { get; set; }
@@ -35,14 +58,6 @@ namespace CommonLibrary
 
             Text = text;
             Type = MessageType.Custom;
-        }
-
-        [field: NonSerialized]
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public ChatMessage SetFrom(User user)
@@ -69,6 +84,15 @@ namespace CommonLibrary
             return this;
         }
 
+        public ChatMessage SetGroupChat(GroupChat gchat)
+        {
+            Chat = gchat;
+            return this;
+        }
+
+       
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "") {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         public bool ShowAvatar
         {
             get => showAvatar;

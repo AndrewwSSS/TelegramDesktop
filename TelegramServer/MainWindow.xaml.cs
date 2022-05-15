@@ -2,6 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using CommonLibrary;
+using System.Data.Entity;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace TelegramServer
 {
@@ -11,26 +14,46 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-    
+        private DataBaseContext DbContext;
+
         private TcpServerWrap Server;
-        
+
         public MainWindow()
         {
-      
+            Database.SetInitializer<DataBaseContext>(null);
+
             InitializeComponent();
 
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
 
             LB_UsersOffline.ItemsSource = UsersOffline;
-            LB_UsersOnline.ItemsSource = UsersOnline;   
+            LB_UsersOnline.ItemsSource = UsersOnline;
 
 
-            Server = new TcpServerWrap();
+            DbContext = new DataBaseContext();
 
-            Server.Started += OnServerStarted;
-            Server.Stopped += OnServerStopped;
-            Server.MessageReceived += ClientMessageRecived;
+
+            MessageBox.Show(DbContext.Users.Count().ToString());
+
+     
+
+            //foreach (var item in DbContext.Users)
+            //{
+            //    UsersOffline.Add(item);
+            //}
+
+            //LB_UsersOnline.ItemsSource = DbContext.Users.First().MessagesToSend;
+
+
+            //LB_UsersOffline.ItemsSource = UsersOffline;
+            ////LB_UsersOnline.ItemsSource = UsersOnline;
+
+            //Server = new TcpServerWrap();
+
+            //Server.Started += OnServerStarted;
+            //Server.Stopped += OnServerStopped;
+            //Server.MessageReceived += ClientMessageRecived;
 
         }
 

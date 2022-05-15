@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -16,9 +15,15 @@ namespace CommonLibrary
     [Serializable]
     public class ImageContainer : INotifyPropertyChanged
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; private set; }
 
+
+        private byte[] data;
 
         public string Name { get; set; }
+
         public byte[] Data
         {
             get => data;
@@ -36,31 +41,8 @@ namespace CommonLibrary
                 ".jpg",
                 ".jpeg"
             };
-        private byte[] data;
-        public static string GetImageFormat(Image img)
-        {
-            if (img.RawFormat.Equals(ImageFormat.Jpeg))
-                return ".jpeg";
-            if (img.RawFormat.Equals(ImageFormat.Bmp))
-                return ".bmp";
-            if (img.RawFormat.Equals(ImageFormat.Png))
-                return ".png";
-            if (img.RawFormat.Equals(ImageFormat.Emf))
-                return ".emf";
-            if (img.RawFormat.Equals(ImageFormat.Exif))
-                return ".exif";
-            if (img.RawFormat.Equals(ImageFormat.Gif))
-                return ".gif";
-            if (img.RawFormat.Equals(ImageFormat.Icon))
-                return ".ico";
-            if (img.RawFormat.Equals(ImageFormat.MemoryBmp))
-                return ".bmp";
-            if (img.RawFormat.Equals(ImageFormat.Tiff))
-                return ".tiff";
-            else
-                return ".wmf";
-        }
 
+        [NotMapped]
         public ImageSource ImageSource
         {
             get
@@ -73,6 +55,8 @@ namespace CommonLibrary
                 return image;
             }
         }
+
+
         public static ImageContainer FromImage(Image img)
         {
             ImageContainer result = new ImageContainer();
@@ -99,6 +83,31 @@ namespace CommonLibrary
             };
             return result;
         }
+
+        public static string GetImageFormat(Image img)
+        {
+            if (img.RawFormat.Equals(ImageFormat.Jpeg))
+                return ".jpeg";
+            if (img.RawFormat.Equals(ImageFormat.Bmp))
+                return ".bmp";
+            if (img.RawFormat.Equals(ImageFormat.Png))
+                return ".png";
+            if (img.RawFormat.Equals(ImageFormat.Emf))
+                return ".emf";
+            if (img.RawFormat.Equals(ImageFormat.Exif))
+                return ".exif";
+            if (img.RawFormat.Equals(ImageFormat.Gif))
+                return ".gif";
+            if (img.RawFormat.Equals(ImageFormat.Icon))
+                return ".ico";
+            if (img.RawFormat.Equals(ImageFormat.MemoryBmp))
+                return ".bmp";
+            if (img.RawFormat.Equals(ImageFormat.Tiff))
+                return ".tiff";
+            else
+                return ".wmf";
+        }
+
         /// <summary>
         /// Сохраняет этот файл на устройстве
         /// </summary>

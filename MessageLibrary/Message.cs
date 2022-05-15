@@ -51,7 +51,7 @@ namespace MessageLibrary
                 Buffer = new byte[8192],
                 Socket = socket
             };
-            socket.BeginReceive(stateObject.Buffer, 0, StateObject.BufferSize, SocketFlags.None, cb, stateObject);
+            socket.BeginReceive(stateObject.Buffer, 0, StateObject.ConstBufferSize, SocketFlags.None, cb, stateObject);
         }
 
         public static Message FromNetworkStream(NetworkStream stream) => bf.Deserialize(stream) as Message;

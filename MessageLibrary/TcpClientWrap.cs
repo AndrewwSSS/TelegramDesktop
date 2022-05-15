@@ -171,13 +171,13 @@ namespace MessageLibrary
                     {
                         MemoryStream ms = new MemoryStream();
 
-                        byte[] tmp = new byte[StateObject.BufferSize];
-                        ms.Write(state.Buffer, 0, state.Buffer.Length);
+                        byte[] tmp = new byte[StateObject.ConstBufferSize];
+                        ms.Write(state.Buffer, 0, state.CurrentBufferSize);
 
 
                         do
                         {
-                            int br = socket.Receive(tmp, StateObject.BufferSize, 0);
+                            int br = socket.Receive(tmp, state.CurrentBufferSize, 0);
 
                             if (br == 0)
                                 continue;
@@ -186,7 +186,7 @@ namespace MessageLibrary
 
                         } while(socket.Available > 0);
 
-                        state.Buffer = ms.ToArray();
+                        state.SetBuffer(ms.ToArray());
 
                     }
 
@@ -194,7 +194,7 @@ namespace MessageLibrary
                     MessageReceived?.Invoke(this, msg);
                     
 
-                    socket.BeginReceive(state.Buffer, 0, StateObject.BufferSize, SocketFlags.None, ReceiveCB, state);
+                    socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
                 }
             }
             catch (Exception)
@@ -203,8 +203,6 @@ namespace MessageLibrary
                 Console.WriteLine("TcpClientWrap.Receive: SOCKET EXCEPTION");
                 return;
             }
-            
-            //array = new byte[8192];
         }
     }
 }

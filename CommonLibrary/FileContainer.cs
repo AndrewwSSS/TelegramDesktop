@@ -1,10 +1,17 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 
 namespace CommonLibrary
 {
+    [Serializable]
     public class FileContainer
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; private set; }
+
         public string Name { get; set; }
         public byte[] Data { get; set; }
         
@@ -19,6 +26,7 @@ namespace CommonLibrary
             };
             return result;
         }
+
         /// <summary>
         /// Сохраняет этот файл на устройстве
         /// </summary>
