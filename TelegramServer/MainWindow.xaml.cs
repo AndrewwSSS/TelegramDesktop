@@ -136,7 +136,7 @@ namespace TelegramServer
                         {
                             ResultMessage.Email = user.Email;
                         }
-                        ResultMessage.DateRegistration = user.RegistrationDate;
+                        ResultMessage.RegistrationDate = user.RegistrationDate;
 
                         client.SendAsync(ResultMessage);
                         
