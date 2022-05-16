@@ -1,13 +1,23 @@
 ﻿using System;
-
+using System.Collections.Generic;
 
 namespace CommonLibrary
 {
     [Serializable]
-    public class PublicGroupInfo
+    public class PublicGroupInfo : UserEntity
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int GroupId { get; set; }
+        public int Id { get; set; }
+        public List<PublicUserInfo> Users { get; set; }
+
+        public PublicGroupInfo(string Name, string Description, int Id)
+        {
+            this.Name = Name;
+            this.Description = Description;
+            this.Id = Id;
+
+            Users = new List<PublicUserInfo>();
+        }
+
+
     }
 }

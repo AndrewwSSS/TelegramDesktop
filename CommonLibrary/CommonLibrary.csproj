@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="AuthenticationResult.cs" />
     <Compile Include="DictionaryWrap.cs" />
+    <Compile Include="PublicUserInfo.cs" />
     <Compile Include="UserEntity.cs" />
     <Compile Include="FileContainer.cs" />
     <Compile Include="ChatMessage.cs" />
