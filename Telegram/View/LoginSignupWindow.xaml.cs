@@ -1,5 +1,6 @@
 ﻿using CommonLibrary;
 using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
 using System.Collections.Generic;
@@ -63,8 +64,9 @@ namespace Telegram.View
                    email = TB_SignUp_Email.Text,
                    name = TB_SignUp_UserName.Text;
 
-                        var me = new User()
+                        var me = new User(result.Id)
                         {
+                            
                             Email = email,
                             Name = name,
                             Password = password,
