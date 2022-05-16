@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MessageLibrary;
 
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages.Auth
 {
     [Serializable]
     public class SignUpMessage : Message

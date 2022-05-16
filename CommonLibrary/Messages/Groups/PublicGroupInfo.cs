@@ -1,7 +1,8 @@
-﻿using System;
+﻿using CommonLibrary.Messages.Users;
+using System;
 using System.Collections.Generic;
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
     public class PublicGroupInfo : UserEntity

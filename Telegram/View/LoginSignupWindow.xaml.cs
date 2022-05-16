@@ -1,4 +1,5 @@
 ﻿using CommonLibrary;
+using CommonLibrary.Messages.Auth;
 using MessageLibrary;
 using System;
 using System.Collections.Generic;
@@ -62,14 +63,15 @@ namespace Telegram.View
                    email = TB_SignUp_Email.Text,
                    name = TB_SignUp_UserName.Text;
 
-                        var me = new User("Дмитрий Осипов")
+                        var me = new User()
                         {
                             Email = email,
                             Name = name,
                             Password = password,
                             Login = login,
                             RegistrationDate = result.RegistrationDate
-                        }.AddImage("Resources/darkl1ght.png");
+                        };
+                        me.AddImage("Resources/darkl1ght.png");
                         wnd = new MainWindow(client, me);
                         wnd.Show();
                         Close();
@@ -96,7 +98,8 @@ namespace Telegram.View
                             Password = password,
                             Login = login,
                             RegistrationDate = result.RegistrationDate
-                        }.AddImage("Resources/darkl1ght.png");
+                        };
+                        me.AddImage("Resources/darkl1ght.png");
                         wnd = new MainWindow(client, me);
                         wnd.Show();
                         Close();

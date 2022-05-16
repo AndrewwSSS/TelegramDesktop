@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 
-namespace CommonLibrary
+namespace CommonLibrary.Containers
 {
     [Serializable]
     public class FileContainer
@@ -14,7 +14,7 @@ namespace CommonLibrary
 
         public string Name { get; set; }
         public byte[] Data { get; set; }
-        
+
         public static FileContainer FromFile(string path)
         {
             if (!File.Exists(path))

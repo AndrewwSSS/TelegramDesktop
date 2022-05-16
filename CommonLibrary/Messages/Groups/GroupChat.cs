@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CommonLibrary.Messages.Users;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Windows.Media;
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages.Groups
 {
     public enum GroupType
     {

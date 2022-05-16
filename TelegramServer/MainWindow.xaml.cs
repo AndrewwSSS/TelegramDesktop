@@ -1,14 +1,14 @@
 ﻿using MessageLibrary;
 using System.Collections.ObjectModel;
 using System.Windows;
-using CommonLibrary;
 using System.Data.Entity;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using CommonLibrary.Entitites;
-using CommonLibrary.Entitites.Messages;
-
+using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.Users;
+using CommonLibrary.Messages;
 
 namespace TelegramServer
 {
@@ -44,14 +44,9 @@ namespace TelegramServer
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
             Server.MessageReceived += ClientMessageRecived;
-            Server.ClientDisconnected += OnClientDisconnected;
   
         }
 
-        private void OnClientDisconnected(TcpClientWrap client)
-        {
-            //todo
-        }
 
         private void BtnStartServer_Click(object sender, RoutedEventArgs e)
         {
@@ -88,7 +83,7 @@ namespace TelegramServer
                 {
                     SignUpMessage signUpMessage = (SignUpMessage)msg;
                     
-                    if(DbContext.Users.Any(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login))
+                    if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
                     {
                         User NewUser = new User()
                         {
@@ -101,6 +96,7 @@ namespace TelegramServer
                         };
 
                         DbContext.Users.Add(NewUser);
+                        Dispatcher.Invoke(() => UsersOnline.Add(NewUser));
                         DbContext.SaveChanges();
 
                         SignUpResultMessage ResultMessage
@@ -128,7 +124,7 @@ namespace TelegramServer
                     if(user != null && user.Password == loginMessage.Password)
                     {
                       
-                       
+                        user.client = client;
                         LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
 
                         if (user.Login == loginMessage.Login)
@@ -141,10 +137,6 @@ namespace TelegramServer
 
                         client.SendAsync(ResultMessage);
 
-                        user.client = client;
-                        user.isOnline = true;
-                        DbContext.SaveChanges();
-
                         Dispatcher.Invoke(() =>
                         {
                             UsersOffline.Remove(user);
@@ -154,8 +146,8 @@ namespace TelegramServer
 
                         if(user.MessagesToSend != null && user.MessagesToSend.Count > 0)
                         {
-                            ArrayMessage<Message> Messages
-                                    = new ArrayMessage<Message>(user.MessagesToSend);
+                            ArrayMessage<ChatMessage> Messages
+                                    = new ArrayMessage<ChatMessage>(user.MessagesToSend);
 
                             client.SendAsync(Messages);
 
@@ -235,87 +227,37 @@ namespace TelegramServer
                 }
                 case "CreateNewGroupMessage":
                 {
-                    CreateNewGroupMessage createNewGroupMessage = (CreateNewGroupMessage)msg;
-                    GroupChat NewGroupChat;
-                    List<User> Members = null;
-                    User GroupCreator = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
+                    CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
+                    GroupChat chat;
 
-                    if (GroupCreator == null)
+                    if(createNewGroupMessage.MembersId != null)
                     {
-                        MessageBox.Show("Group creator not found");
-                        break;
-                    }
+                        List<User> Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Any(m => m == u.Id)).ToList();
+                        User GroupCreator = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
 
-                    // если есть пользователи котрых добавили в группу
-                    if (createNewGroupMessage.MembersId != null)
-                    {
-                        Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Any(m => m == u.Id)).ToList();
+                        if(GroupCreator == null)
+                        {
+                            break;
+                            //TODO  
+                        }
 
                         if(Members.Count > 0 )
                         {
                             if(Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id)))
                             {
-                                CreateNewGroupResultMessage ResultMessage
-                                        = new CreateNewGroupResultMessage(AuthenticationResult.Denied, "One or more users in list blocked you");
-                                client.SendAsync(ResultMessage);
-                                break;
+
                             }
-
-
-
                         }
+                        
+
                     }
-
-                    NewGroupChat = new GroupChat();
-                    NewGroupChat.Name = createNewGroupMessage.Name;
-
-                    if(createNewGroupMessage.Image != null)
-                    {
-                        NewGroupChat.Images = new List<ImageContainer>();
-                        NewGroupChat.Images.Add(createNewGroupMessage.Image);
-                    }
-
-                    DbContext.GroupChats.Add(NewGroupChat);
-                    DbContext.SaveChanges();
-
-
-                    if(Members == null)
-                    {
-                        CreateNewGroupResultMessage ResultMessage =
-                                new CreateNewGroupResultMessage(AuthenticationResult.Success, NewGroupChat.Id);
-                        client.SendAsync(ResultMessage);
-                    }
-                    else
-                    {
-                   
-                        NewGroupChat.Members = new List<User>();
-                        NewGroupChat.Members.AddRange(Members);
-
-                         List<PublicUserInfo> PublicUsersInfo = new List<PublicUserInfo>();
-
-                        foreach (var member in Members)
-                        {
-                            if(member.Chats == null)
-                                    member.Chats = new List<GroupChat>(); 
-
-                            member.Chats.Add(NewGroupChat);
-
-                            PublicUsersInfo.Add(
-                                new PublicUserInfo(member.Name, member.Description, member.Id, member.LastVisitDate));
-
-                        }
-                        DbContext.SaveChanges();
-
-                        PublicGroupInfo GroupInfo
-                                = new PublicGroupInfo(NewGroupChat.Name, NewGroupChat.Description, NewGroupChat.Id);
-
-                        GroupInfo.Users = PublicUsersInfo;
-
-                        SendMessageToUsers(new AddtingInGroupMessage(GroupInfo), Members);
-
                     
 
-                    }
+                    
+                    
+
+
+
 
                     break;
                 }
@@ -326,21 +268,6 @@ namespace TelegramServer
 
             }
 
-        }
-
-        private void SendMessageToUsers(Message Message, List<User> UsersToSend)
-        {
-            if(Message == null || UsersToSend == null)
-                return;
-
-            foreach(var user in UsersToSend)
-            {
-                if (user.isOnline)
-                    user.client.SendAsync(Message);
-                else
-                    if(user.MessagesToSend != null)
-                        user.MessagesToSend.Add(Message);
-            }
         }
 
     }

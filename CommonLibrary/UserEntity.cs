@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonLibrary.Containers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace CommonLibrary
 
         public virtual void AddImage(string path)
         {
-                if (Images == null)
-                    Images = new List<ImageContainer>();
-                Images.Add(ImageContainer.FromFile(path));
+            if (Images == null)
+                Images = new List<ImageContainer>();
+            Images.Add(ImageContainer.FromFile(path));
         }
     }
 }

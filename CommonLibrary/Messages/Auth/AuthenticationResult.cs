@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages.Auth
 {
     public enum AuthenticationResult
     {

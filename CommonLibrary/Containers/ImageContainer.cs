@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace CommonLibrary
+namespace CommonLibrary.Containers
 {
     [Serializable]
     public class ImageContainer : INotifyPropertyChanged

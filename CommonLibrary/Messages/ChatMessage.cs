@@ -1,4 +1,7 @@
-﻿using MessageLibrary;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.Users;
+using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,13 +9,13 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages
 {
     [Serializable]
     public class ChatMessage : Message
     {
         private string text;
-       
+
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,7 +26,7 @@ namespace CommonLibrary
         public ChatMessage RespondingTo { get; set; }
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
-        
+
         public string Text
         {
             get => text;
@@ -33,7 +36,7 @@ namespace CommonLibrary
             }
         }
         public GroupChat Chat { get; set; }
-   
+
         public ChatMessage(string text)
         {
 
@@ -72,7 +75,7 @@ namespace CommonLibrary
         }
 
 
-        
+
 
     }
 }

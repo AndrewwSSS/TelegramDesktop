@@ -22,7 +22,8 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-
+    <Grid>
+        
         <Canvas x:Name="MainCanvas" Background="Black">
             <Canvas.Resources>
 
@@ -139,7 +140,7 @@
                 </Grid>
 
                 <Grid Grid.Row="1"
-                  PreviewMouseDown="HideLeftMenu">
+                  PreviewMouseDown="HideMenus">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="70" x:Name="ColumnLeftPanel"/>
                         <ColumnDefinition Width="Auto"/>
@@ -208,9 +209,19 @@
                               Grid.Column="0"
                               Margin="3">
 
-                            <TextBox Margin="2"
+                            <TextBox KeyDown="TB_GroupLookUp_OnEnter" Margin="2"
                                      Style="{StaticResource SearchBoxStyle}"/>
                         </Grid>
+                    <Viewbox Grid.Row="1" Margin="15">
+                        
+                    <TextBlock 
+                                x:Name="TB_GroupsNotFound"   
+                                   Foreground="{StaticResource GreyBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                               TextWrapping="Wrap">
+                        Введите название группы сверху
+                    </TextBlock>
+                    </Viewbox>
                     </Grid>
 
                     <Grid Grid.Column="2"
@@ -459,10 +470,11 @@
                 </Grid >
             </Grid>
 
-            <Border Margin="-280, 0, 0, 0"
+            <Border x:Name="LeftMenu"
+                Margin="-280, 0, 0, 0"
                 Width="280"
                 Height="{Binding ElementName=MainWin, Path=Height}"
-                x:Name="LeftMenu"
+                
                 Background="#282E33">
 
                 <Grid>
@@ -483,10 +495,10 @@
                         <StackPanel Orientation="Vertical">
 
                             <Button Height="40"
-                                Content="Создать группу"/>
+                                Content="Создать группу" Click="B_AddGroupMenu_OnClick"/>
 
                             <Button Height="40"
-                                Content="Создать канал"/>
+                                Content="Создать канал" Click="B_AddGroupMenu_OnClick"/>
 
                             <Button Height="40"
                                 Content="Контакты"/>
@@ -502,5 +514,29 @@
                 </Grid>
 
             </Border>
+
+            
         </Canvas>
+
+        <Grid>
+            <Border x:Name="AddGroupMenu"
+                    Opacity="0"
+                CornerRadius="5"
+                        Background="{StaticResource BgBrush}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Margin="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Имя группы</TextBlock>
+                        <TextBox Width="250" Style="{StaticResource TBInput}"
+                                 TextChanged="TB_GroupName_TextChanged"></TextBox>
+                        <Button x:Name="AddGroupButton" IsEnabled="False" Margin="4,0" Style="{StaticResource BLight}" Height="50" Click="B_AddGroup_OnClick">Создать группу</Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
 </Window>
