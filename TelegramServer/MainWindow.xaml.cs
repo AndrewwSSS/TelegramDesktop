@@ -32,7 +32,6 @@ namespace TelegramServer
 
 
             DbContext = new TelegramDb();
-            DbContext.Users.Add(new User("Andrey"));
             DbContext.SaveChanges();
 
 

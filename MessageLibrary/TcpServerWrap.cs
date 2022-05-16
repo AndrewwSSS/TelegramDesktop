@@ -18,7 +18,7 @@ namespace MessageLibrary
         private TcpListener listener;
         private Thread ListenerThread;
         public event ClientMessageHandler MessageReceived;
-
+        public event ClientMessageHandler MessageSent;
 
         public void Start(int port, int backlog)
         {
@@ -55,7 +55,7 @@ namespace MessageLibrary
             ClientConnected?.Invoke(client);
             client.Disconnected += ClientDisconnected;
             client.MessageReceived += OnMessageReceived;
-
+            client.MessageSent += MessageSent;
             do
             {
                 client.Receive();

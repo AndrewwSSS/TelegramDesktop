@@ -26,10 +26,20 @@ namespace MessageLibrary
             client.Tcp.Client.Send(buf, 0, buf.Length, SocketFlags.None);
         }
 
+
         public void SendTo(Socket socket)
         {
             byte[] buf = ToByteArray();
             socket.Send(buf, 0, buf.Length, SocketFlags.None);
+        }
+        public void SendToAsync(TcpClientWrap client, AsyncCallback cb)
+        {
+            StateObject stateObject = new StateObject
+            {
+                Buffer = ToByteArray(),
+                Socket = client.Tcp.Client
+            };
+            stateObject.Socket.BeginSend(stateObject.Buffer, 0, stateObject.Buffer.Length, SocketFlags.None, cb, stateObject);
         }
 
         public void SendToAsync(Socket socket, AsyncCallback cb)

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32421.90
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegram", "Telegram\Telegram.csproj", "{413728DE-B104-49F4-AF68-14C8E4442D1A}"
 EndProject
@@ -10,8 +10,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramServer", "TelegramServer\TelegramServer.csproj", "{789F517D-E07E-48D7-8774-9CCC7208D0D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLibrary", "CommonLibrary\CommonLibrary.csproj", "{9A350A63-4C66-42FE-A318-FB4FAEB330C9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{7AFBCEE9-620D-4EFD-AAEE-0BC3B25B1770}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{9A350A63-4C66-42FE-A318-FB4FAEB330C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A350A63-4C66-42FE-A318-FB4FAEB330C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A350A63-4C66-42FE-A318-FB4FAEB330C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AFBCEE9-620D-4EFD-AAEE-0BC3B25B1770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AFBCEE9-620D-4EFD-AAEE-0BC3B25B1770}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AFBCEE9-620D-4EFD-AAEE-0BC3B25B1770}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AFBCEE9-620D-4EFD-AAEE-0BC3B25B1770}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -53,6 +53,7 @@
     <Compile Include="ImageContainer.cs" />
     <Compile Include="LoginMessage.cs" />
     <Compile Include="LoginResultMessage.cs" />
+    <Compile Include="MessageItemWrap.cs" />
     <Compile Include="SignUpResultMessage.cs" />
     <Compile Include="SignUpMessage.cs" />
     <Compile Include="User.cs" />

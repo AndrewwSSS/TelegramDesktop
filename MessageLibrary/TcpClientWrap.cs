@@ -19,7 +19,7 @@ namespace MessageLibrary
         public event ClientHandler Disconnected;
 
         public event ClientMessageHandler MessageReceived;
-        public event Action<Message> MessageSent;
+        public event ClientMessageHandler MessageSent;
 
         public TcpClientWrap(IPAddress ip, int port)
         {
@@ -109,7 +109,7 @@ namespace MessageLibrary
             if (client != null && client.Connected)
             {
                 message.StreamTo(client.GetStream());
-                MessageSent?.Invoke(message);
+                MessageSent?.Invoke(this, message);
                 return true;
             }
             return false;
@@ -131,7 +131,7 @@ namespace MessageLibrary
             StateObject state = (StateObject)ar.AsyncState;
             state.Socket.EndSend(ar);
 
-            MessageSent?.Invoke(Message.FromByteArray(state.Buffer));
+            MessageSent?.Invoke(this, Message.FromByteArray(state.Buffer));
         }
 
         public Message Receive()

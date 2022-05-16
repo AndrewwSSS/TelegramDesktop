@@ -9,10 +9,10 @@ using System.Runtime.CompilerServices;
 namespace CommonLibrary
 {
     [Serializable]
-    public class ChatMessage : Message, INotifyPropertyChanged
+    public class ChatMessage : Message
     {
         private string text;
-        private bool showAvatar = false;
+       
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,30 +23,17 @@ namespace CommonLibrary
         public ChatMessage RespondingTo { get; set; }
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
-        public string FormattedTime => Time.ToString("HH:mm");
-        public bool ShowAvatar
-        {
-            get => showAvatar;
-            set
-            {
-                showAvatar = value;
-                OnPropertyChanged();
-            }
-        }
+        
         public string Text
         {
             get => text;
             set
             {
                 text = value;
-                OnPropertyChanged();
             }
         }
         public GroupChat Chat { get; set; }
    
-        [field: NonSerialized]
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public ChatMessage(string text)
         {
 
@@ -84,9 +71,8 @@ namespace CommonLibrary
             return this;
         }
 
-       
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        
 
     }
 }

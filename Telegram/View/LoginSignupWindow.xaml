@@ -16,6 +16,7 @@
     </Window.Resources>
     <Grid Background="{StaticResource DarkBgBrush}">
         <TabControl 
+            x:Name="tabControl"
             BorderThickness="0"
             Background="{StaticResource BgBrush}"
             Width="Auto" Height="Auto" 
@@ -25,13 +26,13 @@
                 <StackPanel Margin="6">
                     <StackPanel Margin="4">
                         <TextBlock Foreground="{StaticResource GreyBrush}">Электронная почта</TextBlock>
-                        <TextBox x:Name="TB_Login_Textbox" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
+                        <TextBox x:Name="TB_Login_Email" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
                     </StackPanel>
                     <StackPanel Margin="4">
                         <TextBlock Foreground="{StaticResource GreyBrush}">Пароль</TextBlock>
                         <TextBox x:Name="TB_Login_Password" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
                     </StackPanel>
-                    <Button Margin="0, 6"  Width="200" Height="40" x:Name="ButtonLoginSend">Войти</Button>
+                    <Button  Style="{StaticResource BLight}" Margin="0, 6"  Width="200" Height="40" x:Name="ButtonLoginSend" Click="ButtonLoginSend_Click">Войти</Button>
 
                 </StackPanel>
             </TabItem>
@@ -47,14 +48,14 @@
                     </StackPanel>
                     <StackPanel Margin="4">
                         <TextBlock Foreground="{StaticResource GreyBrush}">Электронная почта</TextBlock>
-                        <TextBox x:Name="TB_SignUp_Textbox" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
+                        <TextBox x:Name="TB_SignUp_Email" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
                         
                     </StackPanel>
                     <StackPanel Margin="4">
                         <TextBlock Foreground="{StaticResource GreyBrush}">Пароль</TextBlock>
                         <TextBox x:Name="TB_SignUp_Password" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
                     </StackPanel>
-                    <Button Margin="0, 6"  Width="200" Height="40" x:Name="ButtonSignUpSend">Зарегистрироваться</Button>
+                    <Button Margin="0, 6" Style="{StaticResource BLight}" Width="200" Height="40" x:Name="ButtonSignUpSend" Click="ButtonSignUpSend_Click">Зарегистрироваться</Button>
                 </StackPanel>
             </TabItem>
 

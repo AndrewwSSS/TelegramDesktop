@@ -9,7 +9,6 @@ namespace CommonLibrary
         public AuthenticationResult Result { get; set; }
         public string Message { get; set; }
 
-
         public LoginResultMessage(AuthenticationResult Result, string Message=null)
         {
             this.Result = Result;
