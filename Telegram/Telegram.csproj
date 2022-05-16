@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonLibrary\CommonLibrary.csproj">
-      <Project>{9a350a63-4c66-42fe-a318-fb4faeb330c9}</Project>
+      <Project>{9A350A63-4C66-42FE-A318-FB4FAEB330C9}</Project>
       <Name>CommonLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\MessageLibrary\MessageLibrary.csproj">

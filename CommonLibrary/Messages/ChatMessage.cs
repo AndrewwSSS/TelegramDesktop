@@ -4,22 +4,14 @@ using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
 
 namespace CommonLibrary.Messages
 {
     [Serializable]
-    public class ChatMessage : Message
+    public class ChatMessage : BaseMessage
     {
         private string text;
 
-
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; private set; }
         public User FromUser { get; set; }
         public User ToUser { get; set; }
         public User ResendUser { get; set; }

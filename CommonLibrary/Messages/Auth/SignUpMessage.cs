@@ -9,8 +9,9 @@ using MessageLibrary;
 namespace CommonLibrary.Messages.Auth
 {
     [Serializable]
-    public class SignUpMessage : Message
+    public class SignUpMessage : BaseMessage
     {
+
         public string Login { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }

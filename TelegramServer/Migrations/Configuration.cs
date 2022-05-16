@@ -9,8 +9,8 @@
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
-            ContextKey = "TelegramServer.TelegramDb";
+            AutomaticMigrationsEnabled = true;
+
         }
 
         protected override void Seed(TelegramServer.TelegramDb context)

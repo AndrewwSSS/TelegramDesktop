@@ -25,12 +25,14 @@ namespace CommonLibrary.Messages.Users
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
         public bool Banned { get; set; } = false;
-        public List<ChatMessage> MessagesToSend { get; set; }
+        public List<BaseMessage> MessagesToSend { get; set; }
 
 
         [NotMapped]
         public TcpClientWrap client { get; set; }
 
+        [NotMapped]
+        public bool isOnline { get; set; } = false;
 
         [NotMapped]
         public List<ChatMessage> Messages
