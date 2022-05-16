@@ -19,8 +19,6 @@ namespace TelegramServer
 
         public MainWindow()
         {
-            
-
             InitializeComponent();
 
             UsersOnline = new ObservableCollection<User>();
@@ -34,8 +32,8 @@ namespace TelegramServer
 
             DbContext = new TelegramDb();
 
-            foreach (User user in DbContext.Users.ToList())
-            {
+
+            foreach (User user in DbContext.Users.ToList()) {
                 UsersOffline.Add(user);
             }
           
@@ -47,6 +45,7 @@ namespace TelegramServer
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
             Server.MessageReceived += ClientMessageRecived;
+  
         }
 
 
@@ -98,7 +97,7 @@ namespace TelegramServer
                         };
 
                         DbContext.Users.Add(NewUser);
-                        UsersOnline.Add(NewUser);
+                        Dispatcher.Invoke(() => UsersOnline.Add(NewUser));
                         DbContext.SaveChanges();
 
                         SignUpResultMessage ResultMessage
@@ -122,23 +121,36 @@ namespace TelegramServer
                     LoginMessage loginMessage = (LoginMessage)msg;
 
                     User user;
-                    if(((user = DbContext.Users.First(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login)) != null) && user.Password == loginMessage.Password )
+                    if(((user = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login)) != null) && user.Password == loginMessage.Password)
                     {
-                        
+                       
+
 
                         user.client = client;
-                        LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Success);
-                        client.SendAsync(ReultMessage);
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success);
+                        if (user.Login == loginMessage.Login)
+                        {
+                             ResultMessage.Login = user.Login;
+                        }
+                        else
+                        {
+                            ResultMessage.Email = user.Email;
+                        }
+                        ResultMessage.RegistrationDate = user.RegistrationDate;
+
+                        client.SendAsync(ResultMessage);
                         
                         if(user.MessagesToSend.Count > 0)
                         {
-                            //TODO
-                        }
+                            ArrayMessage<ChatMessage> Messages
+                                    = new ArrayMessage<ChatMessage>(user.MessagesToSend);
 
+                            client.SendAsync(Messages);
+                        }
                     }
                     else
                     {
-                         LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong user or password");
+                         LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password");
                          client.SendAsync(ReultMessage);
                     }
                     break;

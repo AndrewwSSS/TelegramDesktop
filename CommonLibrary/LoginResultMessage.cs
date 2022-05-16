@@ -8,6 +8,9 @@ namespace CommonLibrary
     {
         public AuthenticationResult Result { get; set; }
         public string Message { get; set; }
+        public string Login { get; set; }
+        public string Email { get; set; }
+        public DateTime RegistrationDate { get; set; }
 
         public LoginResultMessage(AuthenticationResult Result, string Message=null)
         {
