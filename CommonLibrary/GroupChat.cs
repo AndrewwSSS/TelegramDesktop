@@ -24,8 +24,6 @@ namespace CommonLibrary
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }
 
-
-
         public List<ImageContainer> Images { get; set; }
         public List<ChatMessage> Messages { get; set; }
         public List<User> Members { get; set; }

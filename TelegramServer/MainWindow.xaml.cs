@@ -5,11 +5,10 @@ using CommonLibrary;
 using System.Data.Entity;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace TelegramServer
 {
-
-
     public partial class MainWindow : Window
     {
         private ObservableCollection<User> UsersOnline;
@@ -26,42 +25,35 @@ namespace TelegramServer
 
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
+            Server = new TcpServerWrap();
 
+        
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
 
 
             DbContext = new TelegramDb();
-            DbContext.SaveChanges();
+
+            foreach (User user in DbContext.Users.ToList())
+            {
+                UsersOffline.Add(user);
+            }
+          
 
 
 
-     
-
-            //foreach (var item in DbContext.Users)
-            //{
-            //    UsersOffline.Add(item);
-            //}
-
-            //LB_UsersOnline.ItemsSource = DbContext.Users.First().MessagesToSend;
 
 
-            //LB_UsersOffline.ItemsSource = UsersOffline;
-            ////LB_UsersOnline.ItemsSource = UsersOnline;
-
-            //Server = new TcpServerWrap();
-
-            //Server.Started += OnServerStarted;
-            //Server.Stopped += OnServerStopped;
-            //Server.MessageReceived += ClientMessageRecived;
-
+            Server.Started += OnServerStarted;
+            Server.Stopped += OnServerStopped;
+            Server.MessageReceived += ClientMessageRecived;
         }
 
 
         private void BtnStartServer_Click(object sender, RoutedEventArgs e)
         {
             int port;
-            if(int.TryParse(TB_ListenerPort.Text, out port) && port > 9999 && port < 100000)
+            if(int.TryParse(TB_ListenerPort.Text, out port) && port > 999 && port < 10000)
             {
                 BtnStartServer.IsEnabled = false;
                 Server.Start(port, 1000);
@@ -87,7 +79,100 @@ namespace TelegramServer
 
         private void ClientMessageRecived(TcpClientWrap client, Message msg)
         {
-            
+            switch (msg.GetType().Name)
+            {
+                case "SignUpMessage":
+                {
+                    SignUpMessage signUpMessage = (SignUpMessage)msg;
+                    
+                    if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
+                    {
+                        User NewUser = new User()
+                        {
+                            Email = signUpMessage.Email,
+                            Login = signUpMessage.Login,
+                            Name = signUpMessage.Name,
+                            Password = signUpMessage.Password,
+                            RegistrationDate = DateTime.Now,
+                            LastVisitDate = DateTime.Now
+                        };
+
+                        DbContext.Users.Add(NewUser);
+                        UsersOnline.Add(NewUser);
+                        DbContext.SaveChanges();
+
+                        SignUpResultMessage ResultMessage
+                                = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
+                        
+                        client.SendAsync(ResultMessage);
+
+                    }
+                    else
+                    {
+                        SignUpResultMessage ResultMessage
+                            = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
+                        client.SendAsync(ResultMessage);
+                    }
+
+                        
+                    break;
+                }
+                case "LoginMessage":
+                { 
+                    LoginMessage loginMessage = (LoginMessage)msg;
+
+                    User user;
+                    if(((user = DbContext.Users.First(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login)) != null) && user.Password == loginMessage.Password )
+                    {
+                        
+
+                        user.client = client;
+                        LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Success);
+                        client.SendAsync(ReultMessage);
+                        
+                        if(user.MessagesToSend.Count > 0)
+                        {
+                            //TODO
+                        }
+
+                    }
+                    else
+                    {
+                         LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong user or password");
+                         client.SendAsync(ReultMessage);
+                    }
+                    break;
+                }
+                case "ChatMessage":
+                {
+                     ChatMessage chatMessage = (ChatMessage)msg;
+                   
+                     GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.Id);
+                     groupChat.Messages.Add(chatMessage);
+
+                     foreach(var user in chatMessage.Chat.Members)
+                     {
+                         
+                         if(UsersOnline.FirstOrDefault(u => u.Id == user.Id && u.Id != chatMessage.FromUser.Id) != null) {
+                              user.client.SendAsync(chatMessage);
+                         }
+                         else
+                         {
+                              if(user.Id != chatMessage.FromUser.Id)
+                              {
+                                   user.MessagesToSend.Add(chatMessage);
+                              }
+                              
+                         }
+                     }
+                    
+                    break;
+                }
+                
+
+                
+
+            }
 
         }
 

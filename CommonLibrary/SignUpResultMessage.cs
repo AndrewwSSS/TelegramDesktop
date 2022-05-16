@@ -10,11 +10,15 @@ namespace CommonLibrary
          public string Message { get; set; }
          public DateTime RegistrationDate { get; set; }
 
-         public SignUpResultMessage(AuthenticationResult Result, DateTime RegistrationDate, string Message = null)
+         public SignUpResultMessage(AuthenticationResult Result, string Message = null)
          {
              this.Result = Result;
              this.Message = Message;
-             this.RegistrationDate = RegistrationDate;
+         }
+
+         public SignUpResultMessage SetRegistrationDate(DateTime RegistrationDate) {
+              this.RegistrationDate = RegistrationDate;
+              return this;
          }
     }
 }

@@ -79,7 +79,13 @@
 
                 <ListBox x:Name="LB_UsersOnline"
                          Grid.Row="1"
-                         Margin="5"/>
+                         Margin="5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
             </Grid>
 
@@ -98,7 +104,13 @@
 
                 <ListBox Grid.Row="1" 
                          x:Name="LB_UsersOffline"
-                         Margin="5"/>
+                         Margin="5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
 
             </Grid>
