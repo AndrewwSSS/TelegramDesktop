@@ -10,20 +10,17 @@ using MessageLibrary;
 namespace CommonLibrary
 {
     [Serializable]
-    public class User
+    public class User : UserEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
         public string Login { get; set; }
-        public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime LastVisitDate { get; set; } 
-        public List<ImageContainer> Images { get; set; }
-        public string ProfileDescription { get; set; }
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
         public bool Banned { get; set; } = false;
@@ -43,23 +40,11 @@ namespace CommonLibrary
             return x;
         });
 
-        [NotMapped]
-        public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0].ImageSource;
-
-
-      
-
+        
         public User(string name) => Name = name;
         
         public User() { }
 
-        public User AddImage(string path)
-        {
-            if (Images == null)
-                Images = new List<ImageContainer>();
-            Images.Add(ImageContainer.FromFile(path));
-            return this;
-        }
 
        
 
