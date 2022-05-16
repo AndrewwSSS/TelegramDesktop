@@ -12,7 +12,11 @@ namespace CommonLibrary.Messages.Groups
         public int GroupId { get; set; }
 
 
-        public CreateGroupResultMessage(AuthenticationResult Result) => this.Result = Result;
+        public CreateGroupResultMessage(AuthenticationResult Result, int GroupId)
+        {
+            this.Result = Result;
+            this.GroupId = GroupId;
+        }
 
         public CreateGroupResultMessage(AuthenticationResult Result, string Message)
         {

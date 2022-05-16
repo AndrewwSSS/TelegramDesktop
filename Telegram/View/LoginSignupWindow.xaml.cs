@@ -1,5 +1,6 @@
 ﻿using CommonLibrary;
 using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
 using System.Collections.Generic;

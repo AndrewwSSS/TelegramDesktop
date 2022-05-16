@@ -15,6 +15,7 @@ namespace CommonLibrary
         public string Description { get; set; }
 
         public List<ImageContainer> Images { get; set; }
+
         [NotMapped]
         public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0].ImageSource;
 

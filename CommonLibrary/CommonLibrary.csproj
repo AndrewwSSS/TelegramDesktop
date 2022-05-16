@@ -45,20 +45,22 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
+    <Compile Include="Messages\Auth\Groups\AddtingInGroupMessage.cs" />
+    <Compile Include="Messages\Auth\Groups\CreateGroupMessage.cs" />
     <Compile Include="Messages\Auth\AuthenticationResult.cs" />
-    <Compile Include="Messages\Groups\CreateGroupResultMessage.cs" />
-    <Compile Include="Messages\Groups\GroupLookupMessage.cs" />
+    <Compile Include="Messages\Auth\Groups\CreateGroupResultMessage.cs" />
+    <Compile Include="Messages\Auth\Groups\GroupLookupMessage.cs" />
+    <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\Users\PublicUserInfo.cs" />
     <Compile Include="UserEntity.cs" />
     <Compile Include="Containers\FileContainer.cs" />
     <Compile Include="Messages\ChatMessage.cs" />
-    <Compile Include="Messages\Groups\GroupChat.cs" />
+    <Compile Include="Messages\Auth\Groups\GroupChat.cs" />
     <Compile Include="Containers\ImageContainer.cs" />
     <Compile Include="Messages\Auth\LoginMessage.cs" />
     <Compile Include="Messages\Auth\LoginResultMessage.cs" />
     <Compile Include="Containers\MessageItemWrap.cs" />
-    <Compile Include="Messages\Groups\PublicGroupInfo.cs" />
+    <Compile Include="Messages\Auth\Groups\PublicGroupInfo.cs" />
     <Compile Include="Messages\Auth\SignUpResultMessage.cs" />
     <Compile Include="Messages\Auth\SignUpMessage.cs" />
     <Compile Include="Messages\Users\User.cs" />
