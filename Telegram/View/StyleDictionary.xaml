@@ -53,7 +53,6 @@
                                                 Property="Background"
                                                 Value="{StaticResource DarkBgBrush}"/>
                             </Trigger>
-
                         </ControlTemplate.Triggers>
 
                     </ControlTemplate>
@@ -82,6 +81,7 @@
             </Setter>
         </Style.Setters>
     </Style>
+    
     <Style TargetType="TextBox" x:Key="TBDefault">
         <Style.Setters>
             <Setter Property="Margin" Value="3"/>
@@ -100,6 +100,16 @@
                 </Setter.Value>
             </Setter>
         </Style.Setters>
+    </Style>
+    <Style TargetType="{x:Type TabControl}">
+        <Style.Setters>
+            <Setter Property="Background" Value="{StaticResource BgBrush}"/>
+        </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{StaticResource DarkBgBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style TargetType="{x:Type TabItem}" x:Key="TabDefault">
         <Setter Property="Template">

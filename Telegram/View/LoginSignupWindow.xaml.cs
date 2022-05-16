@@ -84,10 +84,10 @@ namespace Telegram.View
                     var result = msg as LoginResultMessage;
                     if(result.Result == AuthenticationResult.Success)
                     {
-                        string email ,
-                        name,
-                        password,
-                        login;
+                        string email = result.Email ?? TB_Login_Id.Text,
+                        name = result.Name,
+                        password = TB_Login_Password.Text,
+                        login = result.Login?? TB_Login_Id.Text;
                         
                         var me = new User("Дмитрий Осипов")
                         {
@@ -110,7 +110,7 @@ namespace Telegram.View
 
         private void ButtonLoginSend_Click(object sender, RoutedEventArgs e)
         {
-            string email = TB_Login_Email.Text,
+            string email = TB_Login_Id.Text,
                 password = TB_Login_Password.Text;
             if(email.Length == 0||password.Length == 0)
             {

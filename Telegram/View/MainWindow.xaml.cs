@@ -35,19 +35,21 @@ namespace Telegram
         public DoubleAnimation OpenLeftMenuReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.3)));
         public ThicknessAnimation OpenLeftMenuAnimation = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnimation = new ThicknessAnimation();
-        public User Me { get; set; } 
-        public static User ivan { get; set; } = new User("Иван Довголуцкий")
-            .AddImage("Resources/ivan.jpg");
+        public User Me { get; set; }
+        public static User ivan { get; set; } = new User("Иван Довголуцкий");
+            
         
         public ObservableCollection<MessageItemWrap> Messages { get; set; }
         public MainWindow() : this(null, new User("Дмитрий Осипов")
         {
             RegistrationDate = DateTime.Now
-        }.AddImage("Resources/darkl1ght.png"))
+        })
         { }
         public MainWindow(TcpClientWrap client, User me) 
         {
             Me = me;
+            ivan.AddImage("Resources/ivan.jpg");
+            Me.AddImage("Resources/darkl1ght.png");
             this.client = client;
             InitializeComponent();
             HideRightMenu();
