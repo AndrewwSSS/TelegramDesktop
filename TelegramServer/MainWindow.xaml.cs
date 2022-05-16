@@ -36,7 +36,7 @@ namespace TelegramServer
 
             DbContext = new TelegramDb();
 
-
+            DbContext.SaveChanges();
             foreach (User user in DbContext.Users)
                 UsersOffline.Add(user);
          
@@ -229,7 +229,7 @@ namespace TelegramServer
                         
                     break;
                 }
-                case "CreateNewGroupMessage":
+                case "CreateGroupMessage":
                 {
                     CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
                     GroupChat NewGroupChat;

@@ -31,7 +31,7 @@ namespace Telegram.View
             InitializeComponent();
 
             tabControl.IsEnabled = false;
-            client = new TcpClientWrap(IPAddress.Parse("26.87.230.148"), 5000);
+            client = new TcpClientWrap(IPAddress.Parse("127.0.0.1"), 5000);
             client.Connected += Client_Connected;
             client.ConnectFailed += Client_ConnectFailed;
             client.ConnectAsync();
