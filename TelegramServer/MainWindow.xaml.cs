@@ -6,6 +6,8 @@ using System.Data.Entity;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using CommonLibrary.Entitites;
+
 
 namespace TelegramServer
 {
@@ -36,11 +38,7 @@ namespace TelegramServer
             foreach (User user in DbContext.Users) {
                 UsersOffline.Add(user);
             }
-          
-
-
-
-
+         
 
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
@@ -126,7 +124,7 @@ namespace TelegramServer
                     {
                       
                         user.client = client;
-                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success);
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
 
                         if (user.Login == loginMessage.Login)
                              ResultMessage.Login = user.Login;
@@ -223,9 +221,36 @@ namespace TelegramServer
                     }
                     ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
                     client.SendAsync(ResultMessage);
+                        
+                    break;
+                }
+                case "CreateNewGroupMessage":
+                {
+                    CreateNewGroupMessage createNewGroupMessage = (CreateNewGroupMessage)msg;
+                    GroupChat chat;
+
+                    if(createNewGroupMessage.MembersId != null)
+                    {
+                        List<User> Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Any(m => m == u.Id)).ToList();
+
+                        if(Members.Count > 0)
+                        {
+                            
+                        }
+                        
+
+                    }
+                    
+
+                    
+                    
+
+
+
 
                     break;
                 }
+
 
 
 

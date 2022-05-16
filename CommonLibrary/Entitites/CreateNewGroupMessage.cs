@@ -10,12 +10,16 @@ namespace CommonLibrary.Entitites
         public string Name { get; set; }
         public ImageContainer Image { get; set; }
         public List<int> MembersId { get; set; }
+        public int FromUserId { get; set; }
+        
 
-        public CreateNewGroupMessage(string Name, List<int> MembersId,ImageContainer Image = null)
+        public CreateNewGroupMessage(string Name, int FromUserId,List<int> MembersId = null,ImageContainer Image = null)
         {
             this.Name = Name;
             this.Image = Image;
             this.MembersId = MembersId;
+            this.FromUserId = FromUserId;
+
         }
 
         public CreateNewGroupMessage() { }
