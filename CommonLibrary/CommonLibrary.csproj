@@ -50,10 +50,12 @@
     <Compile Include="FileContainer.cs" />
     <Compile Include="ChatMessage.cs" />
     <Compile Include="GroupChat.cs" />
+    <Compile Include="GroupLookupMessage.cs" />
     <Compile Include="ImageContainer.cs" />
     <Compile Include="LoginMessage.cs" />
     <Compile Include="LoginResultMessage.cs" />
     <Compile Include="MessageItemWrap.cs" />
+    <Compile Include="PublicGroupInfo.cs" />
     <Compile Include="SignUpResultMessage.cs" />
     <Compile Include="SignUpMessage.cs" />
     <Compile Include="User.cs" />

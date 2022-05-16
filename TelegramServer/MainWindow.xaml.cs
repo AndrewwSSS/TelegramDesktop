@@ -120,36 +120,40 @@ namespace TelegramServer
                 { 
                     LoginMessage loginMessage = (LoginMessage)msg;
 
-                    User user;
-                    if(((user = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login)) != null) && user.Password == loginMessage.Password)
+                    User user =  DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
+
+                    if(user != null && user.Password == loginMessage.Password)
                     {
-                       
-
-
+                      
                         user.client = client;
                         LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success);
+
                         if (user.Login == loginMessage.Login)
-                        {
                              ResultMessage.Login = user.Login;
-                        }
                         else
-                        {
                             ResultMessage.Email = user.Email;
-                        }
+
                         ResultMessage.Name = user.Name;
                         ResultMessage.RegistrationDate = user.RegistrationDate;
 
                         client.SendAsync(ResultMessage);
-                        
-                        UsersOffline.Remove(user);
-                        UsersOnline.Add(user);
 
-                        if(user.MessagesToSend.Count > 0)
+                        Dispatcher.Invoke(() =>
+                        {
+                            UsersOffline.Remove(user);
+                            UsersOnline.Add(user);
+                        });
+                      
+
+                        if(user.MessagesToSend != null && user.MessagesToSend.Count > 0)
                         {
                             ArrayMessage<ChatMessage> Messages
                                     = new ArrayMessage<ChatMessage>(user.MessagesToSend);
 
                             client.SendAsync(Messages);
+
+                            //temp. Must be after message sent
+                            user.MessagesToSend.Clear();
                         }
                     }
                     else
@@ -175,10 +179,7 @@ namespace TelegramServer
                          else
                          {
                               if(user.Id != chatMessage.FromUser.Id)
-                              {
                                    user.MessagesToSend.Add(chatMessage);
-                              }
-                              
                          }
                      }
                     
