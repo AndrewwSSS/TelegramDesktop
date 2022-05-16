@@ -8,6 +8,35 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
+                        <Border  x:Name="border" Background="{StaticResource BgBrush}"
+                                         BorderThickness="0">
+
+                            <TextBlock Text="{TemplateBinding Property=Content}"
+                                               Foreground="White" 
+                                               FontSize="{TemplateBinding FontSize}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="border"
+                                                Property="Background"
+                                                Value="{StaticResource DarkBgBrush}"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+    <Style TargetType="Button" x:Key="BLight">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
                         <Border  x:Name="border" Background="{StaticResource LightBgBrush}"
                                          BorderThickness="0">
 
@@ -60,12 +89,11 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border CornerRadius="5" Background="{StaticResource LightBgBrush}">
-                            <TextBox Margin="9,11" BorderThickness="0"
+                            <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"        Margin="9,11" BorderThickness="0"
                                              Background="Transparent"
                                              Foreground="{StaticResource GreyBrush}"
                                              VerticalContentAlignment="Center"
                                              CaretBrush="White">
-                                
                             </TextBox>
                         </Border>
                     </ControlTemplate>

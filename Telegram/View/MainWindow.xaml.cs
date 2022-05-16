@@ -25,7 +25,7 @@ namespace Telegram
 
     public partial class MainWindow : Window
     {
-        private TcpClientWrap client ;
+        TcpClientWrap client;
 
         public const int LeftMenuWidth = 280;
         public MenuState RighMenuState { get; set; }
@@ -35,15 +35,20 @@ namespace Telegram
         public DoubleAnimation OpenLeftMenuReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.3)));
         public ThicknessAnimation OpenLeftMenuAnimation = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnimation = new ThicknessAnimation();
-        private static readonly User me = new User("Дмитрий Осипов")
-            .AddImage("Resources/darkl1ght.png");
-        private static readonly User ivan = new User("Иван Довголуцкий")
+        public User Me { get; set; } 
+        public static User ivan { get; set; } = new User("Иван Довголуцкий")
             .AddImage("Resources/ivan.jpg");
-        public ObservableCollection<ChatMessage> Messages { get; set; } 
-            
-
-        public MainWindow()
+        
+        public ObservableCollection<MessageItemWrap> Messages { get; set; }
+        public MainWindow() : this(null, new User("Дмитрий Осипов")
         {
+            RegistrationDate = DateTime.Now
+        }.AddImage("Resources/darkl1ght.png"))
+        { }
+        public MainWindow(TcpClientWrap client, User me) 
+        {
+            Me = me;
+            this.client = client;
             InitializeComponent();
             HideRightMenu();
 
@@ -58,31 +63,31 @@ namespace Telegram
             CloseLeftMenuAnimation.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnimation.Duration = TimeSpan.FromMilliseconds(200);
 
-            client = new TcpClientWrap(IPAddress.Parse("26.246.72.11"), 5000);
             DataContext = this;
 
-            Messages = new ObservableCollection<ChatMessage>();
-            AddMessage(new ChatMessage("Всем привет, это телеграм").SetFrom(me));
-            AddMessage(new ChatMessage("Скоро командный проект").SetFrom(me).SetResendUser(ivan));
-            AddMessage(new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(Messages[1]));
-            AddMessage(new ChatMessage("тест").SetFrom(me));
-            AddMessage(new ChatMessage("тест").SetFrom(me));
-            AddMessage(new ChatMessage("тест").SetFrom(me));
-            AddMessage(new ChatMessage("тест").SetFrom(me));
+            Messages = new ObservableCollection<MessageItemWrap>();
+            AddMessage(new ChatMessage("Всем привет, это телеграм").SetFrom(Me));
+            AddMessage(new ChatMessage("Скоро командный проект").SetFrom(Me).SetResendUser(ivan));
+            AddMessage(new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(Messages[1].Message));
+            AddMessage(new ChatMessage("тест").SetFrom(Me));
+            AddMessage(new ChatMessage("тест").SetFrom(Me));
+            AddMessage(new ChatMessage("тест").SetFrom(Me));
+            AddMessage(new ChatMessage("тест").SetFrom(Me));
         }
 
         private void AddMessage(ChatMessage msg)
         {
-            if(Messages.Count != 0 && Messages.Last().FromUser == msg.FromUser)
+            MessageItemWrap item = new MessageItemWrap(msg);
+            if (Messages.Count != 0 && Messages.Last().Message.FromUser == msg.FromUser)
             {
                 Messages.Last().ShowAvatar = false;
-                msg.ShowAvatar = true;
-                Messages.Add(msg);
+                item.ShowAvatar = true;
+                Messages.Add(item);
             }
             else
             {
-                msg.ShowAvatar = true;
-                Messages.Add(msg);
+                item.ShowAvatar = true;
+                Messages.Add(item);
             }
         }
 
