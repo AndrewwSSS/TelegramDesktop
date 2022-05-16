@@ -136,10 +136,14 @@ namespace TelegramServer
                         {
                             ResultMessage.Email = user.Email;
                         }
+                        ResultMessage.Name = user.Name;
                         ResultMessage.RegistrationDate = user.RegistrationDate;
 
                         client.SendAsync(ResultMessage);
                         
+                        UsersOffline.Remove(user);
+                        UsersOnline.Add(user);
+
                         if(user.MessagesToSend.Count > 0)
                         {
                             ArrayMessage<ChatMessage> Messages
