@@ -127,17 +127,18 @@ namespace TelegramServer
 
 
                         user.client = client;
-                        LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Success);
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success);
                         if (user.Login == loginMessage.Login)
                         {
-                             ReultMessage.Login = user.Login;
+                             ResultMessage.Login = user.Login;
                         }
                         else
                         {
-                            ReultMessage.Email = user.Email;
+                            ResultMessage.Email = user.Email;
                         }
+                        ResultMessage.DateRegistration = user.RegistrationDate;
 
-                        client.SendAsync(ReultMessage);
+                        client.SendAsync(ResultMessage);
                         
                         if(user.MessagesToSend.Count > 0)
                         {
