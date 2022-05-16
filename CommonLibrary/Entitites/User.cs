@@ -24,14 +24,16 @@ namespace CommonLibrary
         public List<User> BlockedUsers { get; set; }
         public List<GroupChat> Chats { get; set; }
         public bool Banned { get; set; } = false;
-        public List<ChatMessage> MessagesToSend { get; set; }
+        public List<Message> MessagesToSend { get; set; }
 
 
         [NotMapped]
         public TcpClientWrap client { get; set; }
 
+        [NotMapped]
+        public bool isOnline { get; set; } = false;
 
-       [NotMapped]
+        [NotMapped]
         public List<ChatMessage> Messages 
             => Chats.Select(chat => chat.Messages)
             .Aggregate((x, y) => 

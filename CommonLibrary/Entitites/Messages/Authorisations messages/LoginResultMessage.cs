@@ -21,6 +21,13 @@ namespace CommonLibrary
             this.Message = Message;
             this.Id = Id;
         }
-        
+
+        public LoginResultMessage(AuthenticationResult Result, string Message)
+        {
+            this.Result = Result;
+            this.Message = Message;
+        }
+
+
     }
 }

@@ -11,7 +11,13 @@ namespace CommonLibrary.Entitites.Messages
         public int GroupId { get; set; }
 
 
-        public CreateNewGroupResultMessage(AuthenticationResult Result) => this.Result = Result;
+        public CreateNewGroupResultMessage(AuthenticationResult Result, int GroupId)
+        {
+            this.Result = Result;
+            this.GroupId = GroupId;
+            
+
+        }
 
         public CreateNewGroupResultMessage(AuthenticationResult Result, string Message) {
             this.Result = Result;
