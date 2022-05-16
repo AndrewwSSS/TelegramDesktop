@@ -14,6 +14,7 @@ namespace MessageLibrary
         private IPEndPoint endPoint;
         private TcpClient client;
         public TcpClient Tcp => client;
+        public bool IsConnected => client.Connected;
 
         public event ClientHandler Connected;
         public event ClientHandler Disconnected;

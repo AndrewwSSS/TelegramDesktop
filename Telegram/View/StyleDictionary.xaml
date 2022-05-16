@@ -37,21 +37,21 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border  x:Name="border" Background="{StaticResource LightBgBrush}"
+                        <Border  x:Name="border" Background="{StaticResource BlueBrush}"
                                          BorderThickness="0">
 
                             <TextBlock Text="{TemplateBinding Property=Content}"
-                                               Foreground="White" 
+                                               Foreground="{StaticResource GreyBrush}" 
                                                FontSize="{TemplateBinding FontSize}"
                                                TextAlignment="Center"
                                                VerticalAlignment="Center"/>
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
+                            <Trigger Property="IsEnabled" Value="false">
                                 <Setter TargetName="border"
                                                 Property="Background"
-                                                Value="{StaticResource DarkBgBrush}"/>
+                                                Value="{StaticResource DarkGreyBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
 
@@ -81,7 +81,33 @@
             </Setter>
         </Style.Setters>
     </Style>
-    
+    <Style TargetType="TextBox" x:Key="TBInput">
+        <Style.Setters>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Foreground" Value="{StaticResource GreyBrush}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource GreyBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="2"/>
+                            </Grid.RowDefinitions>
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                            <Border Grid.Row="1" CornerRadius="4" Width="{TemplateBinding Width}" Name="splitter" Background="{StaticResource DarkGreyBrush}"></Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="splitter" Property="Background" Value="{StaticResource BlueBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                    
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
     <Style TargetType="TextBox" x:Key="TBDefault">
         <Style.Setters>
             <Setter Property="Margin" Value="3"/>
