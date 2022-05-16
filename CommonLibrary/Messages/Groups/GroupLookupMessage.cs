@@ -1,7 +1,7 @@
 ﻿using System;
 using MessageLibrary;
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
     public class GroupLookupMessage : Message

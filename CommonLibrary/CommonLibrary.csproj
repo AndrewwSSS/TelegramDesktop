@@ -45,23 +45,23 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entitites\Messages\CreateNewGroupMessage.cs" />
-    <Compile Include="Entitites\Messages\Authorisations messages\AuthenticationResult.cs" />
-    <Compile Include="Entitites\Messages\CreateNewGroupResultMessage.cs" />
-    <Compile Include="Entitites\PublicUserInfo.cs" />
-    <Compile Include="Entitites\Messages\UserEntity.cs" />
-    <Compile Include="Entitites\FileContainer.cs" />
-    <Compile Include="Entitites\Messages\ChatMessage.cs" />
-    <Compile Include="Entitites\GroupChat.cs" />
-    <Compile Include="Entitites\Messages\GroupLookupMessage.cs" />
-    <Compile Include="Entitites\ImageContainer.cs" />
-    <Compile Include="Entitites\Messages\Authorisations messages\LoginMessage.cs" />
-    <Compile Include="Entitites\Messages\Authorisations messages\LoginResultMessage.cs" />
-    <Compile Include="Entitites\MessageItemWrap.cs" />
-    <Compile Include="Entitites\PublicGroupInfo.cs" />
-    <Compile Include="Entitites\Messages\Authorisations messages\SignUpResultMessage.cs" />
-    <Compile Include="Entitites\Messages\Authorisations messages\SignUpMessage.cs" />
-    <Compile Include="Entitites\User.cs" />
+    <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
+    <Compile Include="Messages\Auth\AuthenticationResult.cs" />
+    <Compile Include="Messages\Groups\CreateGroupResultMessage.cs" />
+    <Compile Include="Messages\Groups\GroupLookupMessage.cs" />
+    <Compile Include="Messages\Users\PublicUserInfo.cs" />
+    <Compile Include="UserEntity.cs" />
+    <Compile Include="Containers\FileContainer.cs" />
+    <Compile Include="Messages\ChatMessage.cs" />
+    <Compile Include="Messages\Groups\GroupChat.cs" />
+    <Compile Include="Containers\ImageContainer.cs" />
+    <Compile Include="Messages\Auth\LoginMessage.cs" />
+    <Compile Include="Messages\Auth\LoginResultMessage.cs" />
+    <Compile Include="Containers\MessageItemWrap.cs" />
+    <Compile Include="Messages\Groups\PublicGroupInfo.cs" />
+    <Compile Include="Messages\Auth\SignUpResultMessage.cs" />
+    <Compile Include="Messages\Auth\SignUpMessage.cs" />
+    <Compile Include="Messages\Users\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

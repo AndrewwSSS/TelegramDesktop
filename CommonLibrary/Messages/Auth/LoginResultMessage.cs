@@ -1,7 +1,7 @@
 ﻿using System;
 using MessageLibrary;
 
-namespace CommonLibrary
+namespace CommonLibrary.Messages.Auth
 {
     [Serializable]
     public class LoginResultMessage : Message
@@ -15,12 +15,12 @@ namespace CommonLibrary
         public string Email { get; set; }
         public DateTime RegistrationDate { get; set; }
 
-        public LoginResultMessage(AuthenticationResult Result, int Id, string Message=null)
+        public LoginResultMessage(AuthenticationResult Result, int Id, string Message = null)
         {
             this.Result = Result;
             this.Message = Message;
             this.Id = Id;
         }
-        
+
     }
 }

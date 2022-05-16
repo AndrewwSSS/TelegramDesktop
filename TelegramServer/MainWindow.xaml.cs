@@ -1,13 +1,14 @@
 ﻿using MessageLibrary;
 using System.Collections.ObjectModel;
 using System.Windows;
-using CommonLibrary;
 using System.Data.Entity;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using CommonLibrary.Entitites;
-
+using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.Users;
+using CommonLibrary.Messages;
 
 namespace TelegramServer
 {
@@ -226,7 +227,7 @@ namespace TelegramServer
                 }
                 case "CreateNewGroupMessage":
                 {
-                    CreateNewGroupMessage createNewGroupMessage = (CreateNewGroupMessage)msg;
+                    CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
                     GroupChat chat;
 
                     if(createNewGroupMessage.MembersId != null)

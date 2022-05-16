@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
-using CommonLibrary;
+using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.Users;
 
 namespace TelegramServer
 {
