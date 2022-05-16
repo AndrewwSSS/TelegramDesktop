@@ -45,8 +45,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entitites\CreateNewGroupMessage.cs" />
+    <Compile Include="Entitites\Messages\CreateNewGroupMessage.cs" />
     <Compile Include="Entitites\Messages\Authorisations messages\AuthenticationResult.cs" />
+    <Compile Include="Entitites\Messages\CreateNewGroupResultMessage.cs" />
     <Compile Include="Entitites\PublicUserInfo.cs" />
     <Compile Include="Entitites\Messages\UserEntity.cs" />
     <Compile Include="Entitites\FileContainer.cs" />

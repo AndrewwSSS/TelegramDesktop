@@ -232,10 +232,20 @@ namespace TelegramServer
                     if(createNewGroupMessage.MembersId != null)
                     {
                         List<User> Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Any(m => m == u.Id)).ToList();
+                        User GroupCreator = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
 
-                        if(Members.Count > 0)
+                        if(GroupCreator == null)
                         {
-                            
+                            break;
+                            //TODO  
+                        }
+
+                        if(Members.Count > 0 )
+                        {
+                            if(Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id)))
+                            {
+
+                            }
                         }
                         
 
