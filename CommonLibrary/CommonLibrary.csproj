@@ -45,21 +45,23 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationResult.cs" />
-    <Compile Include="DictionaryWrap.cs" />
-    <Compile Include="UserEntity.cs" />
-    <Compile Include="FileContainer.cs" />
-    <Compile Include="ChatMessage.cs" />
-    <Compile Include="GroupChat.cs" />
-    <Compile Include="GroupLookupMessage.cs" />
-    <Compile Include="ImageContainer.cs" />
-    <Compile Include="LoginMessage.cs" />
-    <Compile Include="LoginResultMessage.cs" />
-    <Compile Include="MessageItemWrap.cs" />
-    <Compile Include="PublicGroupInfo.cs" />
-    <Compile Include="SignUpResultMessage.cs" />
-    <Compile Include="SignUpMessage.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="Entitites\Messages\CreateNewGroupMessage.cs" />
+    <Compile Include="Entitites\Messages\Authorisations messages\AuthenticationResult.cs" />
+    <Compile Include="Entitites\Messages\CreateNewGroupResultMessage.cs" />
+    <Compile Include="Entitites\PublicUserInfo.cs" />
+    <Compile Include="Entitites\Messages\UserEntity.cs" />
+    <Compile Include="Entitites\FileContainer.cs" />
+    <Compile Include="Entitites\Messages\ChatMessage.cs" />
+    <Compile Include="Entitites\GroupChat.cs" />
+    <Compile Include="Entitites\Messages\GroupLookupMessage.cs" />
+    <Compile Include="Entitites\ImageContainer.cs" />
+    <Compile Include="Entitites\Messages\Authorisations messages\LoginMessage.cs" />
+    <Compile Include="Entitites\Messages\Authorisations messages\LoginResultMessage.cs" />
+    <Compile Include="Entitites\MessageItemWrap.cs" />
+    <Compile Include="Entitites\PublicGroupInfo.cs" />
+    <Compile Include="Entitites\Messages\Authorisations messages\SignUpResultMessage.cs" />
+    <Compile Include="Entitites\Messages\Authorisations messages\SignUpMessage.cs" />
+    <Compile Include="Entitites\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

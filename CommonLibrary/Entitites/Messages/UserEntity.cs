@@ -19,9 +19,9 @@ namespace CommonLibrary
 
         public virtual void AddImage(string path)
         {
-            if (Images == null)
-                Images = new List<ImageContainer>();
-            Images.Add(ImageContainer.FromFile(path));
+                if (Images == null)
+                    Images = new List<ImageContainer>();
+                Images.Add(ImageContainer.FromFile(path));
         }
     }
 }

@@ -6,6 +6,8 @@ using System.Data.Entity;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using CommonLibrary.Entitites;
+
 
 namespace TelegramServer
 {
@@ -33,14 +35,10 @@ namespace TelegramServer
             DbContext = new TelegramDb();
 
 
-            foreach (User user in DbContext.Users.ToList()) {
+            foreach (User user in DbContext.Users) {
                 UsersOffline.Add(user);
             }
-          
-
-
-
-
+         
 
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
@@ -126,7 +124,7 @@ namespace TelegramServer
                     {
                       
                         user.client = client;
-                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success);
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
 
                         if (user.Login == loginMessage.Login)
                              ResultMessage.Login = user.Login;
@@ -184,10 +182,88 @@ namespace TelegramServer
                      }
                     
                     break;
+               
                 }
-                
+                case "GroupLookupMessage":
+                {
+                    GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
+                    ArrayMessage<PublicGroupInfo> ResultMessage;
 
-                
+                    List<PublicGroupInfo> SuitableGroups = new List<PublicGroupInfo>();
+                        
+                    if(DbContext.GroupChats.Count() == 0)
+                    {
+                          ResultMessage = new ArrayMessage<PublicGroupInfo>(null);
+                          client.SendAsync(ResultMessage);
+                          break;
+                    }
+
+                    foreach (var groupChat in DbContext.GroupChats)
+                    {
+                        if(groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()) ||
+                            groupLookupMessage.GroupName.ToLower().Contains(groupChat.Name.ToLower()))
+                        {
+                            PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
+
+                            foreach(var groupMember in groupChat.Members)
+                            {
+                                PublicUserInfo publicUser
+                                    = new PublicUserInfo(groupMember.Name, groupMember.Description, groupMember.Id, groupMember.LastVisitDate);
+
+                                if(groupMember.Images != null)
+                                    foreach (var image in groupMember.Images)
+                                        publicUser.Images.Add(image);
+           
+                            }
+
+                            SuitableGroups.Add(SuitableGroup);
+                        }
+                    }
+                    ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+                    client.SendAsync(ResultMessage);
+                        
+                    break;
+                }
+                case "CreateNewGroupMessage":
+                {
+                    CreateNewGroupMessage createNewGroupMessage = (CreateNewGroupMessage)msg;
+                    GroupChat chat;
+
+                    if(createNewGroupMessage.MembersId != null)
+                    {
+                        List<User> Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Any(m => m == u.Id)).ToList();
+                        User GroupCreator = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
+
+                        if(GroupCreator == null)
+                        {
+                            break;
+                            //TODO  
+                        }
+
+                        if(Members.Count > 0 )
+                        {
+                            if(Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id)))
+                            {
+
+                            }
+                        }
+                        
+
+                    }
+                    
+
+                    
+                    
+
+
+
+
+                    break;
+                }
+
+
+
+
 
             }
 
