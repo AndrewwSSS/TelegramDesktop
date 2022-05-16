@@ -7,7 +7,6 @@ namespace CommonLibrary.Messages.Auth
     public class SignUpResultMessage : BaseMessage
     {
         public AuthenticationResult Result { get; set; }
-        public int UserId { get; set; }
         public string Message { get; set; }
         public DateTime RegistrationDate { get; set; }
 
@@ -17,10 +16,9 @@ namespace CommonLibrary.Messages.Auth
             this.Message = Message;
         }
 
-        public SignUpResultMessage(AuthenticationResult Result, int UserId)
+        public SignUpResultMessage(AuthenticationResult Result)
         {
             this.Result = Result;
-            this.UserId = UserId;
         }
 
 

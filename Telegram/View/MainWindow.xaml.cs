@@ -1,5 +1,6 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
+using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -58,6 +59,8 @@ namespace Telegram
             ivan.AddImage("Resources/ivan.jpg");
             Me.AddImage("Resources/darkl1ght.png");
             this.client = client;
+            if(client != null)
+                this.client.MessageReceived += Client_MessageReceived;
             InitializeComponent();
             HideRightMenu();
 
@@ -82,6 +85,16 @@ namespace Telegram
             AddMessage(new ChatMessage("тест").SetFrom(Me));
             AddMessage(new ChatMessage("тест").SetFrom(Me));
             AddMessage(new ChatMessage("тест").SetFrom(Me));
+        }
+
+        private void Client_MessageReceived(TcpClientWrap client, Message msg)
+        {
+            if(msg is CreateGroupResultMessage)
+            {
+                var result = msg as CreateGroupResultMessage;
+                if(result.Result == AuthenticationResult.Success)
+                    MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
+            }
         }
 
         private void AddMessage(ChatMessage msg)
@@ -227,7 +240,8 @@ namespace Telegram
 
         private void B_AddGroup_OnClick(object sender, RoutedEventArgs e)
         {
-
+            client.SendAsync(new CreateGroupMessage(TB_NewGroupName.Text, Me.Id));
+            client.ReceiveAsync();
         }
 
         private void TB_GroupName_TextChanged(object sender, TextChangedEventArgs e)

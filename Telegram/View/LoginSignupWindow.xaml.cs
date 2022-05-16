@@ -58,29 +58,11 @@ namespace Telegram.View
                 {
                     var result = msg as SignUpResultMessage;
                     if (result.Result == AuthenticationResult.Success)
-                    {
-                        string login = TB_SignUp_Login.Text,
-                   password = TB_SignUp_Password.Text,
-                   email = TB_SignUp_Email.Text,
-                   name = TB_SignUp_UserName.Text;
-
-                        var me = new User(result.Id)
-                        {
-                            
-                            Email = email,
-                            Name = name,
-                            Password = password,
-                            Login = login,
-                            RegistrationDate = result.RegistrationDate
-                        };
-                        me.AddImage("Resources/darkl1ght.png");
-                        wnd = new MainWindow(client, me);
-                        wnd.Show();
-                        Close();
-                    }
+                        MessageBox.Show("Регистрация прошла успешно.");
                     else
-                        tabControl.IsEnabled = true;
+                        MessageBox.Show("Регистрация не произошла.");
 
+                    tabControl.IsEnabled = true;
                 });
             } else if(msg is LoginResultMessage)
             {
@@ -93,7 +75,7 @@ namespace Telegram.View
                         password = TB_Login_Password.Text,
                         login = result.Login?? TB_Login_Id.Text;
                         
-                        var me = new User("Дмитрий Осипов")
+                        var me = new User(result.Id)
                         {
                             Email = email,
                             Name = name,

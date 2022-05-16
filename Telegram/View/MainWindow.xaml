@@ -488,7 +488,14 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding Me.Name}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" Foreground="White"></TextBlock>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" Foreground="White">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}#{1}">
+                                    <Binding Path="Me.Name" />
+                                    <Binding Path="Me.Id" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </Grid>
 
                     <Grid Grid.Row="1">
@@ -531,7 +538,7 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Имя группы</TextBlock>
-                        <TextBox Width="250" Style="{StaticResource TBInput}"
+                        <TextBox x:Name="TB_NewGroupName" Width="250" Style="{StaticResource TBInput}"
                                  TextChanged="TB_GroupName_TextChanged"></TextBox>
                         <Button x:Name="AddGroupButton" IsEnabled="False" Margin="4,0" Style="{StaticResource BLight}" Height="50" Click="B_AddGroup_OnClick">Создать группу</Button>
                     </StackPanel>
