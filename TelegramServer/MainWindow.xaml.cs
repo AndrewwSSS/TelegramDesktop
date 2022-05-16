@@ -33,7 +33,7 @@ namespace TelegramServer
             DbContext = new TelegramDb();
 
 
-            foreach (User user in DbContext.Users.ToList()) {
+            foreach (User user in DbContext.Users) {
                 UsersOffline.Add(user);
             }
           
@@ -184,10 +184,51 @@ namespace TelegramServer
                      }
                     
                     break;
+               
                 }
-                
+                case "GroupLookupMessage":
+                {
+                    GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
+                    ArrayMessage<PublicGroupInfo> ResultMessage;
 
-                
+                    List<PublicGroupInfo> SuitableGroups = new List<PublicGroupInfo>();
+                        
+                    if(DbContext.GroupChats.Count() == 0)
+                    {
+                          ResultMessage = new ArrayMessage<PublicGroupInfo>(null);
+                          client.SendAsync(ResultMessage);
+                          break;
+                    }
+
+                    foreach (var groupChat in DbContext.GroupChats)
+                    {
+                        if(groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()) ||
+                            groupLookupMessage.GroupName.ToLower().Contains(groupChat.Name.ToLower()))
+                        {
+                            PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
+
+                            foreach(var groupMember in groupChat.Members)
+                            {
+                                PublicUserInfo publicUser
+                                    = new PublicUserInfo(groupMember.Name, groupMember.Description, groupMember.Id, groupMember.LastVisitDate);
+
+                                if(groupMember.Images != null)
+                                    foreach (var image in groupMember.Images)
+                                        publicUser.Images.Add(image);
+           
+                            }
+
+                            SuitableGroups.Add(SuitableGroup);
+                        }
+                    }
+                    ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+                    client.SendAsync(ResultMessage);
+
+                    break;
+                }
+
+
+
 
             }
 
