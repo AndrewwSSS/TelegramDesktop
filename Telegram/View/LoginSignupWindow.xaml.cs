@@ -85,7 +85,7 @@ namespace Telegram.View
                     if(result.Result == AuthenticationResult.Success)
                     {
                         string email = result.Email ?? TB_Login_Id.Text,
-                        name = result.Username,
+                        name = result.Name,
                         password = TB_Login_Password.Text,
                         login = result.Login?? TB_Login_Id.Text;
                         
