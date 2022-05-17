@@ -44,7 +44,7 @@ namespace CommonLibrary.Messages.Groups
                 return false;
         }
 
-        public bool DelleteMessage(ChatMessage message)
+        public bool DeleteMessage(ChatMessage message)
         {
             if(message != null && Messages.Remove(message))
             {
