@@ -1,4 +1,5 @@
 ﻿using CommonLibrary.Messages;
+using CommonLibrary.Messages.Groups;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,26 +10,19 @@ using System.Threading.Tasks;
 
 namespace CommonLibrary.Containers
 {
-    public class MessageItemWrap : INotifyPropertyChanged
+    public class GroupItemWrap : INotifyPropertyChanged
     {
-        private bool showAvatar = false;
-        public ChatMessage Message { get; set; }
-        public string FormattedTime => Message.Time.ToString("HH:mm");
-        public bool ShowAvatar
+
+        public GroupChat Group { get; set; }
+        public GroupItemWrap(GroupChat group)
         {
-            get => showAvatar;
-            set
-            {
-                showAvatar = value;
-                OnPropertyChanged();
-            }
+            Group = group;
         }
 
+        [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public MessageItemWrap(ChatMessage msg) => Message = msg;
-        
     }
 }
