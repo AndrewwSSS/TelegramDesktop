@@ -26,10 +26,6 @@
         
         <Canvas x:Name="MainCanvas" Background="Black">
             <Canvas.Resources>
-
-
-
-
                 <ControlTemplate TargetType="Button" x:Key="BTNClose">
 
                     <Border  x:Name="BTNClose"

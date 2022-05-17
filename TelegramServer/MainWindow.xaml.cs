@@ -1,15 +1,14 @@
-﻿using MessageLibrary;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Data.Entity;
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using CommonLibrary.Messages.Users;
-using CommonLibrary.Messages.Auth;
+﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
+using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Groups;
-using CommonLibrary.Containers;
+using CommonLibrary.Messages.Users;
+using MessageLibrary;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 
 namespace TelegramServer
 {
@@ -17,6 +16,7 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
+        private ObservableCollection<GroupChat> GroupChat;
         private TelegramDb DbContext;
 
         private TcpServerWrap Server;
@@ -27,24 +27,19 @@ namespace TelegramServer
 
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-            Server = new TcpServerWrap();
-
-        
-            LB_UsersOffline.ItemsSource = UsersOffline;
-            LB_UsersOnline.ItemsSource = UsersOnline;
-
-
+            GroupChat = new ObservableCollection<GroupChat>();
             DbContext = new TelegramDb();
-
-            DbContext.SaveChanges();
-            foreach (User user in DbContext.Users)
-                UsersOffline.Add(user);
-         
-
+            Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
             Server.MessageReceived += ClientMessageRecived;
-  
+
+            LB_UsersOffline.ItemsSource = UsersOffline;
+            LB_UsersOnline.ItemsSource = UsersOnline;
+
+            DbContext.SaveChanges();
+            foreach (User user in DbContext.Users)
+                UsersOffline.Add(user); 
         }
 
 
@@ -56,6 +51,13 @@ namespace TelegramServer
                 BtnStartServer.IsEnabled = false;
                 Server.Start(port, 1000);
             }
+            else
+                MessageBox.Show("Invalid port", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+        }
+
+        private void BtnStopServer_Click(object sender, RoutedEventArgs e) {
+            Server.Shutdown();
         }
 
         private void OnServerStarted(TcpServerWrap client)
@@ -138,7 +140,9 @@ namespace TelegramServer
                         client.SendAsync(ResultMessage);
 
                         user.client = client;
+                        user.LastVisitDate = DateTime.Now;
                         user.isOnline = true;
+
                         DbContext.SaveChanges();
 
                         Dispatcher.Invoke(() =>
@@ -308,8 +312,6 @@ namespace TelegramServer
                         GroupInfo.Users = PublicUsersInfo;
 
                         SendMessageToUsers(new AddtingInGroupMessage(GroupInfo), GroupCreator, Members);
-
-
                     }
 
                     break;
@@ -343,5 +345,6 @@ namespace TelegramServer
             }
         }
 
+      
     }
 }

@@ -80,6 +80,8 @@ namespace MessageLibrary
             {
                 listener?.Stop();
                 ListenerThread.Abort();
+              
+                listener = null;
                 Stopped?.Invoke(this);
             }            
         }

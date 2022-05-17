@@ -5,13 +5,173 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TelegramServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="426" Width="593">
+        Title="MainWindow" Height="426" Width="593"
+        MinHeight="450"
+        MinWidth="800">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="BrushDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{StaticResource BgBrush}"/>
+        </Style>
+    </Window.Style>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
 
+        <Grid.Resources>
+
+            <Style TargetType="Button">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border  x:Name="border" 
+                                             Background="{StaticResource BgBrush}"
+                                             BorderThickness="1"
+                                             BorderBrush="{StaticResource DarkGreyBrush}">
+
+                                    <TextBlock Text="{TemplateBinding Property=Content}"
+                                                   Foreground="White" 
+                                                   FontSize="{TemplateBinding FontSize}"
+                                                   TextAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="true">
+                                        <Setter TargetName="border"
+                                                    Property="Background"
+                                                    Value="{StaticResource MsgBgBrush}"/>
+                                    </Trigger>
+
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="border"
+                                                    Property="Background"
+                                                    Value="{StaticResource DarkBgBrush}"/>
+                                    </Trigger>
+
+                                </ControlTemplate.Triggers>
+
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
+
+
+            <Style TargetType="ListBoxItem" x:Key="Group">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Border Background="{StaticResource DarkBgBrush}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                    </Grid>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
+
+            <Style TargetType="ListBoxItem" x:Key="UserOffline">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Background="{StaticResource LightBlueBrush}"
+                                            BorderBrush="{StaticResource DarkBgBrush}"
+                                            BorderThickness="2"
+                                            CornerRadius="5" >
+
+                                    <Grid Margin="2"  >
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                               Text="Id:"
+                                               FontSize="17"/>
+
+                                            <TextBlock Grid.Column="1"
+                                               Text="{Binding Id}"
+                                               FontSize="17"/>
+                                        </Grid>
+
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                               Text="Name:"
+                                               FontSize="17"/>
+
+                                            <TextBlock Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               FontSize="17"/>
+                                        </Grid>
+
+                                        <Grid Grid.Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="110"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                   Text="Last visit date:"
+                                                   FontSize="17"/>
+
+
+                                            <TextBlock Grid.Column="1"
+                                                   Text="{Binding LastVisitDate}"
+                                                   FontSize="17"/>
+
+
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
+
+
+
+        </Grid.Resources>
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -20,6 +180,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
+            
+            
             <Button Grid.Column="0"
                     Margin="5"
                     Content="Start server"
@@ -32,7 +194,8 @@
                     Content="Stop server"
                     FontSize="20"
                     IsEnabled="False"
-                    x:Name="BtnStopServer"/>
+                    x:Name="BtnStopServer"
+                    Click="BtnStopServer_Click"/>
 
 
             <Grid Grid.Column="1" Margin="5">
@@ -45,13 +208,17 @@
                            Text="Port:"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           FontSize="20"/>
+                           FontSize="20"
+                           Foreground="{StaticResource DarkGreyBrush}"/>
 
                 <TextBox Grid.Column="1"
                          VerticalContentAlignment="Center"
                          HorizontalContentAlignment="Center"
                          FontSize="20"
-                         x:Name="TB_ListenerPort"/>
+                         x:Name="TB_ListenerPort"
+                         Background="{StaticResource BgBrush}"
+                         Foreground="{StaticResource DarkGreyBrush}"/>
+                         
 
             </Grid>
 
@@ -65,21 +232,17 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0"
-                           Text="Users online" 
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="30"/>
+            <GroupBox Grid.Column="0"
+                      Header="UsersOnline"
+                      FontSize="20"
+                      Grid.Row="1"
+                      Margin="5, 5, 5, 0"
+                      Foreground="{StaticResource DarkGreyBrush}"
+                      BorderBrush="{StaticResource DarkGreyBrush}">
 
                 <ListBox x:Name="LB_UsersOnline"
-                         Grid.Row="1"
-                         Margin="5">
+                         Background="{StaticResource BgBrush}"
+                         BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -98,49 +261,41 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-            </Grid>
+            </GroupBox>
 
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                
-                <TextBlock Grid.Row="0"
-                           Text="Users offline" 
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="30"/>
-
+            <GroupBox Grid.Column="1"
+                      Header="UsersOffline"
+                      FontSize="20"
+                      Foreground="{StaticResource DarkGreyBrush}"
+                      BorderBrush="{StaticResource DarkGreyBrush}"
+                      Margin="5, 5, 5, 0">
+              
                 <ListBox Grid.Row="1" 
                          x:Name="LB_UsersOffline"
-                         Margin="5">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="40"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="{Binding Id}"
-                                           Grid.Column="0"/>
-                                <TextBlock Text="{Binding Name}"
-                                           Grid.Column="1"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
+                         Background="{StaticResource BgBrush}"
+                         BorderThickness="0"
+                         ItemContainerStyle="{StaticResource UserOffline}">
+                    
                 </ListBox>
 
 
-            </Grid>
+            </GroupBox>
 
 
 
         </Grid>
 
-    
+        <GroupBox Grid.Row="2"
+                  Header="Groups"
+                  Margin="5"
+                  Foreground="{StaticResource DarkGreyBrush}"
+                  BorderBrush="{StaticResource DarkGreyBrush}">
+
+            <ListBox Background="{StaticResource BgBrush}"
+                     BorderThickness="0"
+                     ItemContainerStyle="{StaticResource UserOffline}"/>
+
+        </GroupBox>
 
 
 

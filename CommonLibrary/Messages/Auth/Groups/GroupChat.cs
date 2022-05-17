@@ -25,5 +25,7 @@ namespace CommonLibrary.Messages.Groups
         public List<ChatMessage> Messages { get; set; }
         public List<User> Members { get; set; }
 
+
+
     }
 }
