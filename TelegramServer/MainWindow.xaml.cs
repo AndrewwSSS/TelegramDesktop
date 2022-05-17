@@ -36,8 +36,10 @@ namespace TelegramServer
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
+            
 
             DbContext.SaveChanges();
+
             foreach (User user in DbContext.Users)
                 UsersOffline.Add(user); 
         }

@@ -17,7 +17,7 @@ namespace CommonLibrary.Messages.Groups
     }
 
     [Serializable]
-    public class GroupChat : UserEntity
+    public class GroupChat : UserEntity, INotifyPropertyChanged
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -28,8 +28,57 @@ namespace CommonLibrary.Messages.Groups
         public List<ChatMessage> Messages { get; set; }
         public ChatMessage LastMessage => Messages.LastOrDefault();
         public List<User> Members { get; set; }
+
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool AddMessage(ChatMessage message)
+        {
+            if (message != null)
+            {
+                Messages.Add(message);
+                OnPropertyChanged(nameof(Messages));
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool DelleteMessage(ChatMessage message)
+        {
+            if(message != null && Messages.Remove(message))
+            {
+                OnPropertyChanged(nameof(Messages));
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool AddMember(User member)
+        {
+            if (member != null)
+            {
+                Members.Add(member);
+                OnPropertyChanged(nameof(Members));
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool DeleteMember(User member)
+        {
+            if (member != null && Members.Remove(member))
+            {
+                OnPropertyChanged(nameof(Members));
+                return true;
+            }
+            else
+                return false;
+
+        }
+
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

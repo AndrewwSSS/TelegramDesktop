@@ -293,7 +293,8 @@
 
             <ListBox Background="{StaticResource BgBrush}"
                      BorderThickness="0"
-                     ItemContainerStyle="{StaticResource UserOffline}"/>
+                     ItemContainerStyle="{StaticResource UserOffline}"
+                     x:Name="LB_Groups"/>
 
         </GroupBox>
 
