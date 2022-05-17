@@ -56,6 +56,7 @@ namespace MessageLibrary
             }
             catch (Exception)
             {
+                ConnectFailed?.Invoke(this);
                 return false;
             }
             if (client.Connected)

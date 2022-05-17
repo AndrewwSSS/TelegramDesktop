@@ -36,7 +36,7 @@ namespace TelegramServer
 
             DbContext = new TelegramDb();
 
-
+            DbContext.SaveChanges();
             foreach (User user in DbContext.Users)
                 UsersOffline.Add(user);
          
