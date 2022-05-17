@@ -95,7 +95,7 @@ namespace TelegramServer
                         };
 
                         DbContext.Users.Add(NewUser);
-                        Dispatcher.Invoke(() => UsersOnline.Add(NewUser));
+                        Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
                         DbContext.SaveChanges();
 
                         SignUpResultMessage ResultMessage
@@ -171,6 +171,7 @@ namespace TelegramServer
                    
                      GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.Id);
                      groupChat.Messages.Add(chatMessage);
+                     DbContext.SaveChanges();
 
                      foreach(var user in chatMessage.Chat.Members)
                      {
@@ -231,9 +232,8 @@ namespace TelegramServer
                 case "CreateGroupMessage":
                 {
                     CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
-                    GroupChat NewGroupChat;
                     List<User> Members = null;
-                    User GroupCreator = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
+                    User GroupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
 
                     if (GroupCreator == null)
                     {
@@ -259,10 +259,11 @@ namespace TelegramServer
                         }
                     }
 
+                    GroupChat NewGroupChat;
                     NewGroupChat = new GroupChat();
                     NewGroupChat.Name = createNewGroupMessage.Name;
                     NewGroupChat.Members = new List<User>() { GroupCreator };
-                    
+                    NewGroupChat.DateCreated = DateTime.Now;
 
                     if (createNewGroupMessage.Image != null)
                     {
@@ -305,7 +306,7 @@ namespace TelegramServer
 
                         GroupInfo.Users = PublicUsersInfo;
 
-                        SendMessageToUsers(new AddtingInGroupMessage(GroupInfo), Members);
+                        SendMessageToUsers(new AddtingInGroupMessage(GroupInfo), GroupCreator, Members);
 
 
                     }
@@ -316,18 +317,28 @@ namespace TelegramServer
             }
         }
 
-        private void SendMessageToUsers(BaseMessage Message, List<User> UsersToSend)
+        private void SendMessageToUsers(BaseMessage Message, User FromUser ,List<User> UsersToSend)
         {
             if (Message == null || UsersToSend == null)
                 return;
 
             foreach (var user in UsersToSend)
             {
-                if (user.isOnline)
-                    user.client.SendAsync(Message);
-                else
-                    if (user.MessagesToSend != null)
-                    user.MessagesToSend.Add(Message);
+                if(user.Id != FromUser.Id)
+                {
+                    if (user.isOnline)
+                        user.client.SendAsync(Message);
+                    else
+                    {
+                        if (user.MessagesToSend == null)
+                            user.MessagesToSend = new List<BaseMessage>();
+
+                        user.MessagesToSend.Add(Message);
+                    }
+                      
+                }
+               
+
             }
         }
 

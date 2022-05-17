@@ -82,7 +82,18 @@
                          Margin="5">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <TextBlock Text="{Binding Id}"
+                                           Grid.Column="0"/>
+                                <TextBlock Text="{Binding Name}"
+                                           Grid.Column="1"/>
+                            </Grid>
+                            
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -107,7 +118,17 @@
                          Margin="5">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="{Binding Id}"
+                                           Grid.Column="0"/>
+                                <TextBlock Text="{Binding Name}"
+                                           Grid.Column="1"/>
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
