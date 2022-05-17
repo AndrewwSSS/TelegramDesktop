@@ -269,14 +269,14 @@
                       Foreground="{StaticResource DarkGreyBrush}"
                       BorderBrush="{StaticResource DarkGreyBrush}"
                       Margin="5, 5, 5, 0">
-              
+
                 <ListBox Grid.Row="1" 
                          x:Name="LB_UsersOffline"
                          Background="{StaticResource BgBrush}"
                          BorderThickness="0"
-                         ItemContainerStyle="{StaticResource UserOffline}">
-                    
-                </ListBox>
+                         ItemContainerStyle="{StaticResource UserOffline}"/>
+
+
 
 
             </GroupBox>
