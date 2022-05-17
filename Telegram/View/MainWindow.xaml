@@ -208,33 +208,23 @@
                             <TextBox KeyDown="TB_GroupLookUp_OnEnter" Margin="2"
                                      Style="{StaticResource SearchBoxStyle}"/>
                         </Grid>
-                        <TextBlock  Grid.Row="1" Margin="15"
-                                x:Name="TB_GroupsNotFound"   
-                                Foreground="{StaticResource GreyBrush}"
-                                HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                TextWrapping="Wrap"
-                                Visibility="Hidden">
-                        Введите название группы сверху
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Groups}" Value="{x:Null}">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <ListBox HorizontalContentAlignment="Stretch"
-                             Background="{StaticResource DarkBgBrush}" Grid.Row="1" x:Name="LB_Groups" ItemsSource="{Binding Groups}">
+                        <ListBox x:Name="LB_Groups" HorizontalContentAlignment="Stretch"
+                             Background="{StaticResource DarkBgBrush}"
+                             Grid.Row="1"  
+                             ItemsSource="{Binding Groups}"
+                                 SelectionChanged="GroupSelected">
                             <ListBox.Style>
                                 
                                 <Style TargetType="ListBox">
-                                    <Style.Triggers>
-                                        <Trigger Property="ItemsSource" Value="{x:Null}">
-                                            <Setter Property="Visibility" Value="Hidden"/>
-                                        </Trigger>
-                                    </Style.Triggers>
+                                    <Style.Resources>
+                                        <BooleanToVisibilityConverter x:Key="boolToVis"/>
+                                    </Style.Resources>
+                                    <Style.Setters>
+                                        
+                                        <Setter Property="Visibility" Value="{Binding HasItems, 
+                                          RelativeSource={RelativeSource Self}, 
+                                          Converter={StaticResource boolToVis}}"/>
+                                    </Style.Setters>
                                 </Style>
                             </ListBox.Style>
                             <ListBox.ItemContainerStyle>
@@ -245,7 +235,6 @@
                             </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-
                                     <DataTemplate.Resources>
                                         <entities:NotNullConverter x:Key="notnull"></entities:NotNullConverter>
                                     </DataTemplate.Resources>
@@ -318,18 +307,34 @@
                                                 Mode=FindAncestor,
                                                 AncestorType={x:Type ListBoxItem}},
                                                 Path=IsSelected}"
-                                            Value="True">       
+                                            Value="True">
                                             <Setter
                                             TargetName="border"
                                             Property="Background"
-                                            Value="{StaticResource MsgBgBrush}"/>           
+                                            Value="{StaticResource MsgBgBrush}"/>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
-
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
 
                         </ListBox>
+                        <TextBlock  Grid.Row="1" Margin="15"
+                                x:Name="TB_GroupsNotFound"   
+                                Visibility="Hidden"
+                                Foreground="{StaticResource GreyBrush}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                TextWrapping="Wrap">
+                        Введите название группы сверху
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=HasItems, ElementName=LB_Groups}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
 
                     </Grid>
 
