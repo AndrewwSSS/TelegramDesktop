@@ -5,6 +5,7 @@ using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -19,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using Telegram.Utility;
 
 namespace Telegram
 {
@@ -50,18 +52,31 @@ namespace Telegram
         public DoubleAnimation MainGridDarkReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.2)));
         public ThicknessAnimation OpenLeftMenuAnim = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnim = new ThicknessAnimation();
-        private ObservableCollection<GroupChat> groups = null;
+        private ObservableCollection<GroupChat> groups = new ObservableCollection<GroupChat>();
+        private ObservableCollection<MessageItemWrap> messages;
 
         public User Me { get; set; }
         public static User ivan { get; set; } = new User("Иван Довголуцкий");
 
 
-        public ObservableCollection<MessageItemWrap> Messages { get; set; }
-        public ObservableCollection<GroupChat> Groups { get => groups; 
-            set { 
+        public ObservableCollection<MessageItemWrap> Messages
+        {
+            get => messages;
+            set
+            {
+                messages = value;
+                OnPropertyChanged();
+            }
+        }
+        public ObservableCollection<GroupChat> Groups
+        {
+            get => groups;
+            set
+            {
+
                 groups = value;
                 OnPropertyChanged();
-            } 
+            }
         }
         public MainWindow() : this(null, new User("Дмитрий Осипов")
         {
@@ -71,14 +86,23 @@ namespace Telegram
         public MainWindow(TcpClientWrap client, User me)
         {
 
+            DataContext = this;
+            InitializeComponent();
+            HideRightMenu();
+
+            Groups.Add(new GroupChat()
+            {
+                Name = "ПВ011",
+                Images = new List<ImageContainer>() { ImageContainer.FromFile("Resources/darkl1ght.png") },
+                Messages = new List<ChatMessage>() { new ChatMessage("Прувет!") }
+            });
+
             Me = me;
             ivan.AddImage("Resources/ivan.jpg");
             Me.AddImage("Resources/darkl1ght.png");
             this.client = client;
             if (client != null)
                 this.client.MessageReceived += Client_MessageReceived;
-            InitializeComponent();
-            HideRightMenu();
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
@@ -91,26 +115,37 @@ namespace Telegram
             CloseLeftMenuAnim.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(200);
 
-            DataContext = this;
+
 
             Messages = new ObservableCollection<MessageItemWrap>();
-            AddMessage(new ChatMessage("Всем привет, это телеграм").SetFrom(Me));
-            AddMessage(new ChatMessage("Скоро командный проект").SetFrom(Me).SetResendUser(ivan));
-            AddMessage(new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(Messages[1].Message));
-            AddMessage(new ChatMessage("тест").SetFrom(Me));
-            AddMessage(new ChatMessage("тест").SetFrom(Me));
-            AddMessage(new ChatMessage("тест").SetFrom(Me));
-            AddMessage(new ChatMessage("тест").SetFrom(Me));
+            var respTo = new ChatMessage("Всем привет, это телеграм").SetFrom(Me);
+            Groups[0].Messages = new List<ChatMessage>() 
+            { 
+                respTo,
+                new ChatMessage("Скоро командный проект").SetFrom(Me).SetResendUser(ivan),
+                new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(respTo),
+                new ChatMessage("тест").SetFrom(Me),
+                new ChatMessage("тест").SetFrom(Me),
+                new ChatMessage("тест").SetFrom(Me),
+                new ChatMessage("тест").SetFrom(Me)
+            };
         }
 
         private void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
-            if (msg is CreateGroupResultMessage)
+            Dispatcher.Invoke(() =>
             {
-                var result = msg as CreateGroupResultMessage;
-                if (result.Result == AuthenticationResult.Success)
-                    MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-            }
+                if (msg is CreateGroupResultMessage)
+                {
+                    var result = msg as CreateGroupResultMessage;
+                    if (result.Result == AuthenticationResult.Success)
+                    {
+                        MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
+
+                        Groups.Add(new GroupChat() { DateCreated = DateTime.Now, Name = Buffers.GroupName });
+                    }
+                }
+            });
         }
 
         private void AddMessage(ChatMessage msg)
@@ -256,6 +291,7 @@ namespace Telegram
 
         private void B_AddGroup_OnClick(object sender, RoutedEventArgs e)
         {
+            Buffers.GroupName = TB_NewGroupName.Text;
             client.SendAsync(new CreateGroupMessage(TB_NewGroupName.Text, Me.Id));
             client.ReceiveAsync();
         }
@@ -264,6 +300,15 @@ namespace Telegram
         {
             TextBox textBox = sender as TextBox;
             AddGroupButton.IsEnabled = !string.IsNullOrEmpty(textBox.Text);
+        }
+
+        private void GroupSelected(object sender, RoutedEventArgs e)
+        {
+            ListBox lb = sender as ListBox;
+            Messages.Clear();
+            if((lb.SelectedItem as GroupChat).Messages != null)
+                foreach(var msg in (lb.SelectedItem as GroupChat).Messages)
+                    AddMessage(msg);
         }
     }
 
