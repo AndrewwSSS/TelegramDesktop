@@ -6,9 +6,11 @@ using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,8 +29,13 @@ namespace Telegram
         Open
     }
 
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        [field: NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         TcpClientWrap client;
 
         public const int LeftMenuWidth = 280;
@@ -43,11 +50,19 @@ namespace Telegram
         public DoubleAnimation MainGridDarkReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.2)));
         public ThicknessAnimation OpenLeftMenuAnim = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnim = new ThicknessAnimation();
+        private ObservableCollection<GroupChat> groups = null;
+
         public User Me { get; set; }
         public static User ivan { get; set; } = new User("Иван Довголуцкий");
 
 
         public ObservableCollection<MessageItemWrap> Messages { get; set; }
+        public ObservableCollection<GroupChat> Groups { get => groups; 
+            set { 
+                groups = value;
+                OnPropertyChanged();
+            } 
+        }
         public MainWindow() : this(null, new User("Дмитрий Осипов")
         {
             RegistrationDate = DateTime.Now
@@ -55,11 +70,12 @@ namespace Telegram
         { }
         public MainWindow(TcpClientWrap client, User me)
         {
+
             Me = me;
             ivan.AddImage("Resources/ivan.jpg");
             Me.AddImage("Resources/darkl1ght.png");
             this.client = client;
-            if(client != null)
+            if (client != null)
                 this.client.MessageReceived += Client_MessageReceived;
             InitializeComponent();
             HideRightMenu();
@@ -89,10 +105,10 @@ namespace Telegram
 
         private void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
-            if(msg is CreateGroupResultMessage)
+            if (msg is CreateGroupResultMessage)
             {
                 var result = msg as CreateGroupResultMessage;
-                if(result.Result == AuthenticationResult.Success)
+                if (result.Result == AuthenticationResult.Success)
                     MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
             }
         }
@@ -201,7 +217,7 @@ namespace Telegram
                 var fadeAway = MakeDoubleAnim(0, 0.1);
                 fadeAway.Completed += (v1, v2) =>
                 {
-                    Dispatcher.Invoke(()=>
+                    Dispatcher.Invoke(() =>
                     MainGrid.BeginAnimation(Border.OpacityProperty, MainGridDarkReverse));
                 };
                 AddGroupMenuState = MenuState.Hidden;
