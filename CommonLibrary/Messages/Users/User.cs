@@ -1,12 +1,10 @@
-﻿using System;
+﻿using CommonLibrary.Messages.Groups;
+using MessageLibrary;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Windows.Media;
-using CommonLibrary.Messages.Groups;
-using MessageLibrary;
 
 namespace CommonLibrary.Messages.Users
 {
