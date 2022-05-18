@@ -33,8 +33,8 @@ namespace TelegramServer
 
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-            //DbContext.GroupChats.Load();
-            //Chats = DbContext.GroupChats.Local;
+            DbContext.GroupChats.Load();
+            Chats = DbContext.GroupChats.Local;
             Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
@@ -44,12 +44,8 @@ namespace TelegramServer
             LB_UsersOnline.ItemsSource = UsersOnline;
             LB_Groups.ItemsSource = Chats;
 
-
-            DbContext.Users.Add(new User() { LastVisitDate=DateTime.Now, RegistrationDate=DateTime.Now, Name="Aboba", Login="log"});
-            //LB_Groups.ItemsSource = Chats;
-
-            //foreach (User user in DbContext.Users)
-            //    UsersOffline.Add(user); 
+            foreach (User user in DbContext.Users)
+                UsersOffline.Add(user);
         }
 
 
