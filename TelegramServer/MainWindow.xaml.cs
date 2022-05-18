@@ -92,7 +92,8 @@ namespace TelegramServer
             switch (msg.GetType().Name)
             {
                 case "SignUpMessage":
-                {
+                
+                    {
                     SignUpMessage signUpMessage = (SignUpMessage)msg;
                     
                     if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
