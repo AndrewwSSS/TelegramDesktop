@@ -1,7 +1,7 @@
 ﻿using CommonLibrary.Messages.Users;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace CommonLibrary.Messages.Groups
 {
@@ -13,11 +13,12 @@ namespace CommonLibrary.Messages.Groups
         public GroupType GroupType { get; set; }
         public List<ChatMessage> Messages { get; set; }
 
-        public PublicGroupInfo(string Name, string Description, int Id)
+        public ChatMessage LastMessage => Messages == null ? null : Messages.LastOrDefault();
+        public PublicGroupInfo(string name, string desc, int id)
         {
-            this.Name = Name;
-            this.Description = Description;
-            this.Id = Id;
+            Name = name;
+            Description = desc;
+            Id = id;
         }
 
 

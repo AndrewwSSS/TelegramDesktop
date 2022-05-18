@@ -83,7 +83,6 @@ namespace Telegram.View
                             Login = login,
                             RegistrationDate = result.RegistrationDate
                         };
-                        me.AddImage("Resources/darkl1ght.png");
                         wnd = new MainWindow(client, me);
                         wnd.Show();
                         Close();

@@ -10,6 +10,7 @@ using System.Windows.Media;
 
 namespace CommonLibrary.Messages.Groups
 {
+    [Serializable]
     public enum GroupType
     {
         Personal,
