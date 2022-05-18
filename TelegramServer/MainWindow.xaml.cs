@@ -202,21 +202,16 @@ namespace TelegramServer
                 {
                     GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                     ArrayMessage<PublicGroupInfo> ResultMessage;
-
-                    List<PublicGroupInfo> SuitableGroups = new List<PublicGroupInfo>();
-                        
-                    if(DbContext.GroupChats.Count() == 0)
-                    {
-                          ResultMessage = new ArrayMessage<PublicGroupInfo>(null);
-                          client.SendAsync(ResultMessage);
-                          break;
-                    }
+                    List<PublicGroupInfo> SuitableGroups = null;
+                     
 
                     foreach (var groupChat in DbContext.GroupChats)
                     {
-                        if(groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()) ||
-                            groupLookupMessage.GroupName.ToLower().Contains(groupChat.Name.ToLower()))
+                        if(groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
                         {
+                            if(SuitableGroups == null)
+                                SuitableGroups = new List<PublicGroupInfo>();
+
                             PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
 
                             foreach(var groupMember in groupChat.Members)
@@ -233,6 +228,7 @@ namespace TelegramServer
                             SuitableGroups.Add(SuitableGroup);
                         }
                     }
+
                     ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
                     client.SendAsync(ResultMessage);
                         
