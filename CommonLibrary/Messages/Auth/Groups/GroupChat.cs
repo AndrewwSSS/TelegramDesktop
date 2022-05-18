@@ -25,12 +25,21 @@ namespace CommonLibrary.Messages.Groups
 
         public GroupType Type { get; set; }
         public DateTime DateCreated { get; set; }
-        public List<ChatMessage> Messages { get; set; }
+        public virtual List<ChatMessage> Messages { get; set; }
         public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
-        public List<User> Members { get; set; }
+
+        public virtual List<User> Members { get; set; }
+
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
+
+
+        public GroupChat()
+        {
+            //Messages = new List<ChatMessage>();
+            //Members = new List<User>();
+        }
 
         public bool AddMessage(ChatMessage message)
         {
@@ -46,7 +55,7 @@ namespace CommonLibrary.Messages.Groups
 
         public bool DeleteMessage(ChatMessage message)
         {
-            if(message != null && Messages.Remove(message))
+            if (message != null && Messages.Remove(message))
             {
                 OnPropertyChanged(nameof(Messages));
                 return true;
@@ -79,6 +88,7 @@ namespace CommonLibrary.Messages.Groups
 
         }
 
+       
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
