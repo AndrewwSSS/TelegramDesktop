@@ -87,41 +87,39 @@ namespace TelegramServer
             switch (msg.GetType().Name)
             {
                 case "SignUpMessage":
-                
-                    {
-                    SignUpMessage signUpMessage = (SignUpMessage)msg;
+                {
+                SignUpMessage signUpMessage = (SignUpMessage)msg;
                     
-                    if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
+                if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
+                {
+                    User NewUser = new User()
                     {
-                        User NewUser = new User()
-                        {
-                            Email = signUpMessage.Email,
-                            Login = signUpMessage.Login,
-                            Name = signUpMessage.Name,
-                            Password = signUpMessage.Password,
-                            RegistrationDate = DateTime.Now,
-                            LastVisitDate = DateTime.Now
-                        };
+                        Email = signUpMessage.Email,
+                        Login = signUpMessage.Login,
+                        Name = signUpMessage.Name,
+                        Password = signUpMessage.Password,
+                        RegistrationDate = DateTime.Now,
+                        LastVisitDate = DateTime.Now
+                    };
 
-                        DbContext.Users.Add(NewUser);
-                        Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
-                        DbContext.SaveChanges();
+                    DbContext.Users.Add(NewUser);
+                    Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
+                    DbContext.SaveChanges();
 
-                        SignUpResultMessage ResultMessage
-                                = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
+                    SignUpResultMessage ResultMessage
+                            = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
                         
-                        client.SendAsync(ResultMessage);
+                    client.SendAsync(ResultMessage);
 
-                    }
-                    else
-                    {
-                        SignUpResultMessage ResultMessage
-                            = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
-                        client.SendAsync(ResultMessage);
-                    }
+                }
+                else
+                {
+                    SignUpResultMessage ResultMessage
+                        = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
+                    client.SendAsync(ResultMessage);
+                }
+                break;
 
-                        
-                    break;
                 }
                 case "LoginMessage":
                 { 
@@ -297,7 +295,7 @@ namespace TelegramServer
 
                     if(Members != null)
                     {
-                        //NewGroupChat.Members.AddRange(Members);
+                        NewGroupChat.Members.AddRange(Members);
 
                         List<PublicUserInfo> PublicUsersInfo = new List<PublicUserInfo>();
 
@@ -320,7 +318,7 @@ namespace TelegramServer
 
                         GroupInfo.Users = PublicUsersInfo;
 
-                        SendMessageToUsers(new AddtingInGroupMessage(GroupInfo), GroupCreator, Members);
+                        SendMessageToUsers(new AddingInGroupMessage(GroupInfo), GroupCreator, Members);
                     }
 
                     break;

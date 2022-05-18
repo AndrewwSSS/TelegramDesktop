@@ -26,10 +26,9 @@ namespace CommonLibrary.Messages.Groups
         public GroupType Type { get; set; }
         public DateTime DateCreated { get; set; }
         public virtual List<ChatMessage> Messages { get; set; }
-        public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
-
         public virtual List<User> Members { get; set; }
 
+        public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
@@ -87,8 +86,6 @@ namespace CommonLibrary.Messages.Groups
                 return false;
 
         }
-
-       
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
