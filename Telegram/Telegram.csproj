@@ -61,7 +61,6 @@
       <DependentUpon>LoginSignupWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="WPF Entities\AndConverter.cs" />
-    <Compile Include="WPF Entities\IsLastMessageConverter.cs" />
     <Compile Include="WPF Entities\NotNullConverter.cs" />
     <Page Include="View\BrushDictionary.xaml">
       <SubType>Designer</SubType>

@@ -411,10 +411,7 @@
                              IsHitTestVisible="False">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                <DataTemplate.Resources>
-                                    <entities:IsLastMessageConverter x:Key="last" />
-                                </DataTemplate.Resources>
-                                <Grid>
+                                    <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto"/>
                                         <ColumnDefinition Width="*"/>
