@@ -26,9 +26,10 @@ namespace CommonLibrary.Messages.Groups
         public GroupType Type { get; set; }
         public DateTime DateCreated { get; set; }
         public List<ChatMessage> Messages { get; set; }
-        public ChatMessage LastMessage => Messages.LastOrDefault();
         public List<User> Members { get; set; }
 
+
+        public ChatMessage LastMessage => Messages.LastOrDefault();
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -75,7 +75,7 @@ namespace Telegram.View
                         password = TB_Login_Password.Text,
                         login = result.Login?? TB_Login_Id.Text;
                         
-                        var me = new User(result.Id)
+                        var me = new User(result.UserId)
                         {
                             Email = email,
                             Name = name,
