@@ -7,6 +7,7 @@ using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity;
 using System.Linq;
 using System.Windows;
 
@@ -16,7 +17,7 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-        private ObservableCollection<GroupChat> GroupChat;
+        private ObservableCollection<GroupChat> Chats;
         private TelegramDb DbContext;
 
         private TcpServerWrap Server;
@@ -25,10 +26,15 @@ namespace TelegramServer
         {
             InitializeComponent();
 
+            DbContext = new TelegramDb();
+
+
+            DbContext.Configuration.AutoDetectChangesEnabled = true;
+
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-            GroupChat = new ObservableCollection<GroupChat>();
-            DbContext = new TelegramDb();
+            //DbContext.GroupChats.Load();
+            //Chats = DbContext.GroupChats.Local;
             Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
@@ -36,11 +42,14 @@ namespace TelegramServer
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
-            
+            LB_Groups.ItemsSource = Chats;
 
-            DbContext.SaveChanges();
-            foreach (User user in DbContext.Users)
-                UsersOffline.Add(user); 
+
+            DbContext.Users.Add(new User() { LastVisitDate=DateTime.Now, RegistrationDate=DateTime.Now, Name="Aboba", Login="log"});
+            //LB_Groups.ItemsSource = Chats;
+
+            //foreach (User user in DbContext.Users)
+            //    UsersOffline.Add(user); 
         }
 
 
@@ -270,6 +279,7 @@ namespace TelegramServer
                     NewGroupChat.Name = createNewGroupMessage.Name;
                     NewGroupChat.Members = new List<User>() { GroupCreator };
                     NewGroupChat.DateCreated = DateTime.Now;
+                    
 
                     if (createNewGroupMessage.Image != null)
                     {
@@ -277,11 +287,13 @@ namespace TelegramServer
                         NewGroupChat.Images.Add(createNewGroupMessage.Image);
                     }
 
-                    DbContext.GroupChats.Add(NewGroupChat);
-                    DbContext.SaveChanges();
-
-
-
+                    Dispatcher.Invoke(() => {
+                        DbContext.GroupChats.Add(NewGroupChat);
+                        DbContext.SaveChanges();
+                        DbContext.GroupChats.Load();
+                    });
+                  
+                   
                     CreateGroupResultMessage ResultMessage =
                             new CreateGroupResultMessage(AuthenticationResult.Success, NewGroupChat.Id);
                     client.SendAsync(ResultMessage);

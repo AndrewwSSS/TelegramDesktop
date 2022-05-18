@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TelegramServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="426" Width="593"
+        Title="MainWindow" Height="585" Width="820"
         MinHeight="450"
         MinWidth="800">
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -22,7 +22,7 @@
             <Setter Property="Background" Value="{StaticResource BgBrush}"/>
         </Style>
     </Window.Style>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -76,13 +76,45 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <Border Background="{StaticResource DarkBgBrush}">
+                                <Border Background="{StaticResource BlueBrush}"
+                                        Margin="5"
+                                        CornerRadius="5">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
                                             <RowDefinition/>
-                                            <RowDefinition/>
                                         </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Name:"
+                                                       FontSize="17"/>
+
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Name}"
+                                                       FontSize="17"/>
+                                        </Grid>
+
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="140"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Members count:"
+                                                       FontSize="17"/>
+
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Path=Members.Count}"
+                                                       FontSize="17"/>
+                                        </Grid>
+
                                     </Grid>
                                 </Border>
                             </ControlTemplate>
@@ -110,16 +142,16 @@
 
                                         <Grid Grid.Row="0">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="50"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0"
-                                               Text="Id:"
+                                               Text="Login:"
                                                FontSize="17"/>
 
                                             <TextBlock Grid.Column="1"
-                                               Text="{Binding Id}"
+                                               Text="{Binding Login}"
                                                FontSize="17"/>
                                         </Grid>
 
@@ -159,9 +191,7 @@
                                 </Border>
 
                                 <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-
-                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True"/>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Setter.Value>
@@ -169,6 +199,63 @@
                 </Style.Setters>
             </Style>
 
+            <Style TargetType="ListBoxItem" x:Key="UserOnline">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Background="{StaticResource LightBlueBrush}"
+                                        BorderBrush="Green"
+                                        BorderThickness="2"
+                                        CornerRadius="5">
+
+                                    <Grid Margin="2"  >
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                               Text="Login:"
+                                               FontSize="17"/>
+
+                                            <TextBlock Grid.Column="1"
+                                               Text="{Binding Login}"
+                                               FontSize="17"/>
+                                        </Grid>
+
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                               Text="Name:"
+                                               FontSize="17"/>
+
+                                            <TextBlock Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               FontSize="17"/>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True"/>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
 
 
         </Grid.Resources>
@@ -180,8 +267,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            
-            
+
+
             <Button Grid.Column="0"
                     Margin="5"
                     Content="Start server"
@@ -218,14 +305,14 @@
                          x:Name="TB_ListenerPort"
                          Background="{StaticResource BgBrush}"
                          Foreground="{StaticResource DarkGreyBrush}"/>
-                         
+
 
             </Grid>
 
 
 
         </Grid>
-        
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -242,24 +329,8 @@
 
                 <ListBox x:Name="LB_UsersOnline"
                          Background="{StaticResource BgBrush}"
-                         BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="40"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <TextBlock Text="{Binding Id}"
-                                           Grid.Column="0"/>
-                                <TextBlock Text="{Binding Name}"
-                                           Grid.Column="1"/>
-                            </Grid>
-                            
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                         BorderThickness="0"
+                         ItemContainerStyle="{StaticResource UserOffline}"/>
 
             </GroupBox>
 
@@ -293,7 +364,7 @@
 
             <ListBox Background="{StaticResource BgBrush}"
                      BorderThickness="0"
-                     ItemContainerStyle="{StaticResource UserOffline}"
+                     ItemContainerStyle="{StaticResource Group}"
                      x:Name="LB_Groups"/>
 
         </GroupBox>

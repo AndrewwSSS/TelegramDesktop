@@ -48,11 +48,5 @@ namespace CommonLibrary.Messages.Users
 
         public User(int id) => Id = id;
         public User() { }
-
-
-
-
-
-
     }
 }
