@@ -29,8 +29,6 @@ namespace CommonLibrary.Messages.Groups
         public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
         public List<User> Members { get; set; }
 
-
-        public ChatMessage LastMessage => Messages.LastOrDefault();
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
