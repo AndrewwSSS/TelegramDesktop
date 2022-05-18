@@ -5,11 +5,11 @@ using System;
 namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
-    public class AddtingInGroupMessage : BaseMessage
+    public class AddingInGroupMessage : BaseMessage
     {
         public PublicGroupInfo GroupInfo { get; set; }
 
-        public AddtingInGroupMessage(PublicGroupInfo GroupInfo)
+        public AddingInGroupMessage(PublicGroupInfo GroupInfo)
         {
             this.GroupInfo = GroupInfo;
         }
