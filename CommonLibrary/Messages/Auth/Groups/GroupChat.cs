@@ -26,7 +26,7 @@ namespace CommonLibrary.Messages.Groups
         public GroupType Type { get; set; }
         public DateTime DateCreated { get; set; }
         public List<ChatMessage> Messages { get; set; }
-        public ChatMessage LastMessage => Messages.LastOrDefault();
+        public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
         public List<User> Members { get; set; }
 
         [field: NonSerialized]
@@ -44,7 +44,7 @@ namespace CommonLibrary.Messages.Groups
                 return false;
         }
 
-        public bool DelleteMessage(ChatMessage message)
+        public bool DeleteMessage(ChatMessage message)
         {
             if(message != null && Messages.Remove(message))
             {
