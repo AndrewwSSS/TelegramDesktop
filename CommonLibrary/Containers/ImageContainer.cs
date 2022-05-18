@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Resources;
 
 namespace CommonLibrary.Containers
 {
@@ -83,6 +84,16 @@ namespace CommonLibrary.Containers
             };
             return result;
         }
+        //public static ImageContainer FromFile(Uri uri)
+        //{
+        //    var stream = System.Windows.Application.GetResourceStream(uri);
+        //    ImageContainer result = new ImageContainer
+        //    {
+        //        Name = Path.GetFileName(path),
+        //        Data = File.ReadAllBytes(path)
+        //    };
+        //    return result;
+        //}
 
         public static string GetImageFormat(Image img)
         {

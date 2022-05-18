@@ -77,14 +77,12 @@ namespace Telegram.View
                         
                         var me = new User(result.UserId)
                         {
-                  
                             Email = email,
                             Name = name,
                             Password = password,
                             Login = login,
                             RegistrationDate = result.RegistrationDate
                         };
-                        me.AddImage("Resources/darkl1ght.png");
                         wnd = new MainWindow(client, me);
                         wnd.Show();
                         Close();

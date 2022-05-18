@@ -33,6 +33,11 @@ namespace CommonLibrary.Messages.Users
             //Chats = new List<GroupChat>();
         }
 
+        public User(int id)
+        {
+            Id = id;
+        }
+
         [NotMapped]
         public TcpClientWrap client { get; set; }
 
