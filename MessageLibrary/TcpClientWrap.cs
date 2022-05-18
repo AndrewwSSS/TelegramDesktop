@@ -167,7 +167,7 @@ namespace MessageLibrary
 
                 int bytesRead = Tcp.Client.EndReceive(ar);
 
-                if (bytesRead > 0)
+                if(bytesRead > 0)
                 {
                     if(socket.Available > 0)
                     {

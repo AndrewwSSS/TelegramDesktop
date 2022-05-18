@@ -8,8 +8,7 @@ namespace CommonLibrary.Messages.Groups
     {
         public string GroupName { get; set; }
 
-        public GroupLookupMessage(string GroupName)
-        {
+        public GroupLookupMessage(string GroupName){
             this.GroupName = GroupName;
         }
 

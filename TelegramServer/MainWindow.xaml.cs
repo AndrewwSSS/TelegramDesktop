@@ -54,6 +54,7 @@ namespace TelegramServer
             if(int.TryParse(TB_ListenerPort.Text, out port) && port > 999 && port < 10000)
             {
                 BtnStartServer.IsEnabled = false;
+                TB_ListenerPort.IsEnabled = false;
                 Server.Start(port, 1000);
             }
             else
@@ -63,6 +64,13 @@ namespace TelegramServer
 
         private void BtnStopServer_Click(object sender, RoutedEventArgs e) {
             Server.Shutdown();
+
+            UsersOnline.Clear();
+            UsersOffline.Clear();
+
+            foreach (var user in DbContext.Users)
+                UsersOffline.Add(user);
+
         }
 
         private void OnServerStarted(TcpServerWrap client)
@@ -79,6 +87,7 @@ namespace TelegramServer
             {
                 BtnStopServer.IsEnabled = false;
                 BtnStartServer.IsEnabled = true;
+                TB_ListenerPort.IsEnabled = true;
             });
         }
 
@@ -88,36 +97,36 @@ namespace TelegramServer
             {
                 case "SignUpMessage":
                 {
-                SignUpMessage signUpMessage = (SignUpMessage)msg;
+                    SignUpMessage signUpMessage = (SignUpMessage)msg;
                     
-                if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
-                {
-                    User NewUser = new User()
+                    if(DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
                     {
-                        Email = signUpMessage.Email,
-                        Login = signUpMessage.Login,
-                        Name = signUpMessage.Name,
-                        Password = signUpMessage.Password,
-                        RegistrationDate = DateTime.Now,
-                        LastVisitDate = DateTime.Now
-                    };
+                        User NewUser = new User()
+                        {
+                            Email = signUpMessage.Email,
+                            Login = signUpMessage.Login,
+                            Name = signUpMessage.Name,
+                            Password = signUpMessage.Password,
+                            RegistrationDate = DateTime.Now,
+                            LastVisitDate = DateTime.Now
+                        };
 
-                    DbContext.Users.Add(NewUser);
-                    Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
-                    DbContext.SaveChanges();
+                        DbContext.Users.Add(NewUser);
+                        Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
+                        DbContext.SaveChanges();
 
-                    SignUpResultMessage ResultMessage
-                            = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
+                        SignUpResultMessage ResultMessage
+                                = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
                         
-                    client.SendAsync(ResultMessage);
+                        client.SendAsync(ResultMessage);
 
-                }
-                else
-                {
-                    SignUpResultMessage ResultMessage
-                        = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
-                    client.SendAsync(ResultMessage);
-                }
+                    }
+                    else
+                    {
+                        SignUpResultMessage ResultMessage
+                            = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
+                        client.SendAsync(ResultMessage);
+                    }
                 break;
 
                 }
@@ -264,8 +273,7 @@ namespace TelegramServer
                         }
                     }
 
-                    GroupChat NewGroupChat;
-                    NewGroupChat = new GroupChat();
+                    GroupChat NewGroupChat = new GroupChat();
                     NewGroupChat.Name = createNewGroupMessage.Name;
                     NewGroupChat.Members = new List<User>() { GroupCreator };
                     NewGroupChat.DateCreated = DateTime.Now;

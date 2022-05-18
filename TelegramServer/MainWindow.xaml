@@ -330,7 +330,7 @@
                 <ListBox x:Name="LB_UsersOnline"
                          Background="{StaticResource BgBrush}"
                          BorderThickness="0"
-                         ItemContainerStyle="{StaticResource UserOffline}"/>
+                         ItemContainerStyle="{StaticResource UserOnline}"/>
 
             </GroupBox>
 
