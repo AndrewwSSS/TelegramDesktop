@@ -20,13 +20,20 @@ namespace CommonLibrary.Messages.Users
         public string Login { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public bool Banned { get; set; } = false;
         public DateTime RegistrationDate { get; set; }
         public DateTime LastVisitDate { get; set; }
-        public List<User> BlockedUsers { get; set; }
-        public List<GroupChat> Chats { get; set; }
-        public bool Banned { get; set; } = false;
-        public List<BaseMessage> MessagesToSend { get; set; }
+        public virtual List<User> BlockedUsers { get; set; }
+        public virtual List<GroupChat> Chats { get; set; }
+        public virtual List<BaseMessage> MessagesToSend { get; set; }
+       
 
+
+        public User()
+        {
+            //BlockedUsers = new List<User>();
+            //Chats = new List<GroupChat>();
+        }
 
         [NotMapped]
         public TcpClientWrap client { get; set; }
@@ -44,9 +51,9 @@ namespace CommonLibrary.Messages.Users
              });
 
 
-        public User(string name) => Name = name;
+        //public User(string name) => Name = name;
 
-        public User(int id) => Id = id;
-        public User() { }
+        //public User(int id) => Id = id;
+
     }
 }

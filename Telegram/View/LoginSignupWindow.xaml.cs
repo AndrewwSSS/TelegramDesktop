@@ -77,6 +77,7 @@ namespace Telegram.View
                         
                         var me = new User(result.UserId)
                         {
+                  
                             Email = email,
                             Name = name,
                             Password = password,

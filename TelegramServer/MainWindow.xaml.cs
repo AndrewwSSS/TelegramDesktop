@@ -28,13 +28,12 @@ namespace TelegramServer
 
             DbContext = new TelegramDb();
 
-
-            DbContext.Configuration.AutoDetectChangesEnabled = true;
-
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
+
             DbContext.GroupChats.Load();
             Chats = DbContext.GroupChats.Local;
+
             Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
@@ -298,7 +297,7 @@ namespace TelegramServer
 
                     if(Members != null)
                     {
-                        NewGroupChat.Members.AddRange(Members);
+                        //NewGroupChat.Members.AddRange(Members);
 
                         List<PublicUserInfo> PublicUsersInfo = new List<PublicUserInfo>();
 
