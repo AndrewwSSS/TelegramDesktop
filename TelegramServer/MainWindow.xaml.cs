@@ -255,7 +255,7 @@ namespace TelegramServer
                     // если есть пользователи котрых добавили в группу
                     if (createNewGroupMessage.MembersId != null)
                     {
-                        Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Any(m => m == u.Id)).ToList();
+                        Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Contains(u.Id)).ToList();
 
                         if (Members.Count > 0)
                         {
