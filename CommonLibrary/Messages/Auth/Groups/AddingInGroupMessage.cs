@@ -5,7 +5,7 @@ using System;
 namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
-    public class AddingInGroupMessage : Message
+    public class AddingInGroupMessage :BaseMessage
     {
         public PublicGroupInfo GroupInfo { get; set; }
 
