@@ -11,15 +11,13 @@ namespace MessageLibrary
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class ArrayMessage<T> : Message, ITypedMessage
+    public class ArrayMessage<T> : Message
     {
         public T[] Array { get; set; }
-        public Type ContainedType { get; private set; }
         public ArrayMessage(IEnumerable<T> arr)
         {
-            Array = arr.ToArray();
-            Type = MessageType.Array;
-            ContainedType = typeof(T);
+            if(arr != null)
+                Array = arr.ToArray();
         }
     }
 }

@@ -12,11 +12,7 @@ namespace MessageLibrary
     public class TextMessage : Message
     {
         public string Text { get; set; }
-        public TextMessage(string text)
-        {
-            Type = MessageType.Text;
-            Text = text;
-        }
+        public TextMessage(string text) => Text = text;
         public override string ToString() => Text;
     }
 }
