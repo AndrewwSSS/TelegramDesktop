@@ -35,10 +35,7 @@ namespace Telegram.View
            
         }
 
-        private void Client_ConnectFailed(TcpClientWrap obj)
-        {
-            client.ConnectAsync();
-        }
+        private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
 
         private void Client_Connected(TcpClientWrap client)
         {
@@ -87,7 +84,9 @@ namespace Telegram.View
                         };
 
                         client.MessageReceived -= Client_MessageReceived;
+                        
                         wnd = new MainWindow(me);
+                        wnd.Client = App.Client;
                         wnd.Show();
                     } else
 

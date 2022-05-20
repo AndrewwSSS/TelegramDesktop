@@ -15,7 +15,7 @@ namespace TelegramServer
         public TelegramDb()
             : base("Telegram")
         {
-            
+            Database.SetInitializer<TelegramDb>(new CreateDatabaseIfNotExists<TelegramDb>());
             //Database.SetInitializer<TelegramDb>(null);
         }
     }

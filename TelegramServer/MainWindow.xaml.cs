@@ -334,7 +334,7 @@ namespace TelegramServer
             }
         }
 
-        private void SendMessageToUsers(Message msg, User FromUser, List<User> UsersToSend)
+        private void SendMessageToUsers(BaseMessage msg, User FromUser, List<User> UsersToSend)
         {
             if (msg == null || UsersToSend == null)
                 return;
@@ -344,11 +344,11 @@ namespace TelegramServer
                 {
                     if (user.isOnline)
                         user.client.SendAsync(msg);
-                    else if (msg is BaseMessage)
+                    else
                     {
                         if (user.MessagesToSend == null)
                             user.MessagesToSend = new List<BaseMessage>();
-                        user.MessagesToSend.Add(msg as BaseMessage);
+                        user.MessagesToSend.Add(msg);
                     }
                 }
         }
