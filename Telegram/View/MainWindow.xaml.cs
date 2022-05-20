@@ -128,7 +128,17 @@ namespace Telegram
                 new ChatMessage("тест").SetFrom(Me),
                 new ChatMessage("тест").SetFrom(Me)
             };
+
+            Closed += OnClosed;
         }
+
+        private void OnClosed(object sender, EventArgs e)
+        {
+            if(Me != null)
+                Client.Send(new ClientDisconnectMessage(Me.Id));
+            Client.Disconnect();
+        }
+
         private void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
             Dispatcher.Invoke(() =>

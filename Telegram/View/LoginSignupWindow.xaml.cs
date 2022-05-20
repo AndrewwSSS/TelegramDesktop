@@ -19,8 +19,10 @@ namespace Telegram.View
 
             tabControl.IsEnabled = false;
             client = App.Client;
-           
+            Closed += LoginSignupWindow_Closed;
         }
+
+        private void LoginSignupWindow_Closed(object sender, System.EventArgs e) => App.Client.Disconnect();
 
         private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
 
@@ -58,12 +60,11 @@ namespace Telegram.View
                     {
                         var info = result.UserInfo;
                         client.MessageReceived -= Client_MessageReceived;
-                        
+
                         wnd = new MainWindow(info);
                         wnd.Client = App.Client;
                         wnd.Show();
                     } else
-
                         tabControl.IsEnabled = true;
                 });
             }

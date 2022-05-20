@@ -9,6 +9,7 @@ using System.Windows.Media;
 
 namespace CommonLibrary
 {
+    [Serializable]
     public abstract class UserEntity
     {
         public string Name { get; set; }
