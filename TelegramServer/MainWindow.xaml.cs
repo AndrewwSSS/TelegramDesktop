@@ -187,24 +187,26 @@ namespace TelegramServer
                 case "ChatMessage":
                 {
                     ChatMessage chatMessage = (ChatMessage)msg;
-
-                    GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.Id);
+                    GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.GroupId);
+                    User fromUser = DbContext.Users.First(u => u.Id == chatMessage.FromUser.Id); 
                     groupChat.Messages.Add(chatMessage);
+                    
                     DbContext.SaveChanges();
 
-                    foreach (var user in chatMessage.Chat.Members)
-                    {
+                    SendMessageToUsers(chatMessage, fromUser, groupChat.Members);
 
-                        if (UsersOnline.FirstOrDefault(u => u.Id == user.Id && u.Id != chatMessage.FromUser.Id) != null)
-                        {
-                            user.client.SendAsync(chatMessage);
-                        }
-                        else
-                        {
-                            if (user.Id != chatMessage.FromUser.Id)
-                                user.MessagesToSend.Add(chatMessage);
-                        }
-                    }
+                    //foreach (var user in groupChat.Members)
+                    //{
+
+                    //    if(user.Id != chatMessage.FromUser.Id)
+                    //    {
+                    //        if (user.isOnline)
+                    //            user.client.SendAsync(chatMessage);
+                    //        else
+                    //            user.MessagesToSend.Add(chatMessage);
+                    //    }
+                      
+                    //}
 
                     break;
 

@@ -8,7 +8,7 @@ namespace TelegramServer
     {
         public DbSet<User> Users { get; set; }
         public DbSet<GroupChat> GroupChats { get; set; }
-
+        //public DbContext Me
 
         public TelegramDb() : base("Telegram")
         {

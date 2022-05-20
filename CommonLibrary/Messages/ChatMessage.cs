@@ -1,5 +1,4 @@
 ﻿using CommonLibrary.Containers;
-using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
@@ -12,9 +11,9 @@ namespace CommonLibrary.Messages
     {
         private string text;
 
-        public User FromUser { get; set; }
-        public User ToUser { get; set; }
-        public User ResendUser { get; set; }
+        public PublicUserInfo FromUser { get; set; }
+        public PublicUserInfo ToUser { get; set; }
+        public PublicUserInfo ResendUser { get; set; }
         public ChatMessage RespondingTo { get; set; }
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
@@ -27,7 +26,8 @@ namespace CommonLibrary.Messages
                 text = value;
             }
         }
-        public GroupChat Chat { get; set; }
+        public int GroupId { get; set; }
+
 
         public ChatMessage(string text)
         {
@@ -38,19 +38,20 @@ namespace CommonLibrary.Messages
 
         public ChatMessage() { }
 
-        public ChatMessage SetFrom(User user)
+
+        public ChatMessage SetFrom(PublicUserInfo user)
         {
             FromUser = user;
             return this;
         }
 
-        public ChatMessage SetTo(User user)
+        public ChatMessage SetTo(PublicUserInfo user)
         {
             ToUser = user;
             return this;
         }
 
-        public ChatMessage SetResendUser(User user)
+        public ChatMessage SetResendUser(PublicUserInfo user)
         {
             ResendUser = user;
             return this;
@@ -62,14 +63,10 @@ namespace CommonLibrary.Messages
             return this;
         }
 
-        public ChatMessage SetGroupChat(GroupChat gchat)
+        public ChatMessage SetGroupId(int GroupId)
         {
-            Chat = gchat;
+            this.GroupId = GroupId;
             return this;
         }
-
-
-
-
     }
 }
