@@ -14,10 +14,7 @@ namespace MessageLibrary
         }
 
 
-        public void SetBuffer(byte[] newBuffer)
-        {
-             Buffer = newBuffer;
-        }
+        public void SetBuffer(byte[] newBuffer) => Buffer = newBuffer;
 
     }
 }

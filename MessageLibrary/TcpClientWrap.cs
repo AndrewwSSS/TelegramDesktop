@@ -103,9 +103,12 @@ namespace MessageLibrary
         {
             Disconnected?.Invoke(this);
             client?.Close();
-            client = null;
         }
-
+        public void DisconnectAsync()
+        {
+            Disconnected?.Invoke(this);
+            Task.Run(() => client?.Close());
+        }
         public bool Send(Message message)
         {
             if (client != null && client.Connected)
@@ -168,35 +171,36 @@ namespace MessageLibrary
 
                 int bytesRead = Tcp.Client.EndReceive(ar);
 
-                if(bytesRead > 0)
+                if (bytesRead > 0)
                 {
-                    if(socket.Available > 0)
+                    Task.Run(() =>
                     {
-                        MemoryStream ms = new MemoryStream();
-
-                        byte[] tmp = new byte[StateObject.ConstBufferSize];
-                        ms.Write(state.Buffer, 0, state.CurrentBufferSize);
-
-
-                        do
+                        if (socket.Available > 0)
                         {
-                            int br = socket.Receive(tmp, state.CurrentBufferSize, 0);
+                            MemoryStream ms = new MemoryStream();
 
-                            if (br == 0)
-                                continue;
+                            byte[] tmp = new byte[StateObject.ConstBufferSize];
+                            ms.Write(state.Buffer, 0, state.CurrentBufferSize);
 
-                            ms.Write(tmp, 0, br);
 
-                        } while(socket.Available > 0);
+                            do
+                            {
+                                int br = socket.Receive(tmp, state.CurrentBufferSize, 0);
 
-                        state.SetBuffer(ms.ToArray());
+                                if (br == 0)
+                                    continue;
 
-                    }
+                                ms.Write(tmp, 0, br);
 
-                    Message msg = Message.FromByteArray(state.Buffer);
-                    Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
-                    MessageReceived?.Invoke(this, msg);
-                    
+                            } while (socket.Available > 0);
+
+                            state.SetBuffer(ms.ToArray());
+                        }
+
+                        Message msg = Message.FromByteArray(state.Buffer);
+                        Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
+                        MessageReceived?.Invoke(this, msg);
+                    });
 
                     socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
                 }
