@@ -25,5 +25,7 @@ namespace CommonLibrary.Messages.Users
             RegistrationDate = regDate;
         }
 
+        public PublicUserInfo() { }
+
     }
 }

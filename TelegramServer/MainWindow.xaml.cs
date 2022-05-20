@@ -134,20 +134,25 @@ namespace TelegramServer
                 case "LoginMessage":
                 {
                     LoginMessage loginMessage = (LoginMessage)msg;
-
                     User user = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
 
                     if (user != null && user.Password == loginMessage.Password)
                     {
-                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
+                        PublicUserInfo UserInfo = new PublicUserInfo()
+                        {
+                            Id = user.Id,
+                            Name = user.Name,
+                            RegistrationDate = user.RegistrationDate
+                        };
 
-                        if(user.Login == loginMessage.Login)
-                            ResultMessage.Login = user.Login;
-                        else
-                            ResultMessage.Email = user.Email;
+                        if(user.Images != null)
+                             UserInfo.Images = new List<ImageContainer>(user.Images);
+                        
+                         
+                        if(user.Email == loginMessage.Login)
+                           UserInfo.Login = user.Login;
 
-                        ResultMessage.Name = user.Name;
-                        ResultMessage.RegistrationDate = user.RegistrationDate;
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, UserInfo);
 
                         client.SendAsync(ResultMessage);
 
@@ -228,7 +233,7 @@ namespace TelegramServer
                             foreach (var groupMember in groupChat.Members)
                             {
                                 PublicUserInfo publicUser
-                                    = new PublicUserInfo(groupMember.Name, groupMember.Description, groupMember.Id, groupMember.LastVisitDate);
+                                    = new PublicUserInfo(groupMember.Id, groupMember.Login, groupMember.Name, groupMember.Description, groupMember.LastVisitDate);
 
                                 if (groupMember.Images != null)
                                     foreach (var image in groupMember.Images)
@@ -314,8 +319,13 @@ namespace TelegramServer
 
                             member.Chats.Add(NewGroupChat);
 
-                            PublicUsersInfo.Add(
-                                new PublicUserInfo(member.Name, member.Description, member.Id, member.LastVisitDate));
+                            PublicUsersInfo.Add(new PublicUserInfo()
+                            {
+                                Id = member.Id,
+                                Login = member.Login,
+                                Name = member.Name,
+                                Description = member.Description 
+                            });
 
                         }
                         DbContext.SaveChanges();
@@ -337,14 +347,25 @@ namespace TelegramServer
 
                     User DisconnectedUser = DbContext.Users.FirstOrDefault(u => u.Id == clientDisconnect.UserId);
                     DisconnectedUser.isOnline = false;
-                    DisconnectedUser.client.Disconnect();
-                    DbContext.SaveChanges();
 
-                    Dispatcher.Invoke(() =>
+                    ClientHandler OnClientDisconnected = (c) =>
                     {
-                        UsersOnline.Remove(DisconnectedUser);
-                        UsersOffline.Add(DisconnectedUser);
-                    });
+                        Dispatcher.Invoke(() =>
+                        {
+                            UsersOnline.Remove(DisconnectedUser);
+                            UsersOffline.Add(DisconnectedUser);
+                            DisconnectedUser.client = null;
+                            DbContext.SaveChanges();
+                        });
+                    };
+
+
+                    DisconnectedUser.client.Disconnected += OnClientDisconnected;
+                    DisconnectedUser.client.DisconnectAsync();
+
+                    
+
+                
                     break;
                 }
 
@@ -369,7 +390,5 @@ namespace TelegramServer
                     }
                 }
         }
-
-
     }
 }
