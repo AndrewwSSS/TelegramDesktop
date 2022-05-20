@@ -46,10 +46,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages\Auth\Groups\AddingInGroupMessage.cs" />
+    <Compile Include="Messages\Auth\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Auth\Groups\CreateGroupMessage.cs" />
     <Compile Include="Messages\Auth\AuthenticationResult.cs" />
     <Compile Include="Messages\Auth\Groups\CreateGroupResultMessage.cs" />
+    <Compile Include="Messages\Auth\Groups\GroupJoinResultMessage.cs" />
     <Compile Include="Messages\Auth\Groups\GroupLookupMessage.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\ClientDisconnectMessage.cs" />

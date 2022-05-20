@@ -128,8 +128,9 @@ namespace Telegram
                 new ChatMessage("тест").SetFrom(Me),
                 new ChatMessage("тест").SetFrom(Me)
             };
+            
 
-            Closed += OnClosed;
+            Closing += OnClosed;
         }
 
         private void OnClosed(object sender, EventArgs e)

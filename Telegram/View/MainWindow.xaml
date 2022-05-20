@@ -211,6 +211,7 @@
                         <ListBox x:Name="LB_Groups" HorizontalContentAlignment="Stretch"
                              Background="{StaticResource DarkBgBrush}"
                              Grid.Row="1"  
+                                 BorderThickness="0"
                              ItemsSource="{Binding Groups}"
                                  SelectionChanged="GroupSelected">
                             <ListBox.Style>

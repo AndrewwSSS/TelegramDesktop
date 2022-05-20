@@ -22,8 +22,11 @@ namespace Telegram.View
             Closed += LoginSignupWindow_Closed;
         }
 
-        private void LoginSignupWindow_Closed(object sender, System.EventArgs e) => App.Client.Disconnect();
-
+        private void LoginSignupWindow_Closed(object sender, System.EventArgs e)
+        {
+            if (wnd == null) 
+                client.Disconnect();
+        }
         private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
 
         private void Client_Connected(TcpClientWrap client)
@@ -59,11 +62,15 @@ namespace Telegram.View
                     if(result.Result == AuthenticationResult.Success)
                     {
                         var info = result.UserInfo;
+                        if (info.Login == null)
+                            info.Login = TB_Login_Id.Text;
                         client.MessageReceived -= Client_MessageReceived;
+
 
                         wnd = new MainWindow(info);
                         wnd.Client = App.Client;
                         wnd.Show();
+                        Close();
                     } else
                         tabControl.IsEnabled = true;
                 });

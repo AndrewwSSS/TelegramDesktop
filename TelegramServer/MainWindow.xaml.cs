@@ -338,7 +338,7 @@ namespace TelegramServer
 
                         GroupInfo.Users = PublicUsersInfo;
 
-                        SendMessageToUsers(new AddingInGroupMessage(GroupInfo), GroupCreator, Members);
+                        SendMessageToUsers(new GroupJoinMessage(GroupInfo), GroupCreator, Members);
                     }
 
                     break;
