@@ -155,6 +155,7 @@ namespace MessageLibrary
             }
             return false;
         }
+
         private void ReceiveCB(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
@@ -199,9 +200,10 @@ namespace MessageLibrary
                     socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Disconnected?.Invoke(this);
+                Console.WriteLine(e.Message);
                 Console.WriteLine("TcpClientWrap.Receive: SOCKET EXCEPTION");
                 return;
             }

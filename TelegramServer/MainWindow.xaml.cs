@@ -246,10 +246,10 @@ namespace TelegramServer
                         break;
                     }
                 case "CreateGroupMessage":
-                    {
-                        CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
-                        List<User> Members = null;
-                        User GroupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
+                {
+                    CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
+                    List<User> Members = null;
+                    User GroupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
 
                         if (GroupCreator == null)
                         {

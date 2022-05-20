@@ -6,16 +6,13 @@ namespace TelegramServer
 {
     public class TelegramDb : DbContext
     {
-
-
         public DbSet<User> Users { get; set; }
         public DbSet<GroupChat> GroupChats { get; set; }
 
 
-        public TelegramDb()
-            : base("Telegram")
+        public TelegramDb() : base("Telegram")
         {
-            Database.SetInitializer<TelegramDb>(new CreateDatabaseIfNotExists<TelegramDb>());
+   
             //Database.SetInitializer<TelegramDb>(null);
         }
     }
