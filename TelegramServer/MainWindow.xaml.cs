@@ -228,7 +228,9 @@ namespace TelegramServer
 
                             PublicGroupInfo SuitableGroup
                                     = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
-                            SuitableGroup.Images.AddRange(groupChat.Images);
+
+                            if (SuitableGroup.Images != null)
+                                SuitableGroup.Images.AddRange(groupChat.Images);
 
                             foreach (var groupMember in groupChat.Members)
                             {
