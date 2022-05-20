@@ -166,9 +166,10 @@ namespace MessageLibrary
 
             try
             {
-                if (Tcp == null)
+                if (Tcp == null
+                    || Tcp.Client==null)
                     return;
-
+                
                 int bytesRead = Tcp.Client.EndReceive(ar);
 
                 if (bytesRead > 0)
@@ -181,7 +182,6 @@ namespace MessageLibrary
 
                             byte[] tmp = new byte[StateObject.DefaultBufferSize];
                             ms.Write(state.Buffer, 0, state.CurrentBufferSize);
-
 
                             do
                             {
