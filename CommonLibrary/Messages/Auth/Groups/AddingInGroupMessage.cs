@@ -9,9 +9,8 @@ namespace CommonLibrary.Messages.Groups
     {
         public PublicGroupInfo GroupInfo { get; set; }
 
-        public AddingInGroupMessage(PublicGroupInfo GroupInfo)
-        {
-            this.GroupInfo = GroupInfo;
-        }
+        public AddingInGroupMessage(PublicGroupInfo GroupInfo) => this.GroupInfo = GroupInfo;
+
+        public AddingInGroupMessage() { }
     }
 }

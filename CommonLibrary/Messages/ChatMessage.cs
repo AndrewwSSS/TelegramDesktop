@@ -36,6 +36,8 @@ namespace CommonLibrary.Messages
             Type = MessageType.Custom;
         }
 
+        public ChatMessage() { }
+
         public ChatMessage SetFrom(User user)
         {
             FromUser = user;

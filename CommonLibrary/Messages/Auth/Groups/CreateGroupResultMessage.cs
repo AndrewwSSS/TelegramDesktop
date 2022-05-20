@@ -24,6 +24,8 @@ namespace CommonLibrary.Messages.Groups
             this.Message = Message;
         }
 
+        public CreateGroupResultMessage() { }
+
 
     }
 }
