@@ -15,6 +15,10 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="{StaticResource DarkBgBrush}">
+        <Button Width="100" Height="50" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                Content="CONNECT" Margin="10"
+                Click="ConnectButton_Click"/>
         <TabControl 
             x:Name="tabControl"
             BorderThickness="0"

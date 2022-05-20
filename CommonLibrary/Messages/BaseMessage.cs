@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CommonLibrary.Messages
 {
     [Serializable]
-    public class BaseMessage : Message
+    public abstract class BaseMessage : Message
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

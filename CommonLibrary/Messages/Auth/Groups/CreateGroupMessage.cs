@@ -6,7 +6,7 @@ using MessageLibrary;
 namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
-    public class CreateGroupMessage : BaseMessage
+    public class CreateGroupMessage : Message
     {
         public string Name { get; set; }
         public ImageContainer Image { get; set; }

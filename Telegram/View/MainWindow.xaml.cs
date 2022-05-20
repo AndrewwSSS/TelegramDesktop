@@ -78,13 +78,13 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
-        public MainWindow() : this(null, new User()
+        public MainWindow() : this(new User()
         {
             Name = "Иван Довголуцкий",
             RegistrationDate = DateTime.Now
         })
         { }
-        public MainWindow(TcpClientWrap client, User me)
+        public MainWindow( User me)
         {
 
             DataContext = this;
@@ -95,15 +95,12 @@ namespace Telegram
             {
                 Messages = new List<ChatMessage>() { new ChatMessage("Прувет!") }
             });
-
+            this.client = App.Client;
+            client.Send(new TextMessage("fuck you"));
             Me = me;
-            this.client = client;
-            if (client != null)
-                this.client.MessageReceived += Client_MessageReceived;
-
-            var msg = new SignUpMessage() { Name = "DEBUG" };
-            client.SendAsync(msg);
-            client.ReceiveAsync();
+            this.client.MessageReceived += Client_MessageReceived;
+            
+            
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
@@ -299,16 +296,12 @@ namespace Telegram
 
         private void B_AddGroup_OnClick(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                Buffers.GroupName = TB_NewGroupName.Text;
-                //client.SendAsync(new CreateGroupMessage(TB_NewGroupName.Text, Me.Id));
-                client.MessageSent -= Client_MessageSent;
-                client.MessageSent += Client_MessageSent;
-                var msg = new SignUpMessage() { Name = "DEBUG" };
-                client.SendAsync(msg);
-                client.ReceiveAsync();
-            });
+            Dispatcher.Invoke(()=>Buffers.GroupName=TB_NewGroupName.Text);
+            client.MessageSent -= Client_MessageSent;
+            client.MessageSent += Client_MessageSent;
+            var msg = new CreateGroupMessage(Buffers.GroupName, Me.Id) ;
+            client.Send(msg);
+            client.ReceiveAsync();
         }
 
         private void Client_MessageSent(TcpClientWrap client, Message msg)

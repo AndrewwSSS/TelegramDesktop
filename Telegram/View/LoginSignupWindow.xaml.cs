@@ -31,11 +31,7 @@ namespace Telegram.View
             InitializeComponent();
 
             tabControl.IsEnabled = false;
-            client = new TcpClientWrap(IPAddress.Parse("26.87.230.148"), 5000);
-            client.Connected += Client_Connected;
-            client.ConnectFailed += Client_ConnectFailed;
-            client.ConnectAsync();
-            client.MessageReceived += Client_MessageReceived;
+            client = App.Client;
            
         }
 
@@ -46,7 +42,13 @@ namespace Telegram.View
 
         private void Client_Connected(TcpClientWrap client)
         {
-            Dispatcher.Invoke(()=>tabControl.IsEnabled = true);
+            Dispatcher.Invoke(() =>
+            {
+                tabControl.IsEnabled = true;
+                client.Connected -= Client_Connected;
+                client.ConnectFailed -= Client_ConnectFailed;
+                client.MessageReceived += Client_MessageReceived;
+            });
         }
 
         public static MainWindow wnd;
@@ -83,16 +85,16 @@ namespace Telegram.View
                             Login = login,
                             RegistrationDate = result.RegistrationDate
                         };
-                        wnd = new MainWindow(client, me);
+
+                        client.MessageReceived -= Client_MessageReceived;
+                        wnd = new MainWindow(me);
                         wnd.Show();
-                        Close();
                     } else
 
                         tabControl.IsEnabled = true;
                 });
             }
         }
-
 
         private void ButtonLoginSend_Click(object sender, RoutedEventArgs e)
         {
@@ -146,6 +148,13 @@ namespace Telegram.View
             tabControl.IsEnabled = false;
             client.SendAsync(msg);
             client.ReceiveAsync();
+        }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            client.Connected += Client_Connected;
+            client.ConnectFailed += Client_ConnectFailed;
+            client.ConnectAsync();
         }
     }
 }
