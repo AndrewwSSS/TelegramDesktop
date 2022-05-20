@@ -84,7 +84,7 @@ namespace Telegram
             RegistrationDate = DateTime.Now
         })
         { }
-        public MainWindow( User me)
+        public MainWindow(TcpClientWrap client, User me)
         {
 
             DataContext = this;
@@ -296,12 +296,16 @@ namespace Telegram
 
         private void B_AddGroup_OnClick(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(()=>Buffers.GroupName=TB_NewGroupName.Text);
-            client.MessageSent -= Client_MessageSent;
-            client.MessageSent += Client_MessageSent;
-            var msg = new CreateGroupMessage(Buffers.GroupName, Me.Id) ;
-            client.Send(msg);
-            client.ReceiveAsync();
+            Dispatcher.Invoke(() =>
+            {
+                Buffers.GroupName = TB_NewGroupName.Text;
+                //client.SendAsync(new CreateGroupMessage(TB_NewGroupName.Text, Me.Id));
+                client.MessageSent -= Client_MessageSent;
+                client.MessageSent += Client_MessageSent;
+                var msg = new SignUpMessage() { Name = "DEBUG" };
+                client.SendAsync(msg);
+                client.ReceiveAsync();
+            });
         }
 
         private void Client_MessageSent(TcpClientWrap client, Message msg)
