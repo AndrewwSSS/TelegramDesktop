@@ -214,12 +214,16 @@ namespace TelegramServer
 
                     foreach (var groupChat in DbContext.GroupChats)
                     {
+                        // Поиск по имени группы
                         if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
                         {
+
                             if (SuitableGroups == null)
                                 SuitableGroups = new List<PublicGroupInfo>();
 
-                            PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
+                            PublicGroupInfo SuitableGroup
+                                    = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
+                            SuitableGroup.Images.AddRange(groupChat.Images);
 
                             foreach (var groupMember in groupChat.Members)
                             {
