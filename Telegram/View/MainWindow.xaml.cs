@@ -331,6 +331,8 @@ namespace Telegram
         private void GroupSelected(object sender, RoutedEventArgs e)
         {
             ListBox lb = sender as ListBox;
+            if (lb.SelectedIndex == -1)
+                return;
             Messages.Clear();
             if ((lb.SelectedItem as PublicGroupInfo).Messages != null)
                 foreach (var msg in (lb.SelectedItem as PublicGroupInfo).Messages)
