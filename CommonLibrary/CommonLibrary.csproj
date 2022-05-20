@@ -52,6 +52,7 @@
     <Compile Include="Messages\Auth\Groups\CreateGroupResultMessage.cs" />
     <Compile Include="Messages\Auth\Groups\GroupLookupMessage.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
+    <Compile Include="Messages\ClientDisconnectMessage.cs" />
     <Compile Include="Messages\Users\PublicUserInfo.cs" />
     <Compile Include="UserEntity.cs" />
     <Compile Include="Containers\FileContainer.cs" />
