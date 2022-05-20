@@ -8,8 +8,13 @@ namespace CommonLibrary.Messages.Groups
     public class GroupJoinMessage : BaseMessage
     {
         public int GroupId { get; set; }
+        public int UserId { get; set; }
 
-        public GroupJoinMessage(int GroupId) => this.GroupId = GroupId;
+        public GroupJoinMessage(int GroupId, int UserId)
+        {
+            this.GroupId = GroupId;
+            this.UserId = UserId;
+        }
 
         public GroupJoinMessage() { }
     }
