@@ -139,11 +139,9 @@ namespace TelegramServer
 
                     if (user != null && user.Password == loginMessage.Password)
                     {
-
-
                         LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
 
-                        if (user.Login == loginMessage.Login)
+                        if(user.Login == loginMessage.Login)
                             ResultMessage.Login = user.Login;
                         else
                             ResultMessage.Email = user.Email;
@@ -173,14 +171,24 @@ namespace TelegramServer
 
                             client.SendAsync(Messages);
 
-                            //temp. Must be after message sent
+                            ClientMessageHandler OnSent = null;
+
+                            OnSent = (c, m) =>
+                            {
+                                user.MessagesToSend.Clear();
+                                client.MessageSent -= OnSent;
+                            };
+
+                                
+                            client.MessageSent += OnSent;
+                          
                             user.MessagesToSend.Clear();
                         }
                     }
                     else
                     {
-                        LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password");
-                        client.SendAsync(ReultMessage);
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password");
+                        client.SendAsync(ResultMessage);
                     }
                     break;
                 }
@@ -195,19 +203,6 @@ namespace TelegramServer
 
                     SendMessageToUsers(chatMessage, fromUser, groupChat.Members);
 
-                    //foreach (var user in groupChat.Members)
-                    //{
-
-                    //    if(user.Id != chatMessage.FromUser.Id)
-                    //    {
-                    //        if (user.isOnline)
-                    //            user.client.SendAsync(chatMessage);
-                    //        else
-                    //            user.MessagesToSend.Add(chatMessage);
-                    //    }
-                      
-                    //}
-
                     break;
 
                 }
@@ -216,7 +211,6 @@ namespace TelegramServer
                     GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                     ArrayMessage<PublicGroupInfo> ResultMessage;
                     List<PublicGroupInfo> SuitableGroups = null;
-
 
                     foreach (var groupChat in DbContext.GroupChats)
                     {
@@ -253,85 +247,102 @@ namespace TelegramServer
                     List<User> Members = null;
                     User GroupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
 
-                        if (GroupCreator == null)
-                        {
-                            MessageBox.Show("Group creator not found");
-                            break;
-                        }
-
-                        // если есть пользователи котрых добавили в группу
-                        if (createNewGroupMessage.MembersId != null)
-                        {
-                            Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Contains(u.Id)).ToList();
-
-                            if (Members.Count > 0)
-                            {
-                                if (Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id)))
-                                {
-                                    CreateGroupResultMessage DeniedMessage
-                                            = new CreateGroupResultMessage(AuthenticationResult.Denied, "One or more users in list blocked you");
-                                    client.SendAsync(DeniedMessage);
-                                    break;
-                                }
-
-                            }
-                        }
-
-                        GroupChat NewGroupChat = new GroupChat();
-                        NewGroupChat.Name = createNewGroupMessage.Name;
-                        NewGroupChat.Members = new List<User>() { GroupCreator };
-                        NewGroupChat.DateCreated = DateTime.Now;
-
-
-                        if (createNewGroupMessage.Image != null)
-                        {
-                            NewGroupChat.Images = new List<ImageContainer>();
-                            NewGroupChat.Images.Add(createNewGroupMessage.Image);
-                        }
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            DbContext.GroupChats.Add(NewGroupChat);
-                            DbContext.SaveChanges();
-                            DbContext.GroupChats.Load();
-                        });
-
-
-                        CreateGroupResultMessage ResultMessage =
-                                new CreateGroupResultMessage(AuthenticationResult.Success, NewGroupChat.Id);
-                        client.SendAsync(ResultMessage);
-
-
-                        if (Members != null)
-                        {
-                            NewGroupChat.Members.AddRange(Members);
-
-                            List<PublicUserInfo> PublicUsersInfo = new List<PublicUserInfo>();
-
-                            foreach (var member in Members)
-                            {
-                                if (member.Chats == null)
-                                    member.Chats = new List<GroupChat>();
-
-                                member.Chats.Add(NewGroupChat);
-
-                                PublicUsersInfo.Add(
-                                    new PublicUserInfo(member.Name, member.Description, member.Id, member.LastVisitDate));
-
-                            }
-                            DbContext.SaveChanges();
-
-
-                            PublicGroupInfo GroupInfo
-                                    = new PublicGroupInfo(NewGroupChat.Name, NewGroupChat.Description, NewGroupChat.Id);
-
-                            GroupInfo.Users = PublicUsersInfo;
-
-                            SendMessageToUsers(new AddingInGroupMessage(GroupInfo), GroupCreator, Members);
-                        }
-
+                    if (GroupCreator == null)
+                    {
+                        MessageBox.Show("Group creator not found");
                         break;
                     }
+
+                    // если есть пользователи котрых добавили в группу
+                    if (createNewGroupMessage.MembersId != null)
+                    {
+                        Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Contains(u.Id)).ToList();
+
+                        if (Members.Count > 0)
+                        {
+                            if (Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id)))
+                            {
+                                CreateGroupResultMessage DeniedMessage
+                                        = new CreateGroupResultMessage(AuthenticationResult.Denied, "One or more users in list blocked you");
+                                client.SendAsync(DeniedMessage);
+                                break;
+                            }
+
+                        }
+                    }
+
+                    GroupChat NewGroupChat = new GroupChat();
+                    NewGroupChat.Name = createNewGroupMessage.Name;
+                    NewGroupChat.Members = new List<User>() { GroupCreator };
+                    NewGroupChat.DateCreated = DateTime.Now;
+
+
+                    if (createNewGroupMessage.Image != null)
+                    {
+                        NewGroupChat.Images = new List<ImageContainer>();
+                        NewGroupChat.Images.Add(createNewGroupMessage.Image);
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        DbContext.GroupChats.Add(NewGroupChat);
+                        DbContext.SaveChanges();
+                        DbContext.GroupChats.Load();
+                    });
+
+
+                    CreateGroupResultMessage ResultMessage =
+                            new CreateGroupResultMessage(AuthenticationResult.Success, NewGroupChat.Id);
+
+                    client.SendAsync(ResultMessage);
+
+
+                    if (Members != null)
+                    {
+                        NewGroupChat.Members.AddRange(Members);
+
+                        List<PublicUserInfo> PublicUsersInfo = new List<PublicUserInfo>();
+
+                        foreach (var member in Members)
+                        {
+                            if (member.Chats == null)
+                                member.Chats = new List<GroupChat>();
+
+                            member.Chats.Add(NewGroupChat);
+
+                            PublicUsersInfo.Add(
+                                new PublicUserInfo(member.Name, member.Description, member.Id, member.LastVisitDate));
+
+                        }
+                        DbContext.SaveChanges();
+
+
+                        PublicGroupInfo GroupInfo
+                                = new PublicGroupInfo(NewGroupChat.Name, NewGroupChat.Description, NewGroupChat.Id);
+
+                        GroupInfo.Users = PublicUsersInfo;
+
+                        SendMessageToUsers(new AddingInGroupMessage(GroupInfo), GroupCreator, Members);
+                    }
+
+                    break;
+                }
+                case "ClientDisconnectMessage":
+                {
+                    ClientDisconnectMessage clientDisconnect = new ClientDisconnectMessage();
+
+                    User DisconnectedUser = DbContext.Users.FirstOrDefault(u => u.Id == clientDisconnect.UserId);
+                    DisconnectedUser.isOnline = false;
+                    DisconnectedUser.client.Disconnect();
+                    DbContext.SaveChanges();
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        UsersOnline.Remove(DisconnectedUser);
+                        UsersOffline.Add(DisconnectedUser);
+                    });
+                    break;
+                }
 
             }
         }
