@@ -345,28 +345,29 @@ namespace TelegramServer
                 }
                 case "ClientDisconnectMessage":
                 {
-                    ClientDisconnectMessage clientDisconnect = new ClientDisconnectMessage();
+                    ClientDisconnectMessage clientDisconnect = (ClientDisconnectMessage)msg;
 
                     User DisconnectedUser = DbContext.Users.FirstOrDefault(u => u.Id == clientDisconnect.UserId);
-                    DisconnectedUser.isOnline = false;
 
-                    ClientHandler OnClientDisconnected = (c) =>
+                    if(DisconnectedUser != null)
                     {
-                        Dispatcher.Invoke(() =>
+                        DisconnectedUser.isOnline = false;
+
+                        ClientHandler OnClientDisconnected = (c) =>
                         {
-                            UsersOnline.Remove(DisconnectedUser);
-                            UsersOffline.Add(DisconnectedUser);
-                            DisconnectedUser.client = null;
-                            DbContext.SaveChanges();
-                        });
-                    };
+                            Dispatcher.Invoke(() =>
+                            {
+                                UsersOnline.Remove(DisconnectedUser);
+                                UsersOffline.Add(DisconnectedUser);
+                                DisconnectedUser.client = null;
+                                DbContext.SaveChanges();
+                            });
+                        };
 
 
-                    DisconnectedUser.client.Disconnected += OnClientDisconnected;
-                    DisconnectedUser.client.DisconnectAsync();
-
-                    
-
+                        DisconnectedUser.client.Disconnected += OnClientDisconnected;
+                        DisconnectedUser.client.DisconnectAsync();
+                    }
                 
                     break;
                 }
