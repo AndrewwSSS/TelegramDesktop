@@ -110,7 +110,7 @@ namespace MessageLibrary
         {
             if (client != null && client.Connected)
             {
-                message.StreamTo(client.GetStream());
+                Tcp.Client.Send(message.ToByteArray());
                 MessageSent?.Invoke(this, message);
                 return true;
             }
