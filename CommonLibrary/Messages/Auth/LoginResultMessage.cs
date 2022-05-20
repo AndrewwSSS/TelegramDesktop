@@ -1,4 +1,5 @@
 ﻿using System;
+using CommonLibrary.Messages.Users;
 using MessageLibrary;
 
 namespace CommonLibrary.Messages.Auth
@@ -9,17 +10,12 @@ namespace CommonLibrary.Messages.Auth
         public AuthenticationResult Result { get; set; }
         public string Message { get; set; }
 
-        public int UserId { get; set; }
-        public string Name { get; set; }
-        public string Login { get; set; }
-        public string Email { get; set; }
-        public DateTime RegistrationDate { get; set; }
 
-        public LoginResultMessage(AuthenticationResult Result, int UserId)
+        public PublicUserInfo UserInfo { get; set; }
+        public LoginResultMessage(AuthenticationResult Result, PublicUserInfo info)
         {
             this.Result = Result;
-            this.Message = Message;
-            this.UserId = UserId;
+            UserInfo = info;
         }
 
         public LoginResultMessage(AuthenticationResult Result, string Message)

@@ -13,15 +13,16 @@ namespace CommonLibrary.Messages.Users
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public DateTime LastVisitDate { get; set; }
+        public string Login { get; set; }
+        public DateTime RegistrationDate { get; set; }
 
-        public PublicUserInfo(string Name, string Description, int Id, DateTime LastVisitDate)
+        public PublicUserInfo(int id, string login, string name, string desc, DateTime regDate)
         {
-
-            this.Name = Name;
-            this.Description = Description;
-            this.Id = Id;
-            this.LastVisitDate = LastVisitDate;
+            Name = name;
+            Login = login;
+            Description = desc;
+            Id = id;
+            RegistrationDate = regDate;
         }
 
     }

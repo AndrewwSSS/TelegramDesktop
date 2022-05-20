@@ -56,23 +56,10 @@ namespace Telegram.View
                     var result = msg as LoginResultMessage;
                     if(result.Result == AuthenticationResult.Success)
                     {
-                        string email = result.Email ?? TB_Login_Id.Text,
-                        name = result.Name,
-                        password = TB_Login_Password.Text,
-                        login = result.Login ?? TB_Login_Id.Text;
-                        
-                        var me = new User(result.UserId)
-                        {
-                            Email = email,
-                            Name = name,
-                            Password = password,
-                            Login = login,
-                            RegistrationDate = result.RegistrationDate
-                        };
-
+                        var info = result.UserInfo;
                         client.MessageReceived -= Client_MessageReceived;
                         
-                        wnd = new MainWindow(me);
+                        wnd = new MainWindow(info);
                         wnd.Client = App.Client;
                         wnd.Show();
                     } else

@@ -64,8 +64,8 @@ namespace Telegram
         private ObservableCollection<MessageItemWrap> messages;
         private TcpClientWrap client;
 
-        public User Me { get; set; }
-        public static User ivan { get; set; } = new User() { Name = "Иван Довголуцкий" };
+        public PublicUserInfo Me { get; set; }
+        public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg","Ivan Dovgolutsky", "", DateTime.Now);
 
 
         public ObservableCollection<MessageItemWrap> Messages
@@ -87,13 +87,8 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
-        public MainWindow() : this(new User()
-        {
-            Name = "Иван Довголуцкий",
-            RegistrationDate = DateTime.Now
-        })
-        { }
-        public MainWindow(User me)
+        public MainWindow() : this(new PublicUserInfo(-1, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)){ }
+        public MainWindow(PublicUserInfo me)
         {
 
             DataContext = this;
