@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace CommonLibrary.Messages.Users
 {
@@ -15,6 +17,7 @@ namespace CommonLibrary.Messages.Users
 
         public PublicUserInfo(string Name, string Description, int Id, DateTime LastVisitDate)
         {
+
             this.Name = Name;
             this.Description = Description;
             this.Id = Id;

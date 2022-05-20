@@ -46,7 +46,6 @@ namespace Telegram
                 client = value;
 
                 client.MessageReceived += Client_MessageReceived;
-                sendFY();
             }
         }
         public const int LeftMenuWidth = 280;
@@ -134,10 +133,6 @@ namespace Telegram
                 new ChatMessage("тест").SetFrom(Me),
                 new ChatMessage("тест").SetFrom(Me)
             };
-        }
-        public void sendFY()
-        {
-            Client.Send(new TextMessage("fuck you"));
         }
         private void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
@@ -311,7 +306,8 @@ namespace Telegram
             Client.MessageSent -= Client_MessageSent;
             Client.MessageSent += Client_MessageSent;
             var msg = new CreateGroupMessage(Buffers.GroupName, Me.Id);
-            Client.Send(msg);
+            Client.SendAsync(msg);
+            AddGroupButton.IsEnabled = false;
             Client.ReceiveAsync();
         }
 
