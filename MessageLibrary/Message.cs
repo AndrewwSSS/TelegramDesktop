@@ -8,7 +8,7 @@ namespace MessageLibrary
     [Serializable]
     public abstract class Message
     {
-        public MessageType Type { get; protected set; } = MessageType.Undefined;
+
         public DateTime Time { get; protected set; } = DateTime.Now;
 
         private static BinaryFormatter bf = new BinaryFormatter();
@@ -61,7 +61,7 @@ namespace MessageLibrary
                 Buffer = new byte[8192],
                 Socket = socket
             };
-            socket.BeginReceive(stateObject.Buffer, 0, StateObject.ConstBufferSize, SocketFlags.None, cb, stateObject);
+            socket.BeginReceive(stateObject.Buffer, 0, StateObject.DefaultBufferSize, SocketFlags.None, cb, stateObject);
         }
 
         public static Message FromNetworkStream(NetworkStream stream) => bf.Deserialize(stream) as Message;

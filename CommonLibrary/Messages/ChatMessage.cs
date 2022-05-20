@@ -33,7 +33,6 @@ namespace CommonLibrary.Messages
         {
 
             Text = text;
-            Type = MessageType.Custom;
         }
 
         public ChatMessage() { }

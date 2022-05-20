@@ -179,7 +179,7 @@ namespace MessageLibrary
                         {
                             MemoryStream ms = new MemoryStream();
 
-                            byte[] tmp = new byte[StateObject.ConstBufferSize];
+                            byte[] tmp = new byte[StateObject.DefaultBufferSize];
                             ms.Write(state.Buffer, 0, state.CurrentBufferSize);
 
 

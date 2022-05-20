@@ -17,7 +17,7 @@ namespace CommonLibrary.Messages.Auth
         public string Password { get; set; }
         public string Email { get; set; }
 
-        public SignUpMessage() => Type = MessageType.Custom;
+        public SignUpMessage() { }
 
 
     }
