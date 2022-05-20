@@ -163,6 +163,7 @@ namespace MessageLibrary
         {
             StateObject state = (StateObject)ar.AsyncState;
             Socket socket = state.Socket;
+           
 
             try
             {

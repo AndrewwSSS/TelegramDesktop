@@ -7,9 +7,9 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class GroupJoinMessage : BaseMessage
     {
-        public PublicGroupInfo GroupInfo { get; set; }
+        public int GroupId { get; set; }
 
-        public GroupJoinMessage(PublicGroupInfo GroupInfo) => this.GroupInfo = GroupInfo;
+        public GroupJoinMessage(int GroupId) => this.GroupId = GroupId;
 
         public GroupJoinMessage() { }
     }

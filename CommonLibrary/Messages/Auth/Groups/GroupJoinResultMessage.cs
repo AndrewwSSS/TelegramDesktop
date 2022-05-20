@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MessageLibrary;
 
 namespace CommonLibrary.Messages.Auth.Groups
 {
-    public class GroupJoinResultMessage
+    [Serializable]
+    public class GroupJoinResultMessage : Message
     {
+        public AuthenticationResult Result { get; set; }
+
+        public GroupJoinResultMessage(AuthenticationResult Result) => this.Result = Result;
+
+        public GroupJoinResultMessage() { }
     }
 }
