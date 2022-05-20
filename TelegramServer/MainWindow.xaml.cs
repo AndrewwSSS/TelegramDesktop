@@ -245,6 +245,7 @@ namespace TelegramServer
                 }
                 case "CreateGroupMessage":
                 {
+                    Console.WriteLine("CreateGroupMessage");
                     CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
                     List<User> Members = null;
                     User GroupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
