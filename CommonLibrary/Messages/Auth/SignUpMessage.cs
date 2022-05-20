@@ -19,5 +19,6 @@ namespace CommonLibrary.Messages.Auth
 
         public SignUpMessage() => Type = MessageType.Custom;
 
+
     }
 }

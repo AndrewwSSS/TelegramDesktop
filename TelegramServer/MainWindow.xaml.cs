@@ -97,154 +97,154 @@ namespace TelegramServer
             switch (msg.GetType().Name)
             {
                 case "SignUpMessage":
+                {
+                    SignUpMessage signUpMessage = (SignUpMessage)msg;
+
+                    if (DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
                     {
-                        SignUpMessage signUpMessage = (SignUpMessage)msg;
-
-                        if (DbContext.Users.Count(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) == 0)
+                        User NewUser = new User()
                         {
-                            User NewUser = new User()
-                            {
-                                Email = signUpMessage.Email,
-                                Login = signUpMessage.Login,
-                                Name = signUpMessage.Name,
-                                Password = signUpMessage.Password,
-                                RegistrationDate = DateTime.Now,
-                                LastVisitDate = DateTime.Now
-                            };
+                            Email = signUpMessage.Email,
+                            Login = signUpMessage.Login,
+                            Name = signUpMessage.Name,
+                            Password = signUpMessage.Password,
+                            RegistrationDate = DateTime.Now,
+                            LastVisitDate = DateTime.Now
+                        };
 
-                            DbContext.Users.Add(NewUser);
-                            Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
-                            DbContext.SaveChanges();
-
-                            SignUpResultMessage ResultMessage
-                                    = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
-
-                            client.SendAsync(ResultMessage);
-
-                        }
-                        else
-                        {
-                            SignUpResultMessage ResultMessage
-                                = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
-                            client.SendAsync(ResultMessage);
-                        }
-                        break;
-
-                    }
-                case "LoginMessage":
-                    {
-                        LoginMessage loginMessage = (LoginMessage)msg;
-
-                        User user = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
-
-                        if (user != null && user.Password == loginMessage.Password)
-                        {
-
-
-                            LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
-
-                            if (user.Login == loginMessage.Login)
-                                ResultMessage.Login = user.Login;
-                            else
-                                ResultMessage.Email = user.Email;
-
-                            ResultMessage.Name = user.Name;
-                            ResultMessage.RegistrationDate = user.RegistrationDate;
-
-                            client.SendAsync(ResultMessage);
-
-                            user.client = client;
-                            user.LastVisitDate = DateTime.Now;
-                            user.isOnline = true;
-
-                            DbContext.SaveChanges();
-
-                            Dispatcher.Invoke(() =>
-                            {
-                                UsersOffline.Remove(user);
-                                UsersOnline.Add(user);
-                            });
-
-
-                            if (user.MessagesToSend != null && user.MessagesToSend.Count > 0)
-                            {
-                                ArrayMessage<Message> Messages
-                                        = new ArrayMessage<Message>(user.MessagesToSend);
-
-                                client.SendAsync(Messages);
-
-                                //temp. Must be after message sent
-                                user.MessagesToSend.Clear();
-                            }
-                        }
-                        else
-                        {
-                            LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password");
-                            client.SendAsync(ReultMessage);
-                        }
-                        break;
-                    }
-                case "ChatMessage":
-                    {
-                        ChatMessage chatMessage = (ChatMessage)msg;
-
-                        GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.Id);
-                        groupChat.Messages.Add(chatMessage);
+                        DbContext.Users.Add(NewUser);
+                        Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
                         DbContext.SaveChanges();
 
-                        foreach (var user in chatMessage.Chat.Members)
-                        {
+                        SignUpResultMessage ResultMessage
+                                = new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate);
 
-                            if (UsersOnline.FirstOrDefault(u => u.Id == user.Id && u.Id != chatMessage.FromUser.Id) != null)
-                            {
-                                user.client.SendAsync(chatMessage);
-                            }
-                            else
-                            {
-                                if (user.Id != chatMessage.FromUser.Id)
-                                    user.MessagesToSend.Add(chatMessage);
-                            }
-                        }
-
-                        break;
-
-                    }
-                case "GroupLookupMessage":
-                    {
-                        GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
-                        ArrayMessage<PublicGroupInfo> ResultMessage;
-                        List<PublicGroupInfo> SuitableGroups = null;
-
-
-                        foreach (var groupChat in DbContext.GroupChats)
-                        {
-                            if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
-                            {
-                                if (SuitableGroups == null)
-                                    SuitableGroups = new List<PublicGroupInfo>();
-
-                                PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
-
-                                foreach (var groupMember in groupChat.Members)
-                                {
-                                    PublicUserInfo publicUser
-                                        = new PublicUserInfo(groupMember.Name, groupMember.Description, groupMember.Id, groupMember.LastVisitDate);
-
-                                    if (groupMember.Images != null)
-                                        foreach (var image in groupMember.Images)
-                                            publicUser.Images.Add(image);
-
-                                }
-
-                                SuitableGroups.Add(SuitableGroup);
-                            }
-                        }
-
-                        ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
                         client.SendAsync(ResultMessage);
 
-                        break;
                     }
+                    else
+                    {
+                        SignUpResultMessage ResultMessage
+                            = new SignUpResultMessage(AuthenticationResult.Denied, "Email or login already used to create an account");
+                        client.SendAsync(ResultMessage);
+                    }
+                    break;
+
+                }
+                case "LoginMessage":
+                {
+                    LoginMessage loginMessage = (LoginMessage)msg;
+
+                    User user = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
+
+                    if (user != null && user.Password == loginMessage.Password)
+                    {
+
+
+                        LoginResultMessage ResultMessage = new LoginResultMessage(AuthenticationResult.Success, user.Id);
+
+                        if (user.Login == loginMessage.Login)
+                            ResultMessage.Login = user.Login;
+                        else
+                            ResultMessage.Email = user.Email;
+
+                        ResultMessage.Name = user.Name;
+                        ResultMessage.RegistrationDate = user.RegistrationDate;
+
+                        client.SendAsync(ResultMessage);
+
+                        user.client = client;
+                        user.LastVisitDate = DateTime.Now;
+                        user.isOnline = true;
+
+                        DbContext.SaveChanges();
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            UsersOffline.Remove(user);
+                            UsersOnline.Add(user);
+                        });
+
+
+                        if (user.MessagesToSend != null && user.MessagesToSend.Count > 0)
+                        {
+                            ArrayMessage<Message> Messages
+                                    = new ArrayMessage<Message>(user.MessagesToSend);
+
+                            client.SendAsync(Messages);
+
+                            //temp. Must be after message sent
+                            user.MessagesToSend.Clear();
+                        }
+                    }
+                    else
+                    {
+                        LoginResultMessage ReultMessage = new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password");
+                        client.SendAsync(ReultMessage);
+                    }
+                    break;
+                }
+                case "ChatMessage":
+                {
+                    ChatMessage chatMessage = (ChatMessage)msg;
+
+                    GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.Id);
+                    groupChat.Messages.Add(chatMessage);
+                    DbContext.SaveChanges();
+
+                    foreach (var user in chatMessage.Chat.Members)
+                    {
+
+                        if (UsersOnline.FirstOrDefault(u => u.Id == user.Id && u.Id != chatMessage.FromUser.Id) != null)
+                        {
+                            user.client.SendAsync(chatMessage);
+                        }
+                        else
+                        {
+                            if (user.Id != chatMessage.FromUser.Id)
+                                user.MessagesToSend.Add(chatMessage);
+                        }
+                    }
+
+                    break;
+
+                }
+                case "GroupLookupMessage":
+                {
+                    GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
+                    ArrayMessage<PublicGroupInfo> ResultMessage;
+                    List<PublicGroupInfo> SuitableGroups = null;
+
+
+                    foreach (var groupChat in DbContext.GroupChats)
+                    {
+                        if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
+                        {
+                            if (SuitableGroups == null)
+                                SuitableGroups = new List<PublicGroupInfo>();
+
+                            PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
+
+                            foreach (var groupMember in groupChat.Members)
+                            {
+                                PublicUserInfo publicUser
+                                    = new PublicUserInfo(groupMember.Name, groupMember.Description, groupMember.Id, groupMember.LastVisitDate);
+
+                                if (groupMember.Images != null)
+                                    foreach (var image in groupMember.Images)
+                                        publicUser.Images.Add(image);
+
+                            }
+
+                            SuitableGroups.Add(SuitableGroup);
+                        }
+                    }
+
+                    ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+                    client.SendAsync(ResultMessage);
+
+                    break;
+                }
                 case "CreateGroupMessage":
                 {
                     CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;

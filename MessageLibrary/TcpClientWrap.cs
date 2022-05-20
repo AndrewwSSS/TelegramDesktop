@@ -194,6 +194,7 @@ namespace MessageLibrary
                     }
 
                     Message msg = Message.FromByteArray(state.Buffer);
+                    Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
                     MessageReceived?.Invoke(this, msg);
                     
 

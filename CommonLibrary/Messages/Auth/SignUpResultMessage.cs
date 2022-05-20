@@ -21,6 +21,7 @@ namespace CommonLibrary.Messages.Auth
             this.Result = Result;
         }
 
+        public SignUpResultMessage() { }
 
 
         public SignUpResultMessage SetRegistrationDate(DateTime RegistrationDate)
