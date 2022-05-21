@@ -1,7 +1,7 @@
 ﻿using CommonLibrary.Messages.Groups;
 using System;
 
-namespace CommonLibrary.Messages.Auth.Groups
+namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
     public class GroupInviteMessage : BaseMessage

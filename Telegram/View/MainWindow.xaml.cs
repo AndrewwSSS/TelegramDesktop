@@ -174,6 +174,14 @@ namespace Telegram
                         LB_FoundGroups.Visibility = Visibility.Hidden;
                         FoundGroups = new ObservableCollection<PublicGroupInfo>(array.ToList());
                     }
+                } else if(msg is GroupJoinResultMessage)
+                {
+                    var result = msg as GroupJoinResultMessage;
+                    if(result.Result == AuthenticationResult.Success)
+                    {
+                        Groups.Add(Buffers.GroupJoinInfo);
+                        B_JoinGroup.Visibility = Visibility.Hidden;
+                    }
                 }
             });
         }
@@ -283,10 +291,10 @@ namespace Telegram
                 fadeAway.Completed += (v1, v2) =>
                 {
                     Dispatcher.Invoke(() =>
-                    MainGrid.BeginAnimation(Border.OpacityProperty, MainGridDarkReverse));
+                    MainGrid.BeginAnimation(OpacityProperty, MainGridDarkReverse));
                 };
                 AddGroupMenuState = MenuState.Hidden;
-                AddGroupMenu.BeginAnimation(Border.OpacityProperty, fadeAway);
+                AddGroupMenu.BeginAnimation(OpacityProperty, fadeAway);
             }
         }
 
@@ -379,8 +387,20 @@ namespace Telegram
             if (LB_FoundGroups.SelectedIndex == -1)
                 return;
             var groupInfo = LB_FoundGroups.SelectedItem as PublicGroupInfo;
-            B_JoinGroup.Visibility = Visibility.Hidden;
-            Client.SendAsync(new GroupJoinMessage(new PublicGroupInfo()));
+            Buffers.GroupJoinInfo = groupInfo;
+            Client.SendAsync(new GroupJoinMessage(groupInfo.Id, Me.Id));
+            Client.ReceiveAsync();
+        }
+
+        private void TB_SendMsg_OnEnter(object sender, KeyEventArgs e)
+        {
+            Dispatcher.Invoke(() => {
+                var textBox = sender as TextBox;
+                if (e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
+                {
+                    // TODO: Отправка сообщений после кумеканья над архитектурой
+                }
+            });
         }
     }
 

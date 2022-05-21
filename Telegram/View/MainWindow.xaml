@@ -476,7 +476,8 @@
                                  VerticalAlignment="Center"
                                  FontSize="20"
                                  Foreground="White"
-                                 BorderThickness="0"/>
+                                 BorderThickness="0"
+                                     KeyDown="TB_SendMsg_OnEnter"/>
 
                             <Button Grid.Column="2"
                                 Background="#282E33"
