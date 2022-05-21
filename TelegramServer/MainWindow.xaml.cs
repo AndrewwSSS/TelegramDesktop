@@ -1,6 +1,7 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Auth.Groups;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -338,7 +339,7 @@ namespace TelegramServer
 
                         GroupInfo.Users = PublicUsersInfo;
 
-                        SendMessageToUsers(new GroupJoinMessage(GroupInfo), GroupCreator, Members);
+                        SendMessageToUsers(new GroupInviteMessage(GroupInfo, GroupCreator.Id), GroupCreator, Members);
                     }
 
                     break;
@@ -369,6 +370,27 @@ namespace TelegramServer
                         DisconnectedUser.client.DisconnectAsync();
                     }
                 
+                    break;
+                }
+                case "GroupJoinMessage":
+                {
+                    GroupJoinMessage groupJoinMessage = (GroupJoinMessage)msg;
+                    GroupChat group = DbContext.GroupChats.First(g => g.Id == groupJoinMessage.GroupId);
+                    User user = DbContext.Users.FirstOrDefault(u => u.Id == groupJoinMessage.UserId);
+                    
+                    if(user != null && group != null)
+                    {
+                        user.Chats.Add(group);
+                        GroupJoinResultMessage resultMessage
+                                = new GroupJoinResultMessage(AuthenticationResult.Success);
+
+                    }
+                    else
+                    {
+                        GroupJoinResultMessage resultMessage 
+                                = new GroupJoinResultMessage(AuthenticationResult.Denied);
+                        client.SendAsync(resultMessage);
+                    }
                     break;
                 }
 
