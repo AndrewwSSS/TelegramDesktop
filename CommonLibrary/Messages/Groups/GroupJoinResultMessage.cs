@@ -1,8 +1,8 @@
 ﻿using System;
-using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.Auth;
 using MessageLibrary;
 
-namespace CommonLibrary.Messages.Auth.Groups
+namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
     public class GroupJoinResultMessage : BaseMessage

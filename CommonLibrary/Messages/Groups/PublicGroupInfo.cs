@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace CommonLibrary.Messages.Groups
 {
+    /// <summary>
+    /// Представляет собой класс, содержащий доступную для клиентов информацию о группе
+    /// </summary>
     [Serializable]
     public class PublicGroupInfo : UserEntity
     {

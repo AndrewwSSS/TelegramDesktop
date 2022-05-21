@@ -12,7 +12,6 @@ namespace CommonLibrary.Messages
         private string text;
 
         public PublicUserInfo FromUser { get; set; }
-        public PublicUserInfo ToUser { get; set; }
         public PublicUserInfo ResendUser { get; set; }
         public ChatMessage RespondingTo { get; set; }
         public List<ImageContainer> Images { get; set; }
@@ -44,11 +43,7 @@ namespace CommonLibrary.Messages
             return this;
         }
 
-        public ChatMessage SetTo(PublicUserInfo user)
-        {
-            ToUser = user;
-            return this;
-        }
+        
 
         public ChatMessage SetResendUser(PublicUserInfo user)
         {
