@@ -200,6 +200,10 @@
                             <RowDefinition Height="45"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
 
                         <Grid Grid.Row="0"
                               Grid.Column="0"
@@ -208,116 +212,26 @@
                             <TextBox KeyDown="TB_GroupLookUp_OnEnter" Margin="2"
                                      Style="{StaticResource SearchBoxStyle}"/>
                         </Grid>
-                        <ListBox x:Name="LB_Groups" HorizontalContentAlignment="Stretch"
-                             Background="{StaticResource DarkBgBrush}"
-                             Grid.Row="1"  
-                                 BorderThickness="0"
-                             ItemsSource="{Binding Groups}"
-                                 SelectionChanged="GroupSelected">
-                            <ListBox.Style>
-                                
-                                <Style TargetType="ListBox">
-                                    <Style.Resources>
-                                        <BooleanToVisibilityConverter x:Key="boolToVis"/>
-                                    </Style.Resources>
-                                    <Style.Setters>
-                                        
-                                        <Setter Property="Visibility" Value="{Binding HasItems, 
-                                          RelativeSource={RelativeSource Self}, 
-                                          Converter={StaticResource boolToVis}}"/>
-                                    </Style.Setters>
-                                </Style>
-                            </ListBox.Style>
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="Padding" Value="0"/>
-                                    <Setter Property="Margin" Value="0"/>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <DataTemplate.Resources>
-                                        <entities:NotNullConverter x:Key="notnull"></entities:NotNullConverter>
-                                    </DataTemplate.Resources>
-                                    <Grid Name="border"  Background="{StaticResource BgBrush}">
-                                         <!--Аватар группы-->
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <ContentControl Grid.Column="0">
-                                            <ContentControl.Style>
-                                                <Style TargetType="ContentControl">
-                                                    <Style.Resources>
-                                                        <entities:NotNullConverter x:Key="notnull" />
-
-                                                    </Style.Resources>
-                                                    <Style.Setters>
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border 
-                                                                            Grid.Column="0" Grid.Row="1"
-                                                                            Height="48" Width="48" 
-                                                                            Margin="0,0,5,0" 
-                                                                            CornerRadius="360"
-                                                                            Background="HotPink">
-                                                                        <TextBlock 
-                                                                                VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                Text="{Binding Name}" Foreground="{StaticResource GreyBrush}" FontSize="20">
-                                                                        </TextBlock>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Style.Setters>
-
-                                                    <Style.Triggers>
-                                                        <DataTrigger Value="True" Binding="{Binding Images[0], Converter={StaticResource notnull}}">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate>
-                                                                        <Border Grid.Column="0" Grid.Row="1" Height="48" Width="48" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
-                                                                            <Image Source="{Binding Images[0].ImageSource}">
-                                                                                <Image.Clip>
-                                                                                    <EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/>
-                                                                                </Image.Clip>
-                                                                            </Image>
-                                                                        </Border>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </ContentControl.Style>
-                                        </ContentControl>
-                                        <StackPanel Margin="0, 5" Grid.Column="1">
-                                            <TextBlock Text="{Binding Name}" Foreground="{StaticResource GreyBrush}" FontSize="12"/>
-                                            <TextBlock Name="T_LastMsg" Foreground="{StaticResource DarkGreyBrush}" FontSize="12" Text="Нет новых сообщений"/>
-                                        </StackPanel>
-                                        
-                                    </Grid>
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding LastMessage, Converter={StaticResource notnull}}" Value="True">
-                                            <Setter TargetName="T_LastMsg" Property="Text" Value="{Binding LastMessage.Text}"/>
-                                        </DataTrigger>
-                                        <DataTrigger
-                                            Binding="{Binding
-                                                RelativeSource={RelativeSource
-                                                Mode=FindAncestor,
-                                                AncestorType={x:Type ListBoxItem}},
-                                                Path=IsSelected}"
-                                            Value="True">
-                                            <Setter
-                                            TargetName="border"
-                                            Property="Background"
-                                            Value="{StaticResource MsgBgBrush}"/>
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-
+                        <Button x:Name="B_CloseFoundGroups"
+                                Click="B_CloseFoundGroups_Click"
+                                IsEnabled="False" 
+                                Grid.Row="0" Grid.Column="1" 
+                                Width="32" Height="32" 
+                                Style="{StaticResource BLight}">
+                            X
+                        </Button>
+                        <ListBox x:Name="LB_FoundGroups"
+                                 Grid.Row="1"
+                                 ItemsSource="{Binding FoundGroups}"
+                                 SelectionChanged="FoundGroupSelected"
+                                 Style="{StaticResource LBGroup}"
+                                 Visibility="Hidden">
+                        </ListBox>
+                        <ListBox x:Name="LB_Groups" 
+                                 Grid.Row="1"  
+                                 ItemsSource="{Binding Groups}"
+                                 SelectionChanged="GroupSelected"
+                                 Style="{StaticResource LBGroup}">
                         </ListBox>
                         <TextBlock  Grid.Row="1" Margin="15"
                                 x:Name="TB_GroupsNotFound"   
@@ -547,8 +461,8 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-
-                        <Grid Grid.Row="2" >
+                        
+                        <Grid Background="{StaticResource BgBrush}" Grid.Row="2" x:Name="SendMsgGrid">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
                                 <ColumnDefinition Width="*"/>
@@ -576,6 +490,13 @@
                                 Content="7"/>
 
                         </Grid>
+                        <Button x:Name="B_JoinGroup" 
+                                Visibility="Hidden"
+                                Click="B_JoinGroup_Click"
+                                Grid.Row="2" 
+                                Style="{StaticResource BLight}" >
+                            ВОЙТИ В ГРУППУ
+                        </Button>
                     </Grid>
 
                     <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280"></Grid>

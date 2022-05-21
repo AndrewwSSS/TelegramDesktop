@@ -60,12 +60,14 @@ namespace Telegram
         public DoubleAnimation MainGridDarkReverse = new DoubleAnimation(1, new Duration(TimeSpan.FromSeconds(0.2)));
         public ThicknessAnimation OpenLeftMenuAnim = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnim = new ThicknessAnimation();
+
         private ObservableCollection<PublicGroupInfo> groups = new ObservableCollection<PublicGroupInfo>();
         private ObservableCollection<MessageItemWrap> messages;
         private TcpClientWrap client;
+        private ObservableCollection<PublicGroupInfo> foundGroups;
 
         public PublicUserInfo Me { get; set; }
-        public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg","Ivan Dovgolutsky", "", DateTime.Now);
+        public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "", DateTime.Now);
 
 
         public ObservableCollection<MessageItemWrap> Messages
@@ -87,7 +89,16 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
-        public MainWindow() : this(new PublicUserInfo(-1, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)){ }
+        public ObservableCollection<PublicGroupInfo> FoundGroups
+        {
+            get => foundGroups;
+            set
+            {
+                foundGroups = value;
+                OnPropertyChanged();
+            }
+        }
+        public MainWindow() : this(new PublicUserInfo(-1, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)) { }
         public MainWindow(PublicUserInfo me)
         {
 
@@ -128,14 +139,14 @@ namespace Telegram
                 new ChatMessage("тест").SetFrom(Me),
                 new ChatMessage("тест").SetFrom(Me)
             };
-            
+
 
             Closing += OnClosed;
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
-            if(Me != null)
+            if (Me != null)
                 Client.Send(new ClientDisconnectMessage(Me.Id));
             Client.Disconnect();
         }
@@ -157,9 +168,11 @@ namespace Telegram
                 else if (msg is ArrayMessage<PublicGroupInfo>)
                 {
                     var array = (msg as ArrayMessage<PublicGroupInfo>).Array;
-                    if (array != null)
+                    if (array != null && array.Length != 0)
                     {
-                        Groups = new ObservableCollection<PublicGroupInfo>(array.ToList());
+                        B_CloseFoundGroups.IsEnabled = true;
+                        LB_FoundGroups.Visibility = Visibility.Hidden;
+                        FoundGroups = new ObservableCollection<PublicGroupInfo>(array.ToList());
                     }
                 }
             });
@@ -337,6 +350,37 @@ namespace Telegram
             if ((lb.SelectedItem as PublicGroupInfo).Messages != null)
                 foreach (var msg in (lb.SelectedItem as PublicGroupInfo).Messages)
                     AddMessage(msg);
+        }
+
+        private void FoundGroupSelected(object sender, SelectionChangedEventArgs e)
+        {
+            ListBox lb = sender as ListBox;
+            if (lb.SelectedIndex == -1)
+                return;
+            FoundGroups.Clear();
+            var groupInfo = lb.SelectedItem as PublicGroupInfo;
+            if (groupInfo.Messages != null)
+                foreach (var msg in groupInfo.Messages)
+                    AddMessage(msg);
+            B_JoinGroup.Visibility = Visibility.Visible;
+        }
+
+        private void B_CloseFoundGroups_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            button.IsEnabled = false;
+            FoundGroups = null;
+            LB_FoundGroups.Visibility = Visibility.Hidden;
+            B_JoinGroup.Visibility = Visibility.Hidden;
+        }
+
+        private void B_JoinGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (LB_FoundGroups.SelectedIndex == -1)
+                return;
+            var groupInfo = LB_FoundGroups.SelectedItem as PublicGroupInfo;
+            B_JoinGroup.Visibility = Visibility.Hidden;
+            Client.SendAsync(new GroupJoinMessage(new PublicGroupInfo()));
         }
     }
 
