@@ -65,10 +65,10 @@ namespace Telegram
         private ObservableCollection<MessageItemWrap> messages;
         private TcpClientWrap client;
         private ObservableCollection<PublicGroupInfo> foundGroups;
+        private PublicGroupInfo curGroup;
 
         public PublicUserInfo Me { get; set; }
         public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "", DateTime.Now);
-
 
         public ObservableCollection<MessageItemWrap> Messages
         {
@@ -98,6 +98,16 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
+        public PublicGroupInfo CurGroup { 
+            get => curGroup;
+            set
+            {
+                curGroup = value;
+                OnPropertyChanged();
+                ShowGroupMessages(CurGroup);
+            }
+        }
+        public List<PublicUserInfo> Users { get; set; }
         public MainWindow() : this(new PublicUserInfo(-1, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)) { }
         public MainWindow(PublicUserInfo me)
         {
@@ -171,17 +181,23 @@ namespace Telegram
                     if (array != null && array.Length != 0)
                     {
                         B_CloseFoundGroups.IsEnabled = true;
-                        LB_FoundGroups.Visibility = Visibility.Hidden;
+                        LB_FoundGroups.Visibility = Visibility.Visible;
                         FoundGroups = new ObservableCollection<PublicGroupInfo>(array.ToList());
                     }
-                } else if(msg is GroupJoinResultMessage)
+                }
+                else if (msg is GroupJoinResultMessage)
                 {
                     var result = msg as GroupJoinResultMessage;
-                    if(result.Result == AuthenticationResult.Success)
+                    if (result.Result == AuthenticationResult.Success)
                     {
                         Groups.Add(Buffers.GroupJoinInfo);
+                        Users.AddRange(Buffers.GroupJoinInfo.Users);
                         B_JoinGroup.Visibility = Visibility.Hidden;
                     }
+                }
+                else if (msg is ChatMessage)
+                {
+                    AddMessage(msg as ChatMessage);
                 }
             });
         }
@@ -189,19 +205,38 @@ namespace Telegram
         private void AddMessage(ChatMessage msg)
         {
             MessageItemWrap item = new MessageItemWrap(msg);
-            if (Messages.Count != 0 && Messages.Last().Message.FromUser == msg.FromUser)
+            item.FromUser = Users.First(u => u.Id == msg.FromUserId);
+            if (msg.RespondingTo != -1)
+                item.RespondingTo = Messages.First(m => m.Message.Id == msg.RespondingTo).Message;
+            if (msg.RepostUserId != -1)
+                item.RepostUser = Users.First(u => u.Id == msg.RepostUserId);
+
+            var group = Groups.First(g => g.Id == msg.GroupId);
+
+            if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
             {
                 Messages.Last().ShowAvatar = false;
                 item.ShowAvatar = true;
-                Messages.Add(item);
+                group.Messages.Add(msg);
+                if (LB_Groups.SelectedItem == group)
+                    Messages.Add(item);
             }
             else
             {
                 item.ShowAvatar = true;
-                Messages.Add(item);
+                group.Messages.Add(msg);
+                if (LB_Groups.SelectedItem == group)
+                    Messages.Add(item);
             }
         }
+        private void ShowGroupMessages(PublicGroupInfo group)
+        {
 
+            Messages.Clear();
+            if (CurGroup.Messages != null)
+                foreach (var msg in CurGroup.Messages)
+                    AddMessage(msg);
+        }
         private void BTNFullScreen_Click(object sender, RoutedEventArgs e)
         {
             if (this.WindowState == WindowState.Maximized)
@@ -354,10 +389,8 @@ namespace Telegram
             ListBox lb = sender as ListBox;
             if (lb.SelectedIndex == -1)
                 return;
-            Messages.Clear();
-            if ((lb.SelectedItem as PublicGroupInfo).Messages != null)
-                foreach (var msg in (lb.SelectedItem as PublicGroupInfo).Messages)
-                    AddMessage(msg);
+
+            CurGroup = lb.SelectedItem as PublicGroupInfo;
         }
 
         private void FoundGroupSelected(object sender, SelectionChangedEventArgs e)
@@ -365,12 +398,9 @@ namespace Telegram
             ListBox lb = sender as ListBox;
             if (lb.SelectedIndex == -1)
                 return;
-            FoundGroups.Clear();
-            var groupInfo = lb.SelectedItem as PublicGroupInfo;
-            if (groupInfo.Messages != null)
-                foreach (var msg in groupInfo.Messages)
-                    AddMessage(msg);
-            B_JoinGroup.Visibility = Visibility.Visible;
+            CurGroup = lb.SelectedItem as PublicGroupInfo;
+            if (!Groups.Contains(CurGroup))
+                B_JoinGroup.Visibility = Visibility.Visible;
         }
 
         private void B_CloseFoundGroups_Click(object sender, RoutedEventArgs e)
@@ -394,11 +424,12 @@ namespace Telegram
 
         private void TB_SendMsg_OnEnter(object sender, KeyEventArgs e)
         {
-            Dispatcher.Invoke(() => {
+            Dispatcher.Invoke(() =>
+            {
                 var textBox = sender as TextBox;
                 if (e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
-                    // TODO: Отправка сообщений после кумеканья над архитектурой
+                    Client.SendAsync(new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id));
                 }
             });
         }

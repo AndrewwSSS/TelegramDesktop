@@ -11,9 +11,9 @@ namespace CommonLibrary.Messages
     {
         private string text;
 
-        public PublicUserInfo FromUser { get; set; }
-        public PublicUserInfo ResendUser { get; set; }
-        public ChatMessage RespondingTo { get; set; }
+        public int FromUserId { get; set; }
+        public int RepostUserId { get; set; } = -1;
+        public int RespondingTo { get; set; } = -1;
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
 
@@ -36,24 +36,32 @@ namespace CommonLibrary.Messages
 
         public ChatMessage() { }
 
-
-        public ChatMessage SetFrom(PublicUserInfo user)
+        public ChatMessage SetFrom(PublicUserInfo info)
         {
-            FromUser = user;
+            FromUserId = info.Id;
+            return this;
+        }
+        public ChatMessage SetFrom(int id)
+        {
+            FromUserId = id;
             return this;
         }
 
-        
 
-        public ChatMessage SetResendUser(PublicUserInfo user)
+        public ChatMessage SetResendUser(PublicUserInfo info)
         {
-            ResendUser = user;
+            RepostUserId = info.Id;
+            return this;
+        }
+        public ChatMessage SetResendUser(int id)
+        {
+            RepostUserId = id;
             return this;
         }
 
         public ChatMessage SetRespondingTo(ChatMessage msg)
         {
-            RespondingTo = msg;
+            RespondingTo = msg.Id;
             return this;
         }
 

@@ -1,4 +1,5 @@
 ﻿using CommonLibrary.Messages;
+using CommonLibrary.Messages.Users;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,9 @@ namespace CommonLibrary.Containers
     {
         private bool showAvatar = false;
         public ChatMessage Message { get; set; }
+        public PublicUserInfo FromUser { get; set; }
+        public ChatMessage RespondingTo { get; set; }
+        public PublicUserInfo RepostUser { get; set; }
         public string FormattedTime => Message.Time.ToString("HH:mm");
         public bool ShowAvatar
         {
@@ -29,6 +33,5 @@ namespace CommonLibrary.Containers
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public MessageItemWrap(ChatMessage msg) => Message = msg;
-        
     }
 }
