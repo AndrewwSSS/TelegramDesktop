@@ -1,7 +1,6 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
-using CommonLibrary.Messages.Auth.Groups;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -19,7 +18,9 @@ namespace TelegramServer
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
         private ObservableCollection<GroupChat> Chats;
+        private Dictionary<User, TcpClientWrap> Clients;
         private TelegramDb DbContext;
+
 
         private TcpServerWrap Server;
 
@@ -157,9 +158,9 @@ namespace TelegramServer
 
                         client.SendAsync(ResultMessage);
 
-                        user.client = client;
+                      
                         user.LastVisitDate = DateTime.Now;
-                        user.isOnline = true;
+                        Clients[user] = client;
 
                         DbContext.SaveChanges();
 
@@ -215,12 +216,9 @@ namespace TelegramServer
                 case "GroupLookupMessage":
                 {
                     GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
-                    ArrayMessage<PublicGroupInfo> ResultMessage;
                     List<PublicGroupInfo> SuitableGroups = null;
 
                     foreach (var groupChat in DbContext.GroupChats)
-                    {
-                        // Поиск по имени группы
                         if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
                         {
 
@@ -246,10 +244,8 @@ namespace TelegramServer
 
                             SuitableGroups.Add(SuitableGroup);
                         }
-                    }
 
-                    ResultMessage = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
-                    client.SendAsync(ResultMessage);
+                    client.SendAsync(new ArrayMessage<PublicGroupInfo>(SuitableGroups));
 
                     break;
                 }
@@ -259,21 +255,19 @@ namespace TelegramServer
                     List<User> Members = null;
                     User GroupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
 
-                    if (GroupCreator == null)
-                    {
+                    if (GroupCreator == null) {
                         MessageBox.Show("Group creator not found");
                         break;
                     }
 
-                    // если есть пользователи котрых добавили в группу
+  
                     if (createNewGroupMessage.MembersId != null)
                     {
                         Members = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Contains(u.Id)).ToList();
 
-                        if (Members.Count > 0)
-                        {
-                            if (Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id)))
-                            {
+                        if (Members.Count > 0) {
+
+                            if (Members.Any(m => m.BlockedUsers.Any(bu => bu.Id == GroupCreator.Id))) {
                                 CreateGroupResultMessage DeniedMessage
                                         = new CreateGroupResultMessage(AuthenticationResult.Denied, "One or more users in list blocked you");
                                 client.SendAsync(DeniedMessage);
@@ -289,8 +283,7 @@ namespace TelegramServer
                     NewGroupChat.DateCreated = DateTime.Now;
 
 
-                    if (createNewGroupMessage.Image != null)
-                    {
+                    if (createNewGroupMessage.Image != null) {
                         NewGroupChat.Images = new List<ImageContainer>();
                         NewGroupChat.Images.Add(createNewGroupMessage.Image);
                     }
@@ -347,12 +340,11 @@ namespace TelegramServer
                 case "ClientDisconnectMessage":
                 {
                     ClientDisconnectMessage clientDisconnect = (ClientDisconnectMessage)msg;
-
                     User DisconnectedUser = DbContext.Users.FirstOrDefault(u => u.Id == clientDisconnect.UserId);
 
                     if(DisconnectedUser != null)
-                    {
-                        DisconnectedUser.isOnline = false;
+                    {                        
+                        TcpClientWrap DisconnectedClient = Clients[DisconnectedUser];
 
                         ClientHandler OnClientDisconnected = (c) =>
                         {
@@ -360,14 +352,14 @@ namespace TelegramServer
                             {
                                 UsersOnline.Remove(DisconnectedUser);
                                 UsersOffline.Add(DisconnectedUser);
-                                DisconnectedUser.client = null;
+                                Clients.Remove(DisconnectedUser);
                                 DbContext.SaveChanges();
                             });
                         };
 
 
-                        DisconnectedUser.client.Disconnected += OnClientDisconnected;
-                        DisconnectedUser.client.DisconnectAsync();
+                        DisconnectedClient.Disconnected += OnClientDisconnected;
+                        DisconnectedClient.DisconnectAsync();
                     }
                 
                     break;
@@ -383,7 +375,7 @@ namespace TelegramServer
                         user.Chats.Add(group);
                         GroupJoinResultMessage resultMessage
                                 = new GroupJoinResultMessage(AuthenticationResult.Success);
-
+                        client.SendAsync(resultMessage);
                     }
                     else
                     {
@@ -405,15 +397,18 @@ namespace TelegramServer
             foreach (var user in UsersToSend)
                 if (user.Id != FromUser.Id)
                 {
-                    if (user.isOnline)
-                        user.client.SendAsync(msg);
+                    if(isUserOnline(user))
+                        Clients[user].SendAsync(msg);
                     else
                     {
                         if (user.MessagesToSend == null)
                             user.MessagesToSend = new List<BaseMessage>();
+
                         user.MessagesToSend.Add(msg);
                     }
                 }
         }
+
+        private bool isUserOnline(User user) => Clients.ContainsKey(user);
     }
 }

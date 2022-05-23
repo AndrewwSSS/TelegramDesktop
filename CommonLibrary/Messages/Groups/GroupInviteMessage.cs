@@ -15,5 +15,7 @@ namespace CommonLibrary.Messages.Groups
             this.FromUserId = FromUserId;
         }
 
+        public GroupInviteMessage() { }
+
     }
 }

@@ -25,24 +25,10 @@ namespace CommonLibrary.Messages.Users
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
        
+        public User() { }
 
 
-        public User()
-        {
-            //BlockedUsers = new List<User>();
-            //Chats = new List<GroupChat>();
-        }
-
-        public User(int id)
-        {
-            Id = id;
-        }
-
-        [NotMapped]
-        public TcpClientWrap client { get; set; }
-
-        [NotMapped]
-        public bool isOnline { get; set; } = false;
+        public User(int id) => Id = id;
 
         [NotMapped]
         public List<ChatMessage> Messages
@@ -52,11 +38,6 @@ namespace CommonLibrary.Messages.Users
                  x.AddRange(y);
                  return x;
              });
-
-
-        //public User(string name) => Name = name;
-
-        //public User(int id) => Id = id;
 
     }
 }
