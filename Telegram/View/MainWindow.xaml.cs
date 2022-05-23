@@ -179,6 +179,12 @@ namespace Telegram
                         });
                     }
                 }
+                else if(msg is ArrayMessage<BaseMessage>)
+                {
+                    var arrMsg = msg as ArrayMessage<BaseMessage>;
+                    foreach (var obj in arrMsg.Array)
+                        Client_MessageReceived(client, obj);
+                }
                 else if (msg is ArrayMessage<PublicGroupInfo>)
                 {
                     var array = (msg as ArrayMessage<PublicGroupInfo>).Array;
