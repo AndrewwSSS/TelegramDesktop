@@ -202,7 +202,7 @@ namespace TelegramServer
                 {
                     ChatMessage chatMessage = (ChatMessage)msg;
                     GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.GroupId);
-                    User fromUser = DbContext.Users.First(u => u.Id == chatMessage.FromUser.Id); 
+                    User fromUser = DbContext.Users.First(u => u.Id == chatMessage.FromUserId.Id); 
                     groupChat.Messages.Add(chatMessage);
                     
                     DbContext.SaveChanges();
