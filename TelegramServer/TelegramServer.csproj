@@ -92,6 +92,15 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\202205231442216_InitialCreate.cs" />
+    <Compile Include="Migrations\202205231442216_InitialCreate.designer.cs">
+      <DependentUpon>202205231442216_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202205231622258_M12.cs" />
+    <Compile Include="Migrations\202205231622258_M12.designer.cs">
+      <DependentUpon>202205231622258_M12.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,6 +114,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Migrations\202205231442216_InitialCreate.resx">
+      <DependentUpon>202205231442216_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202205231622258_M12.resx">
+      <DependentUpon>202205231622258_M12.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

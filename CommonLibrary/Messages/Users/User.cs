@@ -21,14 +21,22 @@ namespace CommonLibrary.Messages.Users
         public bool Banned { get; set; } = false;
         public DateTime RegistrationDate { get; set; }
         public DateTime LastVisitDate { get; set; }
-        public virtual List<User> BlockedUsers { get; set; }
+        public virtual List<User> BlockedUsers { get; set; } 
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
        
-        public User() { }
 
+        public User()
+        {
+            BlockedUsers = new List<User>();
+            Chats = new List<GroupChat>();
+            MessagesToSend = new List<BaseMessage>();
+        }
+        public User(int id) : this()
+        {
+            Id = id;
+        }
 
-        public User(int id) => Id = id;
 
         [NotMapped]
         public List<ChatMessage> Messages

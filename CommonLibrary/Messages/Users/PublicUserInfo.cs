@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace CommonLibrary.Messages.Users
 {
@@ -14,18 +12,17 @@ namespace CommonLibrary.Messages.Users
         public int Id { get; set; }
 
         public string Login { get; set; }
-        public DateTime RegistrationDate { get; set; }
 
-        public PublicUserInfo(int id, string login, string name, string desc, DateTime regDate)
+        public PublicUserInfo(int id, string login, string name, string desc)
         {
             Name = name;
             Login = login;
             Description = desc;
             Id = id;
-            RegistrationDate = regDate;
         }
 
         public PublicUserInfo() { }
+
 
     }
 }

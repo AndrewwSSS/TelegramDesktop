@@ -16,13 +16,9 @@ namespace CommonLibrary.Messages.Groups
         public string NewDescription { get; set; }
         public string NewName { get; set; }
 
-        public GroupUpdateMessage()
-        {
 
-        }
-        public GroupUpdateMessage(int id)
-        {
-            GroupId = id;
-        }
+        public GroupUpdateMessage() { }
+        public GroupUpdateMessage(int id) => GroupId = id;
+
     }
 }

@@ -34,7 +34,11 @@ namespace CommonLibrary.Messages.Groups
         public event PropertyChangedEventHandler PropertyChanged;
 
 
-        public GroupChat() { }
+        public GroupChat() 
+        {
+            Messages = new List<ChatMessage>();
+            Members = new List<User>();
+        }
 
 
         public bool AddMessage(ChatMessage message)

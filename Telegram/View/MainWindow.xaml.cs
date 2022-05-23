@@ -175,7 +175,7 @@ namespace Telegram
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
 
                         Groups.Add(new PublicGroupInfo(Buffers.GroupName, "", result.GroupId){
-                            Users = new List<PublicUserInfo>() { Me}
+                            Members = new List<PublicUserInfo>() { Me}
                         });
                     }
                 }
@@ -195,7 +195,7 @@ namespace Telegram
                     if (result.Result == AuthenticationResult.Success)
                     {
                         Groups.Add(Buffers.GroupJoinInfo);
-                        Users.AddRange(Buffers.GroupJoinInfo.Users);
+                        Users.AddRange(Buffers.GroupJoinInfo.Members);
                         B_JoinGroup.Visibility = Visibility.Hidden;
                     }
                 }
@@ -215,7 +215,7 @@ namespace Telegram
                     {
                         if (!Users.Contains(info.NewUser)) 
                             Users.Add(info.NewUser);
-                        Groups.First(g => g.Id == info.GroupId).Users.Add(info.NewUser);
+                        Groups.First(g => g.Id == info.GroupId).Members.Add(info.NewUser);
                     }
                 }
             });

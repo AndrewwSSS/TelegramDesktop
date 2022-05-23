@@ -10,11 +10,11 @@ namespace CommonLibrary.Messages.Groups
     {
         public string Name { get; set; }
         public ImageContainer Image { get; set; }
-        public List<int> MembersId { get; set; }
+        public List<int> MembersId { get; set; } 
         public int FromUserId { get; set; }
 
 
-        public CreateGroupMessage(string Name, int FromUserId, List<int> MembersId = null, ImageContainer Image = null)
+        public CreateGroupMessage(string Name, int FromUserId, List<int> MembersId = null, ImageContainer Image = null) : this()
         {
             this.Name = Name;
             this.Image = Image;
@@ -23,7 +23,9 @@ namespace CommonLibrary.Messages.Groups
 
         }
 
-        public CreateGroupMessage() { }
+        public CreateGroupMessage() {
+            MembersId = new List<int>();
+        }
 
     }
 }

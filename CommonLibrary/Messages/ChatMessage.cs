@@ -1,6 +1,5 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages.Users;
-using MessageLibrary;
 using System;
 using System.Collections.Generic;
 
@@ -34,25 +33,31 @@ namespace CommonLibrary.Messages
             Text = text;
         }
 
-        public ChatMessage() { }
+        public ChatMessage() 
+        {
+            Images = new List<ImageContainer>();
+            Files = new List<FileContainer>();
+        }
+
 
         public ChatMessage SetFrom(PublicUserInfo info)
         {
             FromUserId = info.Id;
             return this;
         }
+
         public ChatMessage SetFrom(int id)
         {
             FromUserId = id;
             return this;
         }
 
-
         public ChatMessage SetResendUser(PublicUserInfo info)
         {
             RepostUserId = info.Id;
             return this;
         }
+
         public ChatMessage SetResendUser(int id)
         {
             RepostUserId = id;
