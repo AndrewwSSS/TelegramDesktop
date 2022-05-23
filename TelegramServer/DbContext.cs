@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 
@@ -14,6 +15,11 @@ namespace TelegramServer
         {
    
             //Database.SetInitializer<TelegramDb>(null);
+        }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
         }
     }
 }
