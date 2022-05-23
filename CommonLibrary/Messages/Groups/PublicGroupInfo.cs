@@ -14,7 +14,7 @@ namespace CommonLibrary.Messages.Groups
         public int Id { get; set; }
         public List<PublicUserInfo> Users { get; set; }
         public GroupType GroupType { get; set; }
-        public List<ChatMessage> Messages { get; set; }
+        public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
 
         public ChatMessage LastMessage => Messages == null ? null : Messages.LastOrDefault();
 
