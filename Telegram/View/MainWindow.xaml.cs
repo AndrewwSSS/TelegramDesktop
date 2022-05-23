@@ -215,6 +215,7 @@ namespace Telegram
                     {
                         if (!Users.Contains(info.NewUser)) 
                             Users.Add(info.NewUser);
+                        Groups.First(g => g.Id == info.GroupId).Users.Add(info.NewUser);
                     }
                 }
             });
