@@ -232,20 +232,14 @@ namespace Telegram
 
             var group = Groups.First(g => g.Id == msg.GroupId);
 
-            if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
+            if (LB_Groups.SelectedItem == group ||
+                LB_FoundGroups.SelectedItem == group ||
+                item.Message.FromUserId == Me.Id)
             {
-                Messages.Last().ShowAvatar = false;
+                if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
+                    Messages.Last().ShowAvatar = false;
                 item.ShowAvatar = true;
-                if (LB_Groups.SelectedItem == group)
-                    Messages.Add(item);
-            }
-            else
-            {
-                item.ShowAvatar = true;
-                if (LB_Groups.SelectedItem == group ||
-                    LB_FoundGroups.SelectedItem == group ||
-                    item.Message.FromUserId == Me.Id)
-                    Messages.Add(item);
+                Messages.Add(item);
             }
         }
         private void ShowGroupMessages(PublicGroupInfo group)
