@@ -230,7 +230,15 @@ namespace TelegramServer
 
                             PublicGroupInfo SuitableGroup
                                     = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
-                            SuitableGroup.Messages.AddRange(groupChat.Messages);
+
+
+                            if(groupChat.Messages != null)
+                            {
+                                foreach (var message in groupChat.Messages)
+                                    SuitableGroup.Messages.Add(message);
+                            }
+                        
+                         
                             
                             if (SuitableGroup.Images != null)
                                 SuitableGroup.Images.AddRange(groupChat.Images);
@@ -383,10 +391,13 @@ namespace TelegramServer
                             user.Chats = new List<GroupChat>();
 
                         user.Chats.Add(group);
-
+                        group.Members.Add(user);
+                      
                         GroupJoinResultMessage resultMessage
                                 = new GroupJoinResultMessage(AuthenticationResult.Success);
-                        client.SendAsync(resultMessage);
+                         client.SendAsync(resultMessage);
+
+                        SendMessageToUsers(new GroupUpdateMessage(group.Id) { }, user.Id, group.Members);
                     }
                     else
                     {
@@ -400,13 +411,13 @@ namespace TelegramServer
             }
         }
 
-        private void SendMessageToUsers(BaseMessage msg, User FromUser, List<User> UsersToSend)
+        private void SendMessageToUsers(BaseMessage msg, int FromUserId, List<User> UsersToSend)
         {
             if (msg == null || UsersToSend == null)
                 return;
 
             foreach (var user in UsersToSend)
-                if (user.Id != FromUser.Id)
+                if (user.Id != FromUserId)
                 {
                     if(isUserOnline(user))
                         Clients[user].SendAsync(msg);

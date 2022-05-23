@@ -15,6 +15,7 @@ namespace CommonLibrary.Messages.Groups
         public List<PublicUserInfo> RemovedUsers { get; set; }
         public string NewDescription { get; set; }
         public string NewName { get; set; }
+
         public GroupUpdateMessage()
         {
 

@@ -19,16 +19,14 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class GroupChat : UserEntity, INotifyPropertyChanged
     {
-       
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
         public GroupType Type { get; set; }
         public DateTime DateCreated { get; set; }
-        public virtual List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+        public virtual List<ChatMessage> Messages { get; set; }
         public virtual List<User> Members { get; set; } = new List<User>();
-
 
         public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
 
