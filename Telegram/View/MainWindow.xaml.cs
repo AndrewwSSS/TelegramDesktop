@@ -443,7 +443,10 @@ namespace Telegram
                 {
                     ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id);
                     Client.SendAsync(msg);
+                    if (CurGroup != null)
+                        CurGroup.Messages.Add(msg);
                     AddMessage(msg);
+                    
                     textBox.Text = "";
                 }
             });
