@@ -206,7 +206,8 @@ namespace Telegram
                     if (group.Messages == null)
                         group.Messages = new List<ChatMessage>();
                     group.Messages.Add(chatMsg);
-                    AddMessage(chatMsg);
+                    if(group == CurGroup)
+                        AddMessage(chatMsg);
                 }
             });
         }
