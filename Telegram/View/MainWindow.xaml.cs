@@ -242,7 +242,9 @@ namespace Telegram
             else
             {
                 item.ShowAvatar = true;
-                if (LB_Groups.SelectedItem == group)
+                if (LB_Groups.SelectedItem == group ||
+                    LB_FoundGroups.SelectedItem == group ||
+                    item.Message.FromUserId == Me.Id)
                     Messages.Add(item);
             }
         }
