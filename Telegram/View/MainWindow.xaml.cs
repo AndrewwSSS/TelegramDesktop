@@ -238,7 +238,10 @@ namespace Telegram
             if (msg.RepostUserId != -1)
                 item.RepostUser = Users.First(u => u.Id == msg.RepostUserId);
 
-            var group = Groups.First(g => g.Id == msg.GroupId);
+            var group = Groups.FirstOrDefault(g => g.Id == msg.GroupId);
+
+            if (group == null)
+                return;
 
             if (LB_Groups.SelectedItem == group ||
                 LB_FoundGroups.SelectedItem == group ||
@@ -252,6 +255,9 @@ namespace Telegram
         }
         private void ShowGroupMessages(PublicGroupInfo group)
         {
+            foreach (var user in group.Members)
+                if (!Users.Contains(user))
+                    Users.Add(user);
 
             Messages.Clear();
             if (CurGroup.Messages != null)

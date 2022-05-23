@@ -29,7 +29,7 @@
             <TabItem Style="{StaticResource TabDefault}"  Header="Вход">
                 <StackPanel Margin="6">
                     <StackPanel Margin="4">
-                        <TextBlock Foreground="{StaticResource GreyBrush}">Электронная почта</TextBlock>
+                        <TextBlock Foreground="{StaticResource GreyBrush}">Электронная почта или логин</TextBlock>
                         <TextBox x:Name="TB_Login_Id" Width="200" Height="40" Style="{StaticResource TBDefault}"/>
                     </StackPanel>
                     <StackPanel Margin="4">
