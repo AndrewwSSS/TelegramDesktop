@@ -223,12 +223,12 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0"
-                                               Text="Login:"
-                                               FontSize="17"/>
+                                                       Text="Login:"
+                                                       FontSize="17"/>
 
                                             <TextBlock Grid.Column="1"
-                                               Text="{Binding Login}"
-                                               FontSize="17"/>
+                                                       Text="{Binding Login}"
+                                                       FontSize="17"/>
                                         </Grid>
 
                                         <Grid Grid.Row="1">

@@ -9,7 +9,6 @@ namespace TelegramServer
     {
         public DbSet<User> Users { get; set; }
         public DbSet<GroupChat> GroupChats { get; set; }
-        //public DbContext Me
 
         public TelegramDb() : base("Telegram")
         {
@@ -20,6 +19,9 @@ namespace TelegramServer
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            modelBuilder.Entity<GroupChat>().HasMany(g => g.Messages)
+            .WithOptional()
+            .WillCascadeOnDelete(true);
         }
     }
 }
