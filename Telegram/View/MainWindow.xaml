@@ -321,10 +321,10 @@
                             </UniformGrid>
                         </Grid>
 
-                        <ScrollViewer>
+                        <ScrollViewer 
+                                 Grid.Row="1">
                             <ListBox ItemsSource="{Binding Messages}" Background="{StaticResource DarkBgBrush}"
                                  BorderThickness="0"
-                                 Grid.Row="1"
                                  IsHitTestVisible="False">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -426,7 +426,7 @@
                                                             FontSize="12" Foreground="{StaticResource LightBlueBrush}" 
                                                             Text="{Binding RespondingTo.FromUser.Name}"
                                                             Margin="0,0,0,5"/>
-                                                        <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Text}"/>
+                                                        <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Message.Text}"/>
                                                     </StackPanel>
                                                 </Grid>
                                                 <StackPanel Grid.Column="1" Grid.Row="3">
