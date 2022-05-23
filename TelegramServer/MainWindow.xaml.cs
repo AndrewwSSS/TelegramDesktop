@@ -29,7 +29,7 @@ namespace TelegramServer
             InitializeComponent();
 
             DbContext = new TelegramDb();
-
+            Clients = new Dictionary<User, TcpClientWrap>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
 
@@ -160,7 +160,7 @@ namespace TelegramServer
 
                       
                         user.LastVisitDate = DateTime.Now;
-                        Clients[user] = client;
+                        Clients.Add(user, client);
 
                         DbContext.SaveChanges();
 
@@ -203,7 +203,10 @@ namespace TelegramServer
                 {
                     ChatMessage chatMessage = (ChatMessage)msg;
                     GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.GroupId);
-                    User fromUser = DbContext.Users.First(u => u.Id == chatMessage.FromUserId.Id); 
+                    User fromUser = DbContext.Users.First(u => u.Id == chatMessage.FromUserId);
+                    if(groupChat.Messages == null)
+                        groupChat.Messages = new List<ChatMessage>();
+
                     groupChat.Messages.Add(chatMessage);
                     
                     DbContext.SaveChanges();
@@ -227,7 +230,8 @@ namespace TelegramServer
 
                             PublicGroupInfo SuitableGroup
                                     = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
-
+                            SuitableGroup.Messages.AddRange(groupChat.Messages);
+                            
                             if (SuitableGroup.Images != null)
                                 SuitableGroup.Images.AddRange(groupChat.Images);
 
@@ -236,10 +240,14 @@ namespace TelegramServer
                                 PublicUserInfo publicUser
                                     = new PublicUserInfo(groupMember.Id, groupMember.Login, groupMember.Name, groupMember.Description, groupMember.LastVisitDate);
 
+                                if(SuitableGroup.Users == null)
+                                     SuitableGroup.Users = new List<PublicUserInfo>();
+
+                                SuitableGroup.Users.Add(publicUser);
+
                                 if (groupMember.Images != null)
                                     foreach (var image in groupMember.Images)
                                         publicUser.Images.Add(image);
-
                             }
 
                             SuitableGroups.Add(SuitableGroup);
@@ -294,7 +302,6 @@ namespace TelegramServer
                         DbContext.SaveChanges();
                         DbContext.GroupChats.Load();
                     });
-
 
                     CreateGroupResultMessage ResultMessage =
                             new CreateGroupResultMessage(AuthenticationResult.Success, NewGroupChat.Id);
@@ -372,7 +379,11 @@ namespace TelegramServer
                     
                     if(user != null && group != null)
                     {
+                        if(user.Chats == null)
+                            user.Chats = new List<GroupChat>();
+
                         user.Chats.Add(group);
+
                         GroupJoinResultMessage resultMessage
                                 = new GroupJoinResultMessage(AuthenticationResult.Success);
                         client.SendAsync(resultMessage);
