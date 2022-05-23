@@ -380,7 +380,6 @@ namespace Telegram
 
         private void Client_MessageSent(TcpClientWrap client, Message msg)
         {
-            Console.WriteLine("sent");
         }
 
         private void TB_GroupName_TextChanged(object sender, TextChangedEventArgs e)
@@ -434,7 +433,9 @@ namespace Telegram
                 var textBox = sender as TextBox;
                 if (e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
-                    Client.SendAsync(new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id));
+                    ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id);
+                    Client.SendAsync(msg);
+                    AddMessage(msg);
                 }
             });
         }
