@@ -211,7 +211,11 @@ namespace Telegram
                 } else if(msg is GroupUpdateMessage)
                 {
                     var info = msg as GroupUpdateMessage;
-                    info.
+                    if(info.NewUser != null)
+                    {
+                        if (!Users.Contains(info.NewUser)) 
+                            Users.Add(info.NewUser);
+                    }
                 }
             });
         }
