@@ -107,8 +107,8 @@ namespace Telegram
                 ShowGroupMessages(CurGroup);
             }
         }
-        public List<PublicUserInfo> Users { get; set; }
-        public MainWindow() : this(new PublicUserInfo(-1, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)) { }
+        public List<PublicUserInfo> Users { get; set; } = new List<PublicUserInfo>();
+        public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)) { }
         public MainWindow(PublicUserInfo me)
         {
 
@@ -118,10 +118,12 @@ namespace Telegram
 
             Groups.Add(new PublicGroupInfo("TEST", "", -1)
             {
+                Id = 0,
                 Messages = new List<ChatMessage>() { new ChatMessage("Прувет!") }
             });
             Me = me;
-
+            Users.Add(me);
+            Users.Add(ivan);
 
 
             RighMenuState = MenuState.Hidden;
@@ -197,7 +199,10 @@ namespace Telegram
                 }
                 else if (msg is ChatMessage)
                 {
-                    AddMessage(msg as ChatMessage);
+                    var chatMsg = msg as ChatMessage;
+                    var group = Groups.First(g => g.Id == chatMsg.GroupId);
+                    group.Messages.Add(chatMsg);
+                    AddMessage(chatMsg);
                 }
             });
         }
@@ -217,14 +222,12 @@ namespace Telegram
             {
                 Messages.Last().ShowAvatar = false;
                 item.ShowAvatar = true;
-                group.Messages.Add(msg);
                 if (LB_Groups.SelectedItem == group)
                     Messages.Add(item);
             }
             else
             {
                 item.ShowAvatar = true;
-                group.Messages.Add(msg);
                 if (LB_Groups.SelectedItem == group)
                     Messages.Add(item);
             }
