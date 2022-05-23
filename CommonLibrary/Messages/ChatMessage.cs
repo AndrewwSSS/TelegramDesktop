@@ -8,23 +8,20 @@ namespace CommonLibrary.Messages
     [Serializable]
     public class ChatMessage : BaseMessage
     {
-        private string text;
-
+  
         public int FromUserId { get; set; }
         public int RepostUserId { get; set; } = -1;
         public int RespondingTo { get; set; } = -1;
         public List<ImageContainer> Images { get; set; }
         public List<FileContainer> Files { get; set; }
 
-        public string Text
-        {
-            get => text;
-            set
-            {
-                text = value;
-            }
-        }
+        public string Text { get; set; }
         public int GroupId { get; set; }
+
+        public DateTime LocalTime
+        {
+            get => Time.ToLocalTime();
+        }
 
 
         public ChatMessage(string text)

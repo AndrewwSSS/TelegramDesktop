@@ -8,10 +8,9 @@ namespace MessageLibrary
     [Serializable]
     public abstract class Message
     {
-
-        public DateTime Time { get; protected set; } = DateTime.Now;
-
+        public DateTime Time { get; protected set; } = DateTime.UtcNow;
         private static BinaryFormatter bf = new BinaryFormatter();
+
         public byte[] ToByteArray()
         {
             MemoryStream ms = new MemoryStream();
@@ -26,12 +25,12 @@ namespace MessageLibrary
             client.Tcp.Client.Send(buf, 0, buf.Length, SocketFlags.None);
         }
 
-
         public void SendTo(Socket socket)
         {
             byte[] buf = ToByteArray();
             socket.Send(buf, 0, buf.Length, SocketFlags.None);
         }
+
         public void SendToAsync(TcpClientWrap client, AsyncCallback cb)
         {
             StateObject stateObject = new StateObject

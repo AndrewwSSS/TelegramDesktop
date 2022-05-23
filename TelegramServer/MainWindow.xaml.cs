@@ -27,11 +27,14 @@ namespace TelegramServer
         {
             InitializeComponent();
 
+
             DbContext = new TelegramDb();
             Clients = new Dictionary<User, TcpClientWrap>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-         
+
+            ClearGroups();
+
             DbContext.GroupChats.Load();
             Chats = DbContext.GroupChats.Local;
 
@@ -110,8 +113,8 @@ namespace TelegramServer
                             Login = signUpMessage.Login,
                             Name = signUpMessage.Name,
                             Password = signUpMessage.Password,
-                            RegistrationDate = DateTime.Now,
-                            LastVisitDate = DateTime.Now
+                            RegistrationDate = DateTime.UtcNow,
+                            LastVisitDate = DateTime.UtcNow
                         };
 
                         DbContext.Users.Add(NewUser);
@@ -156,7 +159,7 @@ namespace TelegramServer
                         client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo));
 
                       
-                        user.LastVisitDate = DateTime.Now;
+                        user.LastVisitDate = DateTime.UtcNow;
                         Clients[user] = client;
 
                         DbContext.SaveChanges();
@@ -261,7 +264,7 @@ namespace TelegramServer
 
   
               
-                    newGroupMembers = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Contains(u.Id)).ToList();
+                    newGroupMembers = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
 
                     if (newGroupMembers.Count > 0) {
 
@@ -280,7 +283,7 @@ namespace TelegramServer
                     {
                         Name = createNewGroupMessage.Name,
                         Members = new List<User>() { groupCreator },
-                        DateCreated = DateTime.Now
+                        DateCreated = DateTime.UtcNow
                     };
 
                     newGroup.Images.Add(createNewGroupMessage.Image);
