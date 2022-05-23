@@ -76,6 +76,7 @@ namespace TelegramServer
 
         }
 
+
         private void OnServerStarted(TcpServerWrap client)
         {
             Dispatcher.Invoke(() =>
@@ -211,7 +212,7 @@ namespace TelegramServer
                     
                     DbContext.SaveChanges();
 
-                    SendMessageToUsers(chatMessage, fromUser, groupChat.Members);
+                    SendMessageToUsers(chatMessage, fromUser.Id, groupChat.Members);
 
                     break;
 
@@ -347,7 +348,7 @@ namespace TelegramServer
 
                         GroupInfo.Users = PublicUsersInfo;
 
-                        SendMessageToUsers(new GroupInviteMessage(GroupInfo, GroupCreator.Id), GroupCreator, Members);
+                        SendMessageToUsers(new GroupInviteMessage(GroupInfo, GroupCreator.Id), GroupCreator.Id, Members);
                     }
 
                     break;
@@ -397,7 +398,20 @@ namespace TelegramServer
                                 = new GroupJoinResultMessage(AuthenticationResult.Success);
                          client.SendAsync(resultMessage);
 
-                        SendMessageToUsers(new GroupUpdateMessage(group.Id) { }, user.Id, group.Members);
+                        PublicUserInfo userInfo = new PublicUserInfo()
+                        {
+                            Id = user.Id,
+                            Name = user.Name,
+                            Description = user.Description,
+                            Login = user.Login,
+                            RegistrationDate = user.RegistrationDate
+                        };
+                        
+                        if(user.Images != null){ 
+                            userInfo.Images.AddRange(user.Images);
+                        }
+                        
+                        SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUser = userInfo }, user.Id, group.Members);
                     }
                     else
                     {
