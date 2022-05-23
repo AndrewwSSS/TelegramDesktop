@@ -208,6 +208,10 @@ namespace Telegram
                     group.Messages.Add(chatMsg);
                     if(group == CurGroup)
                         AddMessage(chatMsg);
+                } else if(msg is GroupUpdateMessage)
+                {
+                    var info = msg as GroupUpdateMessage;
+                    info.
                 }
             });
         }

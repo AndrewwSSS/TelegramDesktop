@@ -10,6 +10,7 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class GroupUpdateMessage : BaseMessage
     {
+        public int GroupId { get; set; }
         public List<PublicUserInfo> NewUsers { get; set; }
         public List<PublicUserInfo> RemovedUsers { get; set; }
         public string NewDescription { get; set; }
@@ -17,6 +18,10 @@ namespace CommonLibrary.Messages.Groups
         public GroupUpdateMessage()
         {
 
+        }
+        public GroupUpdateMessage(int id)
+        {
+            GroupId = id;
         }
     }
 }
