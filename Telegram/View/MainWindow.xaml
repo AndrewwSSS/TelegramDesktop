@@ -345,30 +345,6 @@
                                                     
                                                         <Setter Property="Template">
                                                             <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border 
-                                                                                Grid.Column="0" Grid.Row="1"
-                                                                                Height="32" Width="32" 
-                                                                                Margin="0,0,5,0" 
-                                                                                CornerRadius="360"
-                                                                                Background="HotPink">
-                                                                        <TextBlock 
-                                                                                    VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                    Text="{Binding FromUser.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
-                                                                        </TextBlock>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Style.Setters>
-                                                
-                                                    <Style.Triggers>
-                                                        <DataTrigger Value="False" Binding="{Binding ShowAvatar}">
-                                                            <Setter Property="Visibility" Value="Hidden"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Value="True" Binding="{Binding FromUser.Images[0], Converter={StaticResource notnull}}">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
                                                                     <ControlTemplate>
                                                                         <Border Grid.Column="0" Grid.Row="1" Height="32" Width="32" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
                                                                             <Image Source="{Binding FromUser.Images[0].ImageSource}">
@@ -378,7 +354,32 @@
                                                                             </Image>
                                                                         </Border>
                                                                     </ControlTemplate>
-                                                                </Setter.Value>
+                                                               
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style.Setters>
+                                                
+                                                    <Style.Triggers>
+                                                        <DataTrigger Value="False" Binding="{Binding ShowAvatar}">
+                                                            <Setter Property="Visibility" Value="Hidden"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Value="0" Binding="{Binding FromUser.Images.Count}">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                        <ControlTemplate>
+                                                                            <Border 
+                                                                                Grid.Column="0" Grid.Row="1"
+                                                                                Height="32" Width="32" 
+                                                                                Margin="0,0,5,0" 
+                                                                                CornerRadius="360"
+                                                                                Background="HotPink">
+                                                                                <TextBlock 
+                                                                                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                                    Text="{Binding FromUser.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
+                                                                                </TextBlock>
+                                                                            </Border>
+                                                                        </ControlTemplate>
+                                                                    </Setter.Value>
                                                             </Setter>
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -503,7 +504,15 @@
                         </Button>
                     </Grid>
 
-                    <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280"></Grid>
+                    <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280">
+
+                        <ScrollViewer>
+                            <ListBox 
+                                Style="{StaticResource LBUsers}"
+                                ItemsSource="{Binding CurGroup.Members}">
+                            </ListBox>
+                        </ScrollViewer>
+                    </Grid>
                 </Grid >
             </Grid>
 

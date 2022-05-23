@@ -68,7 +68,7 @@ namespace Telegram
         private PublicGroupInfo curGroup;
 
         public PublicUserInfo Me { get; set; }
-        public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "", DateTime.Now);
+        public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
 
         public ObservableCollection<MessageItemWrap> Messages
         {
@@ -108,7 +108,7 @@ namespace Telegram
             }
         }
         public List<PublicUserInfo> Users { get; set; } = new List<PublicUserInfo>();
-        public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description", DateTime.Now)) { }
+        public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description")) { }
         public MainWindow(PublicUserInfo me)
         {
 
@@ -119,7 +119,8 @@ namespace Telegram
             Groups.Add(new PublicGroupInfo("TEST", "", -1)
             {
                 Id = 0,
-                Messages = new List<ChatMessage>() { new ChatMessage("Прувет!") }
+                Messages = new List<ChatMessage>() { new ChatMessage("Прувет!") },
+                Members = new List<PublicUserInfo>() { me, ivan }
             });
             Me = me;
             Users.Add(me);
@@ -222,6 +223,7 @@ namespace Telegram
                         if (!Users.Contains(info.NewUser)) 
                             Users.Add(info.NewUser);
                         Groups.First(g => g.Id == info.GroupId).Members.Add(info.NewUser);
+                        OnPropertyChanged("Groups");
                     }
                 }
             });
