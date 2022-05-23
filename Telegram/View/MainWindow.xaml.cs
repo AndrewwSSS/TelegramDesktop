@@ -174,7 +174,9 @@ namespace Telegram
                     {
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
 
-                        Groups.Add(new PublicGroupInfo(Buffers.GroupName, "", result.GroupId));
+                        Groups.Add(new PublicGroupInfo(Buffers.GroupName, "", result.GroupId){
+                            Users = new List<PublicUserInfo>() { Me}
+                        });
                     }
                 }
                 else if (msg is ArrayMessage<PublicGroupInfo>)
@@ -212,7 +214,7 @@ namespace Telegram
             MessageItemWrap item = new MessageItemWrap(msg);
             item.FromUser = Users.First(u => u.Id == msg.FromUserId);
             if (msg.RespondingTo != -1)
-                item.RespondingTo = Messages.First(m => m.Message.Id == msg.RespondingTo).Message;
+                item.RespondingTo = Messages.First(m => m.Message.Id == msg.RespondingTo);
             if (msg.RepostUserId != -1)
                 item.RepostUser = Users.First(u => u.Id == msg.RepostUserId);
 

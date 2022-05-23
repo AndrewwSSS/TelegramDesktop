@@ -15,7 +15,7 @@ namespace CommonLibrary.Containers
         private bool showAvatar = false;
         public ChatMessage Message { get; set; }
         public PublicUserInfo FromUser { get; set; }
-        public ChatMessage RespondingTo { get; set; }
+        public MessageItemWrap RespondingTo { get; set; }
         public PublicUserInfo RepostUser { get; set; }
         public string FormattedTime => Message.Time.ToString("HH:mm");
         public bool ShowAvatar
