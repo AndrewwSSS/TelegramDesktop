@@ -216,7 +216,6 @@ namespace TelegramServer
                 case "GroupLookupMessage":
                 {
                     GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
-                    ArrayMessage<PublicGroupInfo> ResultMessage;
                     List<PublicGroupInfo> SuitableGroups = null;
 
                     foreach (var groupChat in DbContext.GroupChats)
@@ -376,7 +375,7 @@ namespace TelegramServer
                         user.Chats.Add(group);
                         GroupJoinResultMessage resultMessage
                                 = new GroupJoinResultMessage(AuthenticationResult.Success);
-                         client.SendAsync(resultMessage);
+                        client.SendAsync(resultMessage);
                     }
                     else
                     {

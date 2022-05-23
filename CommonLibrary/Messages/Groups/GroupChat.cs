@@ -19,6 +19,7 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class GroupChat : UserEntity, INotifyPropertyChanged
     {
+       
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
@@ -28,17 +29,15 @@ namespace CommonLibrary.Messages.Groups
         public virtual List<ChatMessage> Messages { get; set; }
         public virtual List<User> Members { get; set; }
 
+
         public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
 
-        public GroupChat()
-        {
-            //Messages = new List<ChatMessage>();
-            //Members = new List<User>();
-        }
+        public GroupChat() { }
+
 
         public bool AddMessage(ChatMessage message)
         {
@@ -46,17 +45,19 @@ namespace CommonLibrary.Messages.Groups
             {
                 Messages.Add(message);
                 OnPropertyChanged(nameof(Messages));
+                OnPropertyChanged(nameof(LastMessage));
                 return true;
             }
             else
                 return false;
         }
 
-        public bool DeleteMessage(ChatMessage message)
+        public bool RemoveMessage(ChatMessage message)
         {
             if (message != null && Messages.Remove(message))
             {
                 OnPropertyChanged(nameof(Messages));
+                OnPropertyChanged(nameof(LastMessage));
                 return true;
             }
             else
@@ -87,6 +88,7 @@ namespace CommonLibrary.Messages.Groups
 
         }
 
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

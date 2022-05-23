@@ -25,13 +25,8 @@ namespace CommonLibrary.Messages.Users
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
        
+        public User() { }
 
-
-        public User()
-        {
-            //BlockedUsers = new List<User>();
-            //Chats = new List<GroupChat>();
-        }
 
         public User(int id) => Id = id;
 
