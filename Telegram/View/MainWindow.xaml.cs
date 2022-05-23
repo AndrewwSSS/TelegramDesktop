@@ -203,6 +203,8 @@ namespace Telegram
                 {
                     var chatMsg = msg as ChatMessage;
                     var group = Groups.First(g => g.Id == chatMsg.GroupId);
+                    if (group.Messages == null)
+                        group.Messages = new List<ChatMessage>();
                     group.Messages.Add(chatMsg);
                     AddMessage(chatMsg);
                 }
@@ -436,6 +438,7 @@ namespace Telegram
                     ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id);
                     Client.SendAsync(msg);
                     AddMessage(msg);
+                    textBox.Text = "";
                 }
             });
         }
