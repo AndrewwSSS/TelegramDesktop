@@ -507,7 +507,7 @@
 
                     <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280">
 
-                        <ScrollViewer>
+                        <ScrollViewer Style="{StaticResource }">
                             <ListBox 
                                 Style="{StaticResource LBUsers}"
                                 ItemsSource="{Binding CurGroup.Members}">
