@@ -251,17 +251,15 @@
             </Style>
 
 
-
-
             <Style TargetType="Button">
                 <Style.Setters>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="Button">
                                 <Border  x:Name="border" 
-                                             Background="{StaticResource BgBrush}"
-                                             BorderThickness="1"
-                                             BorderBrush="{StaticResource DarkGreyBrush}">
+                                            Background="{StaticResource BgBrush}"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource DarkGreyBrush}">
 
                                     <TextBlock Text="{TemplateBinding Property=Content}"
                                                    Foreground="White" 
@@ -345,6 +343,14 @@
 
             <Style TargetType="ListBoxItem" x:Key="ListBoxItemUserOffline">
                 <Style.Setters>
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Заблокировать"/>
+                                <MenuItem Header="Дополнительная информация"/>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
@@ -410,6 +416,8 @@
 
                                         </Grid>
                                     </Grid>
+
+                                 
                                 </Border>
 
                                 <ControlTemplate.Triggers>
@@ -423,15 +431,24 @@
 
             <Style TargetType="ListBoxItem" x:Key="ListBoxItemUserOnline">
                 <Style.Setters>
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Заблокировать"/>
+                                <MenuItem Header="Дополнительная информация"/>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
                                 <Border Background="{StaticResource LightBlueBrush}"
                                         BorderBrush="Green"
                                         BorderThickness="2"
-                                        CornerRadius="5">
+                                        CornerRadius="5"
+                                         Margin="2, 5, 2, 5">
 
-                                    <Grid Margin="2"  >
+                                    <Grid Margin="5">
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
                                             <RowDefinition/>

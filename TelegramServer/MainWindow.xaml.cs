@@ -352,7 +352,7 @@ namespace TelegramServer
                         if (newGroupMember != null && group != null) {
 
                             newGroupMember.Chats.Add(group);
-                            group.Members.Add(newGroupMember);
+                            group.AddMember(newGroupMember);
 
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success));
 
@@ -383,7 +383,7 @@ namespace TelegramServer
         {
             foreach (var user in UsersToSend)
             {
-                if (user.Id != FromUserId)
+                if (user.Id != FromUserId && !user.Banned)
                 {
                     if (isUserOnline(user))
                         Clients[user].SendAsync(msg);
