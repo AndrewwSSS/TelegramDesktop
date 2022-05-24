@@ -153,7 +153,7 @@
 
                     <StackPanel Grid.Column="0"
                             Orientation="Vertical"
-                            Background="#19191D"
+                            Background="{StaticResource BgBrush}"
                             Grid.RowSpan="2">
 
                         <Button Height="60"
@@ -225,7 +225,8 @@
                                  Grid.ColumnSpan="2"
                                  ItemsSource="{Binding Groups}"
                                  SelectionChanged="GroupSelected"
-                                 Style="{StaticResource LBGroup}">
+                                 Style="{StaticResource LBGroup}"
+                                 >
                         </ListBox>
                         <ListBox x:Name="LB_FoundGroups"
                                  Grid.Row="1"

@@ -60,6 +60,7 @@
     <Compile Include="View\LoginSignupWindow.xaml.cs">
       <DependentUpon>LoginSignupWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\MainWindow.Caching.cs" />
     <Compile Include="WPF Entities\AndConverter.cs" />
     <Compile Include="WPF Entities\NotNullConverter.cs" />
     <Page Include="View\BrushDictionary.xaml">
@@ -114,6 +115,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CacheLibrary\CacheLibrary.csproj">
+      <Project>{20577957-5B77-4122-AADF-3A42F531106D}</Project>
+      <Name>CacheLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommonLibrary\CommonLibrary.csproj">
       <Project>{9A350A63-4C66-42FE-A318-FB4FAEB330C9}</Project>
       <Name>CommonLibrary</Name>

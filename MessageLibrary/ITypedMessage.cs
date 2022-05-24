@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Telegram.Utility
+namespace MessageLibrary
 {
-    public static class Buffers
+    public interface ITypedMessage
     {
-        public static string GroupName;
+        Type ContainedType { get; }
     }
 }

@@ -20,6 +20,7 @@ namespace MessageLibrary
         public event ClientMessageHandler MessageReceived;
         public event ClientMessageHandler MessageSent;
 
+
         public void Start(int port, int backlog)
         {
             if (listener != null)
@@ -28,7 +29,7 @@ namespace MessageLibrary
             if (port < 0 || port > ushort.MaxValue || backlog <= 0)
                 throw new ArgumentOutOfRangeException("Invalid parameter");
 
-    
+
 
 
             listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
@@ -41,8 +42,8 @@ namespace MessageLibrary
                 {
                     TcpClientWrap client;
                     try { client = new TcpClientWrap(listener.AcceptTcpClient()); }
-                    catch(Exception) { return; }
-                    
+                    catch (Exception) { return; }
+
                     ClientConnected?.Invoke(client);
                     ReceiveAsync(client);
                 } while (true);
@@ -54,7 +55,7 @@ namespace MessageLibrary
 
         private void Receive(TcpClientWrap client)
         {
-         
+
             ClientConnected?.Invoke(client);
             client.Disconnected += ClientDisconnected;
             client.MessageReceived += OnMessageReceived;
@@ -69,9 +70,12 @@ namespace MessageLibrary
         {
             client.Disconnected += ClientDisconnected;
             client.MessageReceived += OnMessageReceived;
+           
 
             client.ReceiveAsync();
         }
+
+        
 
         private void OnMessageReceived(TcpClientWrap client, Message msg) => MessageReceived?.Invoke(client, msg);
 
