@@ -146,17 +146,16 @@ namespace Telegram
 
             Messages = new ObservableCollection<MessageItemWrap>();
             var respTo = new ChatMessage("Всем привет, это телеграм").SetFrom(Me);
-            Groups[0].Messages = new List<ChatMessage>()
-            {
-                respTo,
-                new ChatMessage("Скоро командный проект").SetFrom(Me).SetResendUser(ivan),
-                new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(respTo),
-                new ChatMessage("тест").SetFrom(Me),
-                new ChatMessage("тест").SetFrom(Me),
-                new ChatMessage("тест").SetFrom(Me),
-                new ChatMessage("тест").SetFrom(Me)
-            };
-
+            //Groups[0].Messages = new List<ChatMessage>()
+            //{
+            //    respTo,
+            //    new ChatMessage("Скоро командный проект").SetFrom(Me).SetResendUser(ivan),
+            //    new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(respTo),
+            //    new ChatMessage("тест").SetFrom(Me),
+            //    new ChatMessage("тест").SetFrom(Me),
+            //    new ChatMessage("тест").SetFrom(Me),
+            //    new ChatMessage("тест").SetFrom(Me)
+            //};
 
             Closing += OnClosed;
         }
