@@ -157,7 +157,6 @@ namespace Telegram
             //    new ChatMessage("тест").SetFrom(Me)
             //};
 
-
             Closing += OnClosed;
         }
 
