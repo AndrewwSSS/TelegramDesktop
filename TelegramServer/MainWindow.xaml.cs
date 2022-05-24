@@ -187,9 +187,7 @@ namespace TelegramServer
                             }
                         }
                         else
-                        {
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password"));
-                        }
                         break;
                     }
                 case "ChatMessage":
@@ -384,6 +382,7 @@ namespace TelegramServer
         private void SendMessageToUsers(BaseMessage msg, int FromUserId, List<User> UsersToSend)
         {
             foreach (var user in UsersToSend)
+            {
                 if (user.Id != FromUserId)
                 {
                     if (isUserOnline(user))
@@ -395,6 +394,7 @@ namespace TelegramServer
                     }
 
                 }
+            }
         }
 
         private bool isUserOnline(User user) => Clients.ContainsKey(user);
