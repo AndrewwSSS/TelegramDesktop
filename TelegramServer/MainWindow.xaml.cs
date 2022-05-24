@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace TelegramServer
@@ -23,8 +24,10 @@ namespace TelegramServer
         private Dictionary<User, TcpClientWrap> Clients;
         private TelegramDb DbContext;
         private TcpServerWrap Server;
+     
 
         public MainWindow()
+
         {
             InitializeComponent();
 
@@ -33,7 +36,7 @@ namespace TelegramServer
             Clients = new Dictionary<User, TcpClientWrap>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-
+          
 
             DbContext.GroupChats.Load();
             Chats = DbContext.GroupChats.Local;
@@ -346,7 +349,7 @@ namespace TelegramServer
                 case "GroupJoinMessage":
                     {
                         GroupJoinMessage groupJoinMessage = (GroupJoinMessage)msg;
-                        GroupChat group = DbContext.GroupChats.First(g => g.Id == groupJoinMessage.GroupId);
+                        GroupChat group = DbContext.GroupChats.FirstOrDefault(g => g.Id == groupJoinMessage.GroupId);
                         User newGroupMember = DbContext.Users.FirstOrDefault(u => u.Id == groupJoinMessage.UserId);
 
                         if (newGroupMember != null && group != null) {
@@ -421,7 +424,6 @@ namespace TelegramServer
             }
         }
 
-
         private void ClearGroups()
         {
             if(DbContext != null)
@@ -430,6 +432,19 @@ namespace TelegramServer
                 DbContext.SaveChanges();
                
             }
+        }
+
+
+
+        private void BlockOfflineUser_Click(object sender, RoutedEventArgs e)
+        {
+           
+            MessageBox.Show(LB_UsersOffline.SelectedItem.GetType().Name);
+        }
+
+        private void BlockOnlineUser_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

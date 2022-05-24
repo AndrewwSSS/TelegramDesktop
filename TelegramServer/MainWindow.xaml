@@ -74,6 +74,40 @@
                 </GradientBrush.GradientStops>
             </LinearGradientBrush>
 
+            <Style TargetType="ContextMenu">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ContextMenu">
+                                
+                                <Border Background="{StaticResource BgBrush}"
+                                        BorderThickness="2"
+                                        CornerRadius="5">
+                                    
+                                    <StackPanel IsItemsHost="True"
+                                                KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                Margin="10, 15"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
+            
+            <Style TargetType="MenuItem">
+                <Style.Setters>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="MenuItem">
+                                <Border>
+                                    <TextBlock Text="{TemplateBinding Header}"
+                                               Foreground="{StaticResource DarkGreyBrush}"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style.Setters>
+            </Style>
 
             <Style x:Key="ScrollBarLineButton" TargetType="{x:Type RepeatButton}">
 
@@ -343,14 +377,7 @@
 
             <Style TargetType="ListBoxItem" x:Key="ListBoxItemUserOffline">
                 <Style.Setters>
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="Заблокировать"/>
-                                <MenuItem Header="Дополнительная информация"/>
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
+                  
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
@@ -417,7 +444,15 @@
                                         </Grid>
                                     </Grid>
 
-                                 
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Block"
+                                                      x:Name="BlockOfflineUser"
+                                                      Click="BlockOfflineUser_Click"/>
+                                            
+                                            <MenuItem Header="Additional info"/>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
                                 </Border>
 
                                 <ControlTemplate.Triggers>
@@ -431,14 +466,7 @@
 
             <Style TargetType="ListBoxItem" x:Key="ListBoxItemUserOnline">
                 <Style.Setters>
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="Заблокировать"/>
-                                <MenuItem Header="Дополнительная информация"/>
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
+                
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
@@ -485,6 +513,16 @@
                                                FontSize="17"/>
                                         </Grid>
                                     </Grid>
+
+                                    <Border.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Block"
+                                                      x:Name="BlockOnlineUser"
+                                                      Click="BlockOnlineUser_Click"/>
+
+                                            <MenuItem Header="Additional info"/>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
                                 </Border>
 
                                 <ControlTemplate.Triggers>
@@ -562,11 +600,12 @@
                       Foreground="{StaticResource DarkGreyBrush}"
                       BorderBrush="{StaticResource DarkGreyBrush}">
 
-                <ListBox x:Name="LB_UsersOnline"
+                <ListBox Grid.Row="1" 
+                         x:Name="LB_UsersOnline"
                          Background="{StaticResource BgBrush}"
                          BorderThickness="0"
-                         ItemContainerStyle="{StaticResource ListBoxItemUserOnline}"
-                         ScrollViewer.CanContentScroll="False"/>
+                         ScrollViewer.CanContentScroll="False"
+                         ItemContainerStyle="{StaticResource ListBoxItemUserOnline}"/>
 
             </GroupBox>
 
