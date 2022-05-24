@@ -12,9 +12,9 @@ namespace CommonLibrary.Containers
 {
     public class GroupItemWrap : INotifyPropertyChanged
     {
-        private GroupChat group;
+        private PublicGroupInfo group;
 
-        public GroupChat Group
+        public PublicGroupInfo GroupChat
         {
             get => group;
             set
@@ -24,10 +24,10 @@ namespace CommonLibrary.Containers
                 OnPropertyChanged("LastMessage");
             }
         }
-        public ChatMessage LastMessage => Group.Messages.LastOrDefault();
-        public GroupItemWrap(GroupChat group)
+        public ChatMessage LastMessage => GroupChat.Messages.LastOrDefault();
+        public GroupItemWrap(PublicGroupInfo group)
         {
-            Group = group;
+            GroupChat = group;
         }
 
         [field: NonSerialized]
