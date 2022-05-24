@@ -46,6 +46,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Containers\GroupItemWrap.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
