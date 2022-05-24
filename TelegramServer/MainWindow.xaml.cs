@@ -187,9 +187,7 @@ namespace TelegramServer
                             }
                         }
                         else
-                        {
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password"));
-                        }
                         break;
                     }
                 case "ChatMessage":
@@ -354,7 +352,7 @@ namespace TelegramServer
                         if (newGroupMember != null && group != null) {
 
                             newGroupMember.Chats.Add(group);
-                            group.Members.Add(newGroupMember);
+                            group.AddMember(newGroupMember);
 
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success));
 
@@ -384,7 +382,8 @@ namespace TelegramServer
         private void SendMessageToUsers(BaseMessage msg, int FromUserId, List<User> UsersToSend)
         {
             foreach (var user in UsersToSend)
-                if (user.Id != FromUserId)
+            {
+                if (user.Id != FromUserId && !user.Banned)
                 {
                     if (isUserOnline(user))
                         Clients[user].SendAsync(msg);
@@ -395,6 +394,7 @@ namespace TelegramServer
                     }
 
                 }
+            }
         }
 
         private bool isUserOnline(User user) => Clients.ContainsKey(user);

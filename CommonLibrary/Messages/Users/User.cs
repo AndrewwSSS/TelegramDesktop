@@ -18,7 +18,7 @@ namespace CommonLibrary.Messages.Users
         public string Login { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public bool Banned { get; set; } = false;
+        public bool Banned { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime LastVisitDate { get; set; }
         public virtual List<User> BlockedUsers { get; set; } 
@@ -31,6 +31,7 @@ namespace CommonLibrary.Messages.Users
             BlockedUsers = new List<User>();
             Chats = new List<GroupChat>();
             MessagesToSend = new List<BaseMessage>();
+            Banned = false;
         }
         public User(int id) : this()
         {
