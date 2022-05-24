@@ -75,8 +75,6 @@ namespace MessageLibrary
             client.ReceiveAsync();
         }
 
-        
-
         private void OnMessageReceived(TcpClientWrap client, Message msg) => MessageReceived?.Invoke(client, msg);
 
         public void Shutdown()

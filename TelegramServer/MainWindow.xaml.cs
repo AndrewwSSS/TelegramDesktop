@@ -187,9 +187,7 @@ namespace TelegramServer
                             }
                         }
                         else
-                        {
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password"));
-                        }
                         break;
                     }
                 case "ChatMessage":
@@ -342,7 +340,6 @@ namespace TelegramServer
                             TcpClientWrap DisconnectedClient = Clients[DisconnectedUser];
                             DisconnectedClient.DisconnectAsync();
                         }
-
                         break;
                     }
                 case "GroupJoinMessage":
