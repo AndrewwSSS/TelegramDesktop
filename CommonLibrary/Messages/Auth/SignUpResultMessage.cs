@@ -8,8 +8,6 @@ namespace CommonLibrary.Messages.Auth
         public AuthenticationResult Result { get; set; }
         public string Message { get; set; }
 
-        //To remove
-        public DateTime RegistrationDate { get; set; }
 
         public SignUpResultMessage(AuthenticationResult Result, string Message = null)
         {
@@ -21,12 +19,5 @@ namespace CommonLibrary.Messages.Auth
 
 
         public SignUpResultMessage() { }
-
-        // To remove
-        public SignUpResultMessage SetRegistrationDate(DateTime RegistrationDate)
-        {
-            this.RegistrationDate = RegistrationDate;
-            return this;
-        }
     }
 }

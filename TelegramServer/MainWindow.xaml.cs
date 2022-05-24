@@ -22,8 +22,6 @@ namespace TelegramServer
         private ObservableCollection<GroupChat> Chats;
         private Dictionary<User, TcpClientWrap> Clients;
         private TelegramDb DbContext;
-      
-
         private TcpServerWrap Server;
 
         public MainWindow()
@@ -125,7 +123,7 @@ namespace TelegramServer
                             DbContext.SaveChanges();
 
 
-                            client.SendAsync(new SignUpResultMessage(AuthenticationResult.Success).SetRegistrationDate(NewUser.RegistrationDate));
+                            client.SendAsync(new SignUpResultMessage(AuthenticationResult.Success));
 
                         }
                         else
@@ -342,9 +340,6 @@ namespace TelegramServer
                         if (DisconnectedUser != null)
                         {
                             TcpClientWrap DisconnectedClient = Clients[DisconnectedUser];
-
-          
-                            DisconnectedClient.Disconnected += OnClientDisconnected;
                             DisconnectedClient.DisconnectAsync();
                         }
 
@@ -420,11 +415,12 @@ namespace TelegramServer
                 UserDisconnect(DisconnectedUser);
             else
             {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+               Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                   new UserDisconnectedeHandler(UserDisconnect),
-                  new object[] { DisconnectedUser });
+                  DisconnectedUser);
             }
         }
+
 
         private void ClearGroups()
         {
