@@ -67,6 +67,7 @@ namespace Telegram
         private TcpClientWrap client;
         private ObservableCollection<PublicGroupInfo> foundGroups;
         private PublicGroupInfo curGroup;
+        private ObservableCollection<GroupItemWrap> visualGroups = new ObservableCollection<GroupItemWrap>();
 
         public PublicUserInfo Me { get; set; }
         public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
@@ -80,6 +81,14 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
+        public ObservableCollection<GroupItemWrap> VisualGroups
+        {
+            get => visualGroups; set
+            {
+                visualGroups = value;
+                OnPropertyChanged();
+            }
+        }
         public ObservableCollection<PublicGroupInfo> Groups
         {
             get => groups;
@@ -87,6 +96,7 @@ namespace Telegram
             {
 
                 groups = value;
+                
                 OnPropertyChanged();
             }
         }
@@ -106,6 +116,7 @@ namespace Telegram
             {
                 curGroup = value;
                 OnPropertyChanged();
+                if(curGroup!=null)
                 ShowGroupMessages(CurGroup);
             }
         }
@@ -117,6 +128,8 @@ namespace Telegram
             CacheManager.Instance.CachePath = "Cache\\";
             LoadCache();
             LoadGroups();
+            Groups.CollectionChanged += Groups_CollectionChanged;
+
             DataContext = this;
             InitializeComponent();
             HideRightMenu();
@@ -160,6 +173,16 @@ namespace Telegram
             Closing += OnClosed;
         }
 
+        private void Groups_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.OldItems != null)
+            foreach (var item in e.OldItems)
+                VisualGroups.Remove(new GroupItemWrap(item as PublicGroupInfo));
+            if(e.NewItems != null)
+            foreach (var item in e.NewItems)
+                VisualGroups.Add(new GroupItemWrap(item as PublicGroupInfo));
+        }
+
         private void OnClosed(object sender, EventArgs e)
         {
 
@@ -179,11 +202,11 @@ namespace Telegram
                     if (result.Result == AuthenticationResult.Success)
                     {
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-
-                        Groups.Add(new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
+                        var newGroup = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
                         {
                             Members = new List<PublicUserInfo>() { Me }
-                        });
+                        };
+                        Groups.Add(newGroup);
                     }
                 }
                 else if (msg is ArrayMessage<BaseMessage>)
@@ -207,7 +230,6 @@ namespace Telegram
                     var result = msg as GroupJoinResultMessage;
                     if (result.Result == AuthenticationResult.Success)
                     {
-                        Groups.Add(Buffers.GroupJoinInfo);
                         CacheGroup(Buffers.GroupJoinInfo);
 
                         B_JoinGroup.Visibility = Visibility.Hidden;
@@ -220,6 +242,7 @@ namespace Telegram
                     if (group.Messages == null)
                         group.Messages = new List<ChatMessage>();
                     group.Messages.Add(chatMsg);
+                    VisualGroups.First(wrap => wrap.GroupChat == group).OnPropertyChanged("LastMessage");
                     if (group == CurGroup)
                         AddMessage(chatMsg);
                 }
@@ -427,7 +450,7 @@ namespace Telegram
             if (lb.SelectedIndex == -1)
                 return;
 
-            CurGroup = lb.SelectedItem as PublicGroupInfo;
+            CurGroup = (lb.SelectedItem as GroupItemWrap).GroupChat;
         }
 
         private void FoundGroupSelected(object sender, SelectionChangedEventArgs e)
@@ -464,12 +487,14 @@ namespace Telegram
             Dispatcher.Invoke(() =>
             {
                 var textBox = sender as TextBox;
-                if (e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
+                if (curGroup!=null &&e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
                     ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id);
                     Client.SendAsync(msg);
-                    if (CurGroup != null)
-                        CurGroup.Messages.Add(msg);
+                    
+                    CurGroup.Messages.Add(msg);
+                    VisualGroups.First(wrap => wrap.GroupChat == CurGroup).OnPropertyChanged("LastMessage");
+                    
                     AddMessage(msg);
                     textBox.Text = "";
                 }
