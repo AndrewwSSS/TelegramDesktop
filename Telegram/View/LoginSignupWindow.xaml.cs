@@ -1,22 +1,9 @@
-﻿using CommonLibrary;
-using CommonLibrary.Messages.Auth;
+﻿using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Telegram.View
 {
@@ -31,22 +18,26 @@ namespace Telegram.View
             InitializeComponent();
 
             tabControl.IsEnabled = false;
-            client = new TcpClientWrap(IPAddress.Parse("26.87.230.148"), 5000);
-            client.Connected += Client_Connected;
-            client.ConnectFailed += Client_ConnectFailed;
-            client.ConnectAsync();
-            client.MessageReceived += Client_MessageReceived;
-           
+            client = App.Client;
+            Closed += LoginSignupWindow_Closed;
         }
 
-        private void Client_ConnectFailed(TcpClientWrap obj)
+        private void LoginSignupWindow_Closed(object sender, System.EventArgs e)
         {
-            client.ConnectAsync();
+            if (wnd == null) 
+                client.Disconnect();
         }
+        private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
 
         private void Client_Connected(TcpClientWrap client)
         {
-            Dispatcher.Invoke(()=>tabControl.IsEnabled = true);
+            Dispatcher.Invoke(() =>
+            {
+                tabControl.IsEnabled = true;
+                client.Connected -= Client_Connected;
+                client.ConnectFailed -= Client_ConnectFailed;
+                client.MessageReceived += Client_MessageReceived;
+            });
         }
 
         public static MainWindow wnd;
@@ -70,30 +61,21 @@ namespace Telegram.View
                     var result = msg as LoginResultMessage;
                     if(result.Result == AuthenticationResult.Success)
                     {
-                        string email = result.Email ?? TB_Login_Id.Text,
-                        name = result.Name,
-                        password = TB_Login_Password.Text,
-                        login = result.Login ?? TB_Login_Id.Text;
-                        
-                        var me = new User(result.UserId)
-                        {
-                            Email = email,
-                            Name = name,
-                            Password = password,
-                            Login = login,
-                            RegistrationDate = result.RegistrationDate
-                        };
-                        me.AddImage("Resources/darkl1ght.png");
-                        wnd = new MainWindow(client, me);
+                        var info = result.UserInfo;
+                        if (info.Login == null)
+                            info.Login = TB_Login_Id.Text;
+                        client.MessageReceived -= Client_MessageReceived;
+
+
+                        wnd = new MainWindow(info);
+                        wnd.Client = App.Client;
                         wnd.Show();
                         Close();
                     } else
-
                         tabControl.IsEnabled = true;
                 });
             }
         }
-
 
         private void ButtonLoginSend_Click(object sender, RoutedEventArgs e)
         {
@@ -147,6 +129,13 @@ namespace Telegram.View
             tabControl.IsEnabled = false;
             client.SendAsync(msg);
             client.ReceiveAsync();
+        }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            client.Connected += Client_Connected;
+            client.ConnectFailed += Client_ConnectFailed;
+            client.ConnectAsync();
         }
     }
 }
