@@ -160,7 +160,7 @@ namespace MessageLibrary
                     byte[] buffer = new byte[4096];
                     {
                         int firstReceive = Tcp.Client.Receive(buffer);
-                        stream.Write(buffer, 0, firstReceive);
+                        stream.Write(buffer, 4, firstReceive);
                     }
                     int objLen = 0;
                     int remaining;
