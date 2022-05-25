@@ -193,7 +193,8 @@ namespace MessageLibrary
 
                             };
 
-                            state.SetBuffer(ms.ToArray());
+                            byte[] newBuffer = ms.ToArray();
+                            state.SetBuffer(newBuffer, newBuffer.Length);
                         }
 
                         Message msg = Message.FromByteArray(state.Buffer);
