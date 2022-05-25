@@ -148,6 +148,7 @@ namespace MessageLibrary
             }
             return null;
         }
+        const int BUFFER_SIZE = 4096;
         public void ReceiveAsync()
         {
             if (client != null && client.Connected)
@@ -157,9 +158,9 @@ namespace MessageLibrary
                     try
                     {
                         MemoryStream stream = new MemoryStream();
-                        byte[] buffer = new byte[4096];
+                        byte[] buffer = new byte[BUFFER_SIZE];
                         {
-                            int firstReceive = Tcp.Client.Receive(buffer);
+                            int firstReceive = Tcp.Client.Receive(buffer, BUFFER_SIZE - 4, SocketFlags.None);
                             stream.Write(buffer, 4, firstReceive);
                         }
                         int objLen = 0;
@@ -169,7 +170,7 @@ namespace MessageLibrary
                         remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
                         while (client.Available > 0 && remaining != 0)
                         {
-                            int received = Tcp.Client.Receive(buffer, remaining < 4096 ? remaining : 4096, SocketFlags.None);
+                            int received = Tcp.Client.Receive(buffer, remaining < BUFFER_SIZE ? remaining : BUFFER_SIZE, SocketFlags.None);
                             remaining -= received;
                             stream.Write(buffer, 0, received);
                         }
