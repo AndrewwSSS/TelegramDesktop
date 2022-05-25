@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -149,69 +150,39 @@ namespace MessageLibrary
             }
             return null;
         }
-        public bool ReceiveAsync()
+        public void ReceiveAsync()
         {
             if (client != null && client.Connected)
             {
-                Message.ReceiveFromSocket(Tcp.Client, ReceiveCB);
-                return true;
-            }
-            return false;
-        }
-
-        private void ReceiveCB(IAsyncResult ar)
-        {
-            StateObject state = (StateObject)ar.AsyncState;
-            Socket socket = state.Socket;
-          
-
-            try
-            {
-                if (Tcp == null|| Tcp.Client==null)
-                    return;
-                
-                int bytesRead = Tcp.Client.EndReceive(ar);
-
-                if (bytesRead > 0)
+                Task.Run(() =>
                 {
-                    Task.Run(() =>
+                    MemoryStream stream = new MemoryStream();
+                    byte[] buffer = new byte[4096];
                     {
-
-                        MemoryStream ms = new MemoryStream();
-
-                        byte[] tmp = new byte[StateObject.DefaultBufferSize];
-                        ms.Write(state.Buffer, 0, StateObject.DefaultBufferSize);
-
-                        while (socket.Available > 0)
-                        {
-                            int br = socket.Receive(tmp, StateObject.DefaultBufferSize, SocketFlags.None);
-
-                            if (br == 0)
-                                continue;
-
-                            ms.Write(tmp, 0, br);
-
-                        };
-
-                        byte[] newBuffer = ms.ToArray();
-
-                        Message msg = Message.FromByteArray(state.Buffer);
-
-                        //For DEBUG
-                        Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
-
-                        MessageReceived?.Invoke(this, msg);
-                    });
-                }
-                socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
-            }
-            catch (Exception e)
-            {
-                Disconnected?.Invoke(this);
-                Console.WriteLine(e.Message);
-                Console.WriteLine("TcpClientWrap.Receive: SOCKET EXCEPTION");
-                return;
+                        int firstReceive = Tcp.Client.Receive(buffer);
+                        stream.Write(buffer, 0, firstReceive);
+                    }
+                    int objLen = 0;
+                    int remaining;
+                    
+                    byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(lenBytes);
+                    remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
+                    while (client.Available > 0 && remaining != 0)
+                    {
+                        int received = Tcp.Client.Receive(buffer, remaining < 4096 ? remaining : 4096, SocketFlags.None);
+                        remaining -= received;
+                        stream.Write(buffer, 0, received);
+                    }
+                    Message msg = Message.FromMemoryStream(stream);
+                    MessageReceived?.Invoke(this, msg);
+                    if (client.Available > 0)
+                        ReceiveAsync();
+                });
             }
         }
+
+
     }
 }
