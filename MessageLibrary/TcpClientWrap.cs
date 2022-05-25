@@ -163,12 +163,11 @@ namespace MessageLibrary
         {
             StateObject state = (StateObject)ar.AsyncState;
             Socket socket = state.Socket;
-           
+          
 
             try
             {
-                if (Tcp == null
-                    || Tcp.Client==null)
+                if (Tcp == null|| Tcp.Client==null)
                     return;
                 
                 int bytesRead = Tcp.Client.EndReceive(ar);
@@ -199,7 +198,10 @@ namespace MessageLibrary
                         }
 
                         Message msg = Message.FromByteArray(state.Buffer);
+
+                        //For DEBUG
                         Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
+                       
                         MessageReceived?.Invoke(this, msg);
                     });
 

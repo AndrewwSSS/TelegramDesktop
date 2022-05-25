@@ -82,11 +82,15 @@
                                 
                                 <Border Background="{StaticResource BgBrush}"
                                         BorderThickness="2"
-                                        CornerRadius="5">
+                                        CornerRadius="5"
+                                        BorderBrush="{StaticResource DarkGreyBrush}"
+                                        Width="200"
+                                        >
                                     
                                     <StackPanel IsItemsHost="True"
                                                 KeyboardNavigation.DirectionalNavigation="Cycle"
-                                                Margin="10, 15"/>
+                                                Margin="2, 10, 2, 10"
+                                                />
                                 </Border>
                             </ControlTemplate>
                         </Setter.Value>
@@ -99,10 +103,21 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="MenuItem">
-                                <Border>
+                                <Border x:Name="Border">
                                     <TextBlock Text="{TemplateBinding Header}"
-                                               Foreground="{StaticResource DarkGreyBrush}"/>
+                                               Foreground="{StaticResource DarkGreyBrush}"
+                                               FontSize="15"
+                                               x:Name="TextBlock"/>
                                 </Border>
+
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource DarkGreyBrush}"/>
+                                        <Setter TargetName="TextBlock" Property="Foreground" Value="{StaticResource BgBrush}"/>
+                                    </Trigger>
+
+
+                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
@@ -437,7 +452,7 @@
 
 
                                             <TextBlock Grid.Column="1"
-                                                   Text="{Binding LastVisitDate}"
+                                                   Text="{Binding LocalLastVistDate}"
                                                    FontSize="17"/>
 
 
