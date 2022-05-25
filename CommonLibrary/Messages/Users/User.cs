@@ -25,6 +25,11 @@ namespace CommonLibrary.Messages.Users
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
        
+        public DateTime LocalLastVistDate
+        {
+            get => LastVisitDate.ToLocalTime();
+        }
+        
 
         public User()
         {
