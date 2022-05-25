@@ -176,38 +176,34 @@ namespace MessageLibrary
                 {
                     Task.Run(() =>
                     {
-                        
-                            MemoryStream ms = new MemoryStream();
 
-                            byte[] tmp = new byte[StateObject.DefaultBufferSize];
-                            ms.Write(state.Buffer, 0, StateObject.DefaultBufferSize);
-                            
-                            while (socket.Available > 0)
-                            {
-                                int br = socket.Receive(tmp, StateObject.DefaultBufferSize, SocketFlags.None);
+                        MemoryStream ms = new MemoryStream();
 
-                                if (br == 0)
-                                    continue;
+                        byte[] tmp = new byte[StateObject.DefaultBufferSize];
+                        ms.Write(state.Buffer, 0, StateObject.DefaultBufferSize);
 
-                                ms.Write(tmp, 0, br);
+                        while (socket.Available > 0)
+                        {
+                            int br = socket.Receive(tmp, StateObject.DefaultBufferSize, SocketFlags.None);
 
-                            };
+                            if (br == 0)
+                                continue;
 
-                            byte[] newBuffer = ms.ToArray();
-                            state.SetBuffer(newBuffer, newBuffer.Length);
-                        }
+                            ms.Write(tmp, 0, br);
+
+                        };
+
+                        byte[] newBuffer = ms.ToArray();
 
                         Message msg = Message.FromByteArray(state.Buffer);
 
                         //For DEBUG
                         Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
-                       
+
                         MessageReceived?.Invoke(this, msg);
                     });
-
-
-                    socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
                 }
+                socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
             }
             catch (Exception e)
             {
