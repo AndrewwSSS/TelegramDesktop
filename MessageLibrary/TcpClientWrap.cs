@@ -174,7 +174,7 @@ namespace MessageLibrary
                         stream.Write(buffer, 0, received);
                     }
                     stream.Position = 0;
-                    Message msg = Message.FromByteArray(stream.ToArray());
+                    Message msg = Message.FromMemoryStream(stream);
                     MessageReceived?.Invoke(this, msg);
 
                     if (client.Available > 0)
