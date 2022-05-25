@@ -177,8 +177,7 @@ namespace MessageLibrary
                     Message msg = Message.FromMemoryStream(stream);
                     MessageReceived?.Invoke(this, msg);
 
-                    if (client.Available > 0)
-                        ReceiveAsync();
+                    ReceiveAsync();
                 });
             }
         }
