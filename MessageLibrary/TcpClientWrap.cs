@@ -150,7 +150,6 @@ namespace MessageLibrary
             }
             return null;
         }
-
         public void ReceiveAsync()
         {
             if (client != null && client.Connected)
@@ -158,21 +157,15 @@ namespace MessageLibrary
                 Task.Run(() =>
                 {
                     MemoryStream stream = new MemoryStream();
-
                     byte[] buffer = new byte[4096];
                     {
                         int firstReceive = Tcp.Client.Receive(buffer);
                         stream.Write(buffer, 4, firstReceive);
                     }
-
                     int objLen = 0;
                     int remaining;
                     
                     byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
-
-                    //if (BitConverter.IsLittleEndian)
-                    //    Array.Reverse(lenBytes);
-
                     remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
                     while (client.Available > 0 && remaining != 0)
                     {
