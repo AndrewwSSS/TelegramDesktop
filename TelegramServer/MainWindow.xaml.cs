@@ -78,7 +78,6 @@ namespace TelegramServer
 
         private void ClientMessageRecived(TcpClientWrap client, Message msg)
         {
-            //Task.Run(() => MessageProcessing(client, msg));
             switch (msg.GetType().Name)
             {
                 case "SignUpMessage":
@@ -392,6 +391,7 @@ namespace TelegramServer
 
         }
 
+
         private void BlockOfflineUser_Click(object sender, RoutedEventArgs e) {
             MessageBox.Show(LB_UsersOffline.SelectedItem.GetType().Name);
         }
@@ -403,8 +403,6 @@ namespace TelegramServer
 
         #endregion WpfEvents
 
-
-       
 
         private void SendMessageToUsers(BaseMessage msg, int FromUserId, List<User> UsersToSend)
         {
