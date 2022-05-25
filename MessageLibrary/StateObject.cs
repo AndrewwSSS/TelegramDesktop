@@ -6,7 +6,7 @@ namespace MessageLibrary
     {
         public Socket Socket { get; set; }
         public const int DefaultBufferSize = 4096;
-        public int CurrentBufferSize => Buffer.Length;
+        public int CurrentBufferSize { get; set; } = 4096;
         public byte[] Buffer { get; set; }
 
         public StateObject() {
@@ -14,7 +14,16 @@ namespace MessageLibrary
         }
 
 
-        public void SetBuffer(byte[] newBuffer) => Buffer = newBuffer;
+        public bool SetBuffer(byte[] newBuffer, int size)
+        {
+            if (size > 0 && newBuffer != null)
+                return false;
+
+            Buffer = newBuffer;
+            CurrentBufferSize = size;
+
+            return true;
+        }
 
     }
 }

@@ -187,6 +187,7 @@ namespace TelegramServer
                         List<PublicGroupInfo> SuitableGroups = null;
 
                         foreach (var groupChat in DbContext.GroupChats)
+                        {
                             if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
                             {
 
@@ -216,6 +217,8 @@ namespace TelegramServer
 
                                 SuitableGroups.Add(SuitableGroup);
                             }
+                        }
+                        
 
                         client.SendAsync(new ArrayMessage<PublicGroupInfo>(SuitableGroups));
                         break;
