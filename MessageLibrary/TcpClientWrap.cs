@@ -206,6 +206,7 @@ namespace MessageLibrary
                         MessageReceived?.Invoke(this, msg);
                     });
 
+
                     socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
                 }
             }
