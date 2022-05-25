@@ -177,24 +177,30 @@ namespace MessageLibrary
                     Task.Run(() =>
                     {
 
-                        MemoryStream ms = new MemoryStream();
-
-                        byte[] tmp = new byte[StateObject.DefaultBufferSize];
-                        ms.Write(state.Buffer, 0, StateObject.DefaultBufferSize);
-
-                        while (socket.Available > 0)
+                        if(socket.Available > 0)
                         {
-                            int br = socket.Receive(tmp, StateObject.DefaultBufferSize, SocketFlags.None);
 
-                            if (br == 0)
-                                continue;
+                            MemoryStream ms = new MemoryStream();
+                            byte[] tmp = new byte[StateObject.DefaultBufferSize];
 
-                            ms.Write(tmp, 0, br);
+                            while (socket.Available > 0)
+                            {
 
-                        };
+                                ms.Write(state.Buffer, 0, StateObject.DefaultBufferSize);
 
-                        byte[] newBuffer = ms.ToArray();
+                                int br = socket.Receive(tmp, StateObject.DefaultBufferSize, SocketFlags.None);
 
+                                if (br == 0)
+                                    continue;
+
+                                ms.Write(tmp, 0, br);
+
+                            };
+                            byte[] newBuffer = ms.ToArray();
+                            state.SetBuffer(newBuffer, newBuffer.Length);
+                        }
+
+                  
                         Message msg = Message.FromByteArray(state.Buffer);
 
                         //For DEBUG
