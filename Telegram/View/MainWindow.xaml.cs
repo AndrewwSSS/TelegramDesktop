@@ -127,7 +127,7 @@ namespace Telegram
 
             CacheManager.Instance.CachePath = "Cache\\";
             LoadCache();
-            LoadGroups();
+            //LoadGroups();
             Groups.CollectionChanged += Groups_CollectionChanged;
 
             DataContext = this;

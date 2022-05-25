@@ -177,30 +177,27 @@ namespace MessageLibrary
                 {
                     Task.Run(() =>
                     {
-                        if (socket.Available > 0)
-                        {
+                        
                             MemoryStream ms = new MemoryStream();
 
                             byte[] tmp = new byte[StateObject.DefaultBufferSize];
-                            ms.Write(state.Buffer, 0, state.CurrentBufferSize);
-
-                            do
+                            ms.Write(state.Buffer, 0, StateObject.DefaultBufferSize);
+                            
+                            while (socket.Available > 0)
                             {
-                                int br = socket.Receive(tmp, state.CurrentBufferSize, 0);
+                                int br = socket.Receive(tmp, StateObject.DefaultBufferSize, SocketFlags.None);
 
                                 if (br == 0)
                                     continue;
 
                                 ms.Write(tmp, 0, br);
 
-                            } while (socket.Available > 0);
+                            };
 
                             state.SetBuffer(ms.ToArray());
-                        }
-
-                        Message msg = Message.FromByteArray(state.Buffer);
-                        Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
-                        MessageReceived?.Invoke(this, msg);
+                            Message msg = Message.FromByteArray(state.Buffer);
+                            Console.WriteLine("Message received. Type of message: " + msg.GetType().Name);
+                            MessageReceived?.Invoke(this, msg);
                     });
 
                     socket.BeginReceive(state.Buffer, 0, state.CurrentBufferSize, SocketFlags.None, ReceiveCB, state);
