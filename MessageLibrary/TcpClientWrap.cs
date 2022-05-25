@@ -30,12 +30,9 @@ namespace MessageLibrary
 
             endPoint = new IPEndPoint(ip, port);
             client = null;
+            ReceiveAsync();
         }
 
-        public void SendAsync(object gameInfoMessage)
-        {
-            throw new NotImplementedException();
-        }
 
         public TcpClientWrap(TcpClient tcpClient)
         {
@@ -43,6 +40,7 @@ namespace MessageLibrary
                 throw new ArgumentException("Подключение не может быть пустым");
 
             client = tcpClient;
+            ReceiveAsync();
 
         }
 
