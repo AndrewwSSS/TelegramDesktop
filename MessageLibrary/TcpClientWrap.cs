@@ -154,28 +154,36 @@ namespace MessageLibrary
             {
                 Task.Run(() =>
                 {
-                    MemoryStream stream = new MemoryStream();
-                    byte[] buffer = new byte[4096];
+                    try
                     {
-                        int firstReceive = Tcp.Client.Receive(buffer);
-                        stream.Write(buffer, 4, firstReceive);
-                    }
-                    int objLen = 0;
-                    int remaining;
-                    
-                    byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
-                    remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
-                    while (client.Available > 0 && remaining != 0)
-                    {
-                        int received = Tcp.Client.Receive(buffer, remaining < 4096 ? remaining : 4096, SocketFlags.None);
-                        remaining -= received;
-                        stream.Write(buffer, 0, received);
-                    }
-                    stream.Position = 0;
-                    Message msg = Message.FromMemoryStream(stream);
-                    MessageReceived?.Invoke(this, msg);
+                        MemoryStream stream = new MemoryStream();
+                        byte[] buffer = new byte[4096];
+                        {
+                            int firstReceive = Tcp.Client.Receive(buffer);
+                            stream.Write(buffer, 4, firstReceive);
+                        }
+                        int objLen = 0;
+                        int remaining;
 
-                    ReceiveAsync();
+                        byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
+                        remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
+                        while (client.Available > 0 && remaining != 0)
+                        {
+                            int received = Tcp.Client.Receive(buffer, remaining < 4096 ? remaining : 4096, SocketFlags.None);
+                            remaining -= received;
+                            stream.Write(buffer, 0, received);
+                        }
+                        stream.Position = 0;
+                        Message msg = Message.FromMemoryStream(stream);
+                        MessageReceived?.Invoke(this, msg);
+
+                        ReceiveAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        ReceiveAsync();
+                    }
                 });
             }
         }
