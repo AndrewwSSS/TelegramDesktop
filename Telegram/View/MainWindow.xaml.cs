@@ -405,7 +405,6 @@ namespace Telegram
                     if (Client.IsConnected)
                     {
                         Client.SendAsync(new GroupLookupMessage(textBox.Text));
-                        Client.ReceiveAsync();
                     }
         }
 
@@ -431,7 +430,6 @@ namespace Telegram
             Client.SendAsync(msg);
             AddGroupButton.IsEnabled = false;
             HideMenus(null, null);
-            Client.ReceiveAsync();
         }
 
         private void Client_MessageSent(TcpClientWrap client, Message msg)
@@ -479,7 +477,6 @@ namespace Telegram
             var groupInfo = LB_FoundGroups.SelectedItem as PublicGroupInfo;
             Buffers.GroupJoinInfo = groupInfo;
             Client.SendAsync(new GroupJoinMessage(groupInfo.Id, Me.Id));
-            Client.ReceiveAsync();
         }
 
         private void TB_SendMsg_OnEnter(object sender, KeyEventArgs e)

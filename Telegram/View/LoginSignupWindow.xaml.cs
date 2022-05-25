@@ -89,7 +89,6 @@ namespace Telegram.View
             var msg = new LoginMessage(email, password);
             tabControl.IsEnabled = false;
             client.SendAsync(msg);
-            client.ReceiveAsync();  
         }
 
         private bool IsValidPassword(string pw)
@@ -128,7 +127,6 @@ namespace Telegram.View
             };
             tabControl.IsEnabled = false;
             client.SendAsync(msg);
-            client.ReceiveAsync();
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
