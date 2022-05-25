@@ -164,7 +164,8 @@ namespace TelegramServer
                             }
                         }
                         else
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied, "wrong login/email or password"));
+                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied,
+                                                                    "wrong login/email or password"));
                         break;
                     }
                 case "ChatMessage":

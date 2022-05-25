@@ -592,6 +592,7 @@
                          VerticalContentAlignment="Center"
                          HorizontalContentAlignment="Center"
                          FontSize="20"
+                         Text="5000"
                          x:Name="TB_ListenerPort"
                          Background="{StaticResource BgBrush}"
                          Foreground="{StaticResource DarkGreyBrush}"/>
