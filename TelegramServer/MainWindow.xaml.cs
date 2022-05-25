@@ -218,9 +218,11 @@ namespace TelegramServer
                                 SuitableGroups.Add(SuitableGroup);
                             }
                         }
-                        
 
-                        client.SendAsync(new ArrayMessage<PublicGroupInfo>(SuitableGroups));
+                        ArrayMessage<PublicGroupInfo> result
+                            = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+                        client.SendAsync(result);
+
                         break;
                     }
                 case "CreateGroupMessage":
