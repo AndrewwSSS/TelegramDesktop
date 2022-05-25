@@ -21,8 +21,7 @@ namespace MessageLibrary
             MemoryStream ms = new MemoryStream();
 
             bf.Serialize(ms, this);
-            ms.Position = 0;
-            // Message in bytes
+
             byte[] msBuf = ms.ToArray();
 
             // Len message in bytes
@@ -30,21 +29,12 @@ namespace MessageLibrary
 
             MemoryStream ms2 = new MemoryStream();
 
-            // Our array
-            //byte[] result = new byte[len + 4];
-
             byte[] lenBuffer = BitConverter.GetBytes(len);
-
+            
             ms2.Write(lenBuffer, 0, lenBuffer.Length);
             ms2.Write(msBuf, 0, msBuf.Length);
             
-            //msBuf.CopyTo(result, 4);
-
-            //result[0] = (byte)len;
-            //result[1] = (byte)(len >> 8);
-            //result[2] = (byte)(len >> 0x10);
-            //result[3] = (byte)(len >> 0x18);
-
+            ms2.Position = 0;
             return ms2.ToArray();
         }
 
