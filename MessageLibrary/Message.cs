@@ -57,7 +57,7 @@ namespace MessageLibrary
         {
             StateObject stateObject = new StateObject
             {
-                Buffer = new byte[8192],
+                Buffer = new byte[StateObject.DefaultBufferSize],
                 Socket = socket
             };
             socket.BeginReceive(stateObject.Buffer, 0, StateObject.DefaultBufferSize, SocketFlags.None, cb, stateObject);
