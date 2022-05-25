@@ -173,7 +173,8 @@ namespace MessageLibrary
                         remaining -= received;
                         stream.Write(buffer, 0, received);
                     }
-                    Message msg = Message.FromMemoryStream(stream);
+                    stream.Position = 0;
+                    Message msg = Message.FromByteArray(stream.ToArray());
                     MessageReceived?.Invoke(this, msg);
 
                     if (client.Available > 0)
