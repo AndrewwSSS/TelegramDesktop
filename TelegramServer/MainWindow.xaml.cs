@@ -219,8 +219,10 @@ namespace TelegramServer
                             }
                         }
 
+
                         ArrayMessage<PublicGroupInfo> result
                             = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+
                         client.SendAsync(result);
 
                         break;

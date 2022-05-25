@@ -213,9 +213,9 @@ namespace MessageLibrary
             }
             catch (Exception e)
             {
+                Console.WriteLine($"TcpClientWrap.Receive exeption: {e.Message}");
                 Disconnected?.Invoke(this);
-                Console.WriteLine(e.Message);
-                Console.WriteLine("TcpClientWrap.Receive: SOCKET EXCEPTION");
+               
                 return;
             }
         }

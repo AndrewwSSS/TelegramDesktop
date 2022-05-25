@@ -46,7 +46,7 @@ namespace MessageLibrary
             StateObject stateObject = new StateObject
             {
                 Buffer = ToByteArray(),
-                Socket = socket
+                Socket = socket 
             };
             socket.BeginSend(stateObject.Buffer, 0, stateObject.Buffer.Length, SocketFlags.None, cb, stateObject);
         }
