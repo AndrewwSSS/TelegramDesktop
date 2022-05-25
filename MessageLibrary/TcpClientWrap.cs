@@ -166,8 +166,6 @@ namespace MessageLibrary
                     int remaining;
                     
                     byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
-                    if (BitConverter.IsLittleEndian)
-                        Array.Reverse(lenBytes);
                     remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
                     while (client.Available > 0 && remaining != 0)
                     {
@@ -175,6 +173,7 @@ namespace MessageLibrary
                         remaining -= received;
                         stream.Write(buffer, 0, received);
                     }
+                    stream.Position = 0;
                     Message msg = Message.FromMemoryStream(stream);
                     MessageReceived?.Invoke(this, msg);
                     if (client.Available > 0)
