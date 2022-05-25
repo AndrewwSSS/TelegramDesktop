@@ -30,7 +30,6 @@ namespace MessageLibrary
 
             endPoint = new IPEndPoint(ip, port);
             client = null;
-            ReceiveAsync();
         }
 
 
@@ -40,8 +39,6 @@ namespace MessageLibrary
                 throw new ArgumentException("Подключение не может быть пустым");
 
             client = tcpClient;
-            ReceiveAsync();
-
         }
 
         public bool Connect()
@@ -94,8 +91,11 @@ namespace MessageLibrary
             {
                 ConnectFailed?.Invoke(this);
             }
-            if(client.Connected)
+            if (client.Connected)
+            {
                 Connected?.Invoke(this);
+                ReceiveAsync();
+            }
         }
 
         public void Disconnect()
