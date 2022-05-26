@@ -94,7 +94,7 @@ namespace TelegramServer
                                 Name = signUpMessage.Name,
                                 Password = signUpMessage.Password,
                                 RegistrationDate = DateTime.UtcNow,
-                                VisitDate = default
+                                VisitDate = DateTime.UtcNow
                             };
 
                             DbContext.Users.Add(NewUser);
@@ -233,7 +233,7 @@ namespace TelegramServer
                     {
                         CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
                         List<User> newGroupMembers = null;
-                        User groupCreator = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
+                        User sender = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
 
                         newGroupMembers = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
 
@@ -241,7 +241,7 @@ namespace TelegramServer
                         {
 
                             if (newGroupMembers.Any(newGroupMember
-                                => newGroupMember.BlockedUsers.Any(blockedUser => blockedUser.Id == groupCreator.Id)))
+                                => newGroupMember.BlockedUsers.Any(blockedUser => blockedUser.Id == sender.Id)))
                             {
 
                                 client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Denied,
@@ -254,12 +254,16 @@ namespace TelegramServer
                         GroupChat newGroup = new GroupChat()
                         {
                             Name = createNewGroupMessage.Name,
-                            Members = new List<User>() { groupCreator },
+                            Members = new List<User>() { sender },
                             DateCreated = DateTime.UtcNow
                         };
 
-                        newGroup.Images.Add(createNewGroupMessage.Image);
-
+                        if(createNewGroupMessage.Image != null)
+                        {
+                            newGroup.Images.Add(createNewGroupMessage.Image);
+                            DbContext.Images.Add(createNewGroupMessage.Image);
+                        }
+                        
 
                         Dispatcher.Invoke(() =>
                         {
@@ -301,8 +305,8 @@ namespace TelegramServer
 
                             GroupInfo.Members = PublicUsersInfo;
 
-                            SendMessageToUsers(new GroupInviteMessage(GroupInfo, groupCreator.Id),
-                                                     groupCreator.Id,
+                            SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
+                                                     sender.Id,
                                                      newGroupMembers);
                         }
 
@@ -428,15 +432,13 @@ namespace TelegramServer
                     }
                 }
             }
+
             if(changesExist)
                 DbContext.SaveChanges();
         }
 
         private bool isUserOnline(User user) => Clients.ContainsKey(user);
 
- 
-
-     
         private void ClearGroups()
         {
             if(DbContext != null)

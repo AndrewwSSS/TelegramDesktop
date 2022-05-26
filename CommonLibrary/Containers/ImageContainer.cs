@@ -9,17 +9,15 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Resources;
 
 namespace CommonLibrary.Containers
 {
     [Serializable]
-    public class ImageContainer : INotifyPropertyChanged
+    public class ImageContainer
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
-
 
         private byte[] data;
 
@@ -31,8 +29,6 @@ namespace CommonLibrary.Containers
             set
             {
                 data = value;
-                OnPropertyChanged();
-                OnPropertyChanged("ImageSource");
             }
         }
 
@@ -125,12 +121,6 @@ namespace CommonLibrary.Containers
         /// <param name="path">Путь к папке для сохранения файла</param>
         public void ToFile(string path) => File.WriteAllBytes(path, Data);
 
-        [field: NonSerialized]
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+ 
     }
 }
