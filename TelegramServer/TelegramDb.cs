@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using CommonLibrary.Containers;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 
@@ -9,6 +10,9 @@ namespace TelegramServer
     {
         public DbSet<User> Users { get; set; }
         public DbSet<GroupChat> GroupChats { get; set; }
+        public DbSet<ImageContainer> Images { get; set; }
+        public DbSet<FileContainer> Files { get; set; }
+
 
         public TelegramDb() : base("Telegram")
         {
