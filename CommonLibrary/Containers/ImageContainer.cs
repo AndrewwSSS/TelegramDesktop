@@ -56,6 +56,10 @@ namespace CommonLibrary.Containers
         }
 
 
+        public ImageContainer()
+        {
+
+        }
         public ImageContainer(byte[] data)
         {
             this.Data = data;
@@ -81,7 +85,7 @@ namespace CommonLibrary.Containers
                 throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
             if (!AllowedExtensions.Contains(new FileInfo(path).Extension))
                 throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
-            ImageContainer result = new ImageContainer
+            ImageContainer result = new ImageContainer()
             {
                 Name = Path.GetFileName(path),
                 Data = File.ReadAllBytes(path)
