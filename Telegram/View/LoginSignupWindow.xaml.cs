@@ -24,8 +24,8 @@ namespace Telegram.View
 
         private void LoginSignupWindow_Closed(object sender, System.EventArgs e)
         {
-            if (wnd == null) 
-                client.Disconnect();
+            if (wnd == null && client.IsConnected) 
+                client?.Disconnect();
         }
         private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
 

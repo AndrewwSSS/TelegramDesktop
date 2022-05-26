@@ -151,42 +151,47 @@ namespace MessageLibrary
         const int BUFFER_SIZE = 4096;
         public void ReceiveAsync()
         {
-            if (client != null && client.Connected)
+            try
             {
-                Task.Run(() =>
+                if (client != null  && client.Client != null && client.Connected)
                 {
-                    try
+                    Task.Run(() =>
                     {
-                        MemoryStream stream = new MemoryStream();
-                        byte[] buffer = new byte[BUFFER_SIZE];
+                        try
                         {
-                            int firstReceive = Tcp.Client.Receive(buffer, BUFFER_SIZE - 4, SocketFlags.None);
-                            stream.Write(buffer, 4, firstReceive);
-                        }
-                        int objLen = 0;
-                        int remaining;
+                            MemoryStream stream = new MemoryStream();
+                            byte[] buffer = new byte[BUFFER_SIZE];
+                            int firstReceive = Tcp.Client.Receive(buffer, BUFFER_SIZE, SocketFlags.None);
+                            stream.Write(buffer, 4, firstReceive - 4);
 
-                        byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
-                        remaining = objLen = BitConverter.ToInt32(lenBytes, 0);
-                        while (client.Available > 0 && remaining != 0)
+                            int remaining;
+
+                            byte[] lenBytes = new List<byte>(buffer).GetRange(0, 4).ToArray();
+                            remaining = BitConverter.ToInt32(lenBytes, 0) - (firstReceive - 4);
+                            while (client.Available > 0 && remaining != 0)
+                            {
+                                int received = Tcp.Client.Receive(buffer, remaining < BUFFER_SIZE ? remaining : BUFFER_SIZE, SocketFlags.None);
+                                remaining -= received;
+                                stream.Write(buffer, 0, received);
+                            }
+                            stream.Position = 0;
+                            Message msg = Message.FromMemoryStream(stream);
+                            MessageReceived?.Invoke(this, msg);
+
+                            ReceiveAsync();
+                        }
+                        catch (Exception ex)
                         {
-                            int received = Tcp.Client.Receive(buffer, remaining < BUFFER_SIZE ? remaining : BUFFER_SIZE, SocketFlags.None);
-                            remaining -= received;
-                            stream.Write(buffer, 0, received);
+                            Console.WriteLine($"TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
+                            Disconnected?.Invoke(this);
+                            ReceiveAsync();
                         }
-                        stream.Position = 0;
-                        Message msg = Message.FromMemoryStream(stream);
-                        MessageReceived?.Invoke(this, msg);
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
 
-                        ReceiveAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
-                        Disconnected?.Invoke(this);
-                        ReceiveAsync();
-                    }
-                });
             }
         }
 
