@@ -117,46 +117,46 @@ namespace TelegramServer
                 case "LoginMessage":
                     {
                         LoginMessage loginMessage = (LoginMessage)msg;
-                        User user = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
+                        User sender = DbContext.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
 
-                        if (user != null && user.Password == loginMessage.Password)
+                        if (sender != null && sender.Password == loginMessage.Password)
                         {
                             PublicUserInfo UserInfo = new PublicUserInfo()
                             {
-                                Id = user.Id,
-                                Name = user.Name
+                                Id = sender.Id,
+                                Name = sender.Name
                             };
 
 
-                            UserInfo.Images.AddRange(user.Images);
+                            UserInfo.ImagesId.AddRange(sender.ImagesId);
 
-                            if (user.Email == loginMessage.Login)
-                                UserInfo.Login = user.Login;
+                            if (sender.Email == loginMessage.Login)
+                                UserInfo.Login = sender.Login;
 
 
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo));
-                            user.VisitDate = DateTime.UtcNow;
+                            sender.VisitDate = DateTime.UtcNow;
 
                             client.Disconnected += OnClientDisconnected;
-                            Clients[user] = client;
+                            Clients[sender] = client;
 
                             DbContext.SaveChanges();
 
                             Dispatcher.Invoke(() =>
                             {
-                                UsersOffline.Remove(user);
-                                UsersOnline.Add(user);
+                                UsersOffline.Remove(sender);
+                                UsersOnline.Add(sender);
                             });
 
-                            if (user.MessagesToSend.Count > 0)
+                            if (sender.MessagesToSend.Count > 0)
                             {
 
-                                client.SendAsync(new ArrayMessage<BaseMessage>(user.MessagesToSend));
+                                client.SendAsync(new ArrayMessage<BaseMessage>(sender.MessagesToSend));
 
                                 ClientMessageHandler OnMessageSent = null;
                                 OnMessageSent = (c, m) =>
                                 {
-                                    user.MessagesToSend.Clear();
+                                    sender.MessagesToSend.Clear();
                                     client.MessageSent -= OnMessageSent;
                                 };
                                 client.MessageSent += OnMessageSent;
@@ -200,18 +200,15 @@ namespace TelegramServer
                                                                                     groupChat.Description,
                                                                                     groupChat.Id);
 
-
                                 SuitableGroup.Messages.AddRange(groupChat.Messages);
-                                SuitableGroup.Images.AddRange(groupChat.Images);
+                                SuitableGroup.ImagesId.AddRange(groupChat.ImagesId);
 
                                 foreach (var groupMember in groupChat.Members)
-                                {
-           
                                     SuitableGroup.MembersId.Add(groupMember.Id);
-                                    
-                                }
+
 
                                 SuitableGroups.Add(SuitableGroup);
+
                             }
                         }
 
@@ -254,7 +251,7 @@ namespace TelegramServer
 
                         if(createNewGroupMessage.Image != null)
                         {
-                            newGroup.Images.Add(createNewGroupMessage.Image);
+                            newGroup.ImagesId.Add(createNewGroupMessage.Image.Id);
                             DbContext.Images.Add(createNewGroupMessage.Image);
                         }
                         

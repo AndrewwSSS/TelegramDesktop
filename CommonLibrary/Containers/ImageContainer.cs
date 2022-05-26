@@ -15,11 +15,13 @@ namespace CommonLibrary.Containers
     [Serializable]
     public class ImageContainer
     {
+        private byte[] data;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        private byte[] data;
+       
 
         public string Name { get; set; }
 
@@ -54,6 +56,12 @@ namespace CommonLibrary.Containers
         }
 
 
+        public ImageContainer(byte[] data)
+        {
+            this.Data = data;
+        }
+
+
         public static ImageContainer FromImage(Image img)
         {
             ImageContainer result = new ImageContainer();
@@ -80,16 +88,6 @@ namespace CommonLibrary.Containers
             };
             return result;
         }
-        //public static ImageContainer FromFile(Uri uri)
-        //{
-        //    var stream = System.Windows.Application.GetResourceStream(uri);
-        //    ImageContainer result = new ImageContainer
-        //    {
-        //        Name = Path.GetFileName(path),
-        //        Data = File.ReadAllBytes(path)
-        //    };
-        //    return result;
-        //}
 
         public static string GetImageFormat(Image img)
         {
