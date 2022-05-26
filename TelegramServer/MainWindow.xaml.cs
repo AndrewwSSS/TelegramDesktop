@@ -306,15 +306,6 @@ namespace TelegramServer
 
                         break;
                     }
-                case "ClientDisconnectMessage":
-                    {
-                        //ClientDisconnectMessage clientDisconnect = (ClientDisconnectMessage)msg;
-                        //User DisconnectedUser = DbContext.Users.First(u => u.Id == clientDisconnect.UserId);
-
-                        //UserDisconnect(DisconnectedUser);
-
-                        break;
-                    }
                 case "GroupJoinMessage":
                     {
                         GroupJoinMessage groupJoinMessage = (GroupJoinMessage)msg;
