@@ -12,17 +12,7 @@ namespace CommonLibrary
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public List<ImageContainer> Images { get; set; }
-            = new List<ImageContainer>();
-
-        [NotMapped]
-        public ImageSource Avatar => Images == null && Images.Count == 0 ? null : Images[0].ImageSource;
-
-        public virtual void AddImage(string path)
-        {
-            if (Images == null)
-                Images = new List<ImageContainer>();
-            Images.Add(ImageContainer.FromFile(path));
-        }
+        public List<int> ImagesId { get; set; }
+            = new List<int>();
     }
 }
