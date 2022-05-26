@@ -4,7 +4,7 @@
 namespace CommonLibrary.Messages.Auth
 {
     [Serializable]
-    public class SignUpMessage : BaseMessage
+    public class SingUpStage1Message : BaseMessage
     {
 
         public string Login { get; set; }
@@ -12,7 +12,7 @@ namespace CommonLibrary.Messages.Auth
         public string Password { get; set; }
         public string Email { get; set; }
 
-        public SignUpMessage() { }
+        public SingUpStage1Message() { }
 
 
     }

@@ -20,7 +20,6 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-        private ObservableCollection<GroupChat> Chats;
         private Dictionary<User, TcpClientWrap> Clients;
         private TelegramDb DbContext;
         private TcpServerWrap Server;
@@ -38,7 +37,7 @@ namespace TelegramServer
           
 
             DbContext.GroupChats.Load();
-            Chats = DbContext.GroupChats.Local;
+            
 
             Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
@@ -48,7 +47,7 @@ namespace TelegramServer
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
-            LB_Groups.ItemsSource = Chats;
+            LB_Groups.ItemsSource = DbContext.GroupChats.Local;
 
             foreach (var user in DbContext.Users)
                 UsersOffline.Add(user);
@@ -204,26 +203,15 @@ namespace TelegramServer
                         GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                         List<PublicGroupInfo> SuitableGroups = null;
 
-                        foreach (var groupChat in DbContext.GroupChats)
+                        foreach (var group in DbContext.GroupChats)
                         {
-                            if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
+                            if (group.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
                             {
 
                                 if (SuitableGroups == null)
                                     SuitableGroups = new List<PublicGroupInfo>();
 
-                                PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name,
-                                                                                    groupChat.Description,
-                                                                                    groupChat.Id);
-
-                                SuitableGroup.Messages.AddRange(groupChat.Messages);
-                                SuitableGroup.ImagesId.AddRange(groupChat.ImagesId);
-
-                                foreach (var groupMember in groupChat.Members)
-                                    SuitableGroup.MembersId.Add(groupMember.Id);
-
-
-                                SuitableGroups.Add(SuitableGroup);
+                                SuitableGroups.Add(PublicGroupInfoFromGroup(group));
 
                             }
                         }
@@ -442,17 +430,30 @@ namespace TelegramServer
                 DbContext.SaveChanges();
         }
 
-        private bool isUserOnline(User user) => Clients.ContainsKey(user);
-
-        private void ClearGroups()
+        public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group, int MaxMessagesCount = 50)
         {
-            if(DbContext != null)
-            {
-                DbContext.GroupChats.RemoveRange(DbContext.GroupChats);
-                DbContext.SaveChanges();
-            }
+            PublicGroupInfo result = new PublicGroupInfo(group.Name,
+                                                         group.Description,
+                                                         group.Id);
+
+            if (group.Messages.Count >= MaxMessagesCount)
+                result.Messages.AddRange(group.Messages.GetRange(0, MaxMessagesCount-1));
+            else
+                result.Messages.AddRange(group.Messages);
+
+            result.ImagesId.AddRange(group.ImagesId);
+
+            foreach (var groupMember in group.Members)
+                result.MembersId.Add(groupMember.Id);
+
+
+            return result;
         }
 
+
+        private bool isUserOnline(User user) => Clients.ContainsKey(user);
+
+  
 
 
     

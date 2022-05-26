@@ -12,7 +12,7 @@ namespace TelegramServer
         public DbSet<GroupChat> GroupChats { get; set; }
         public DbSet<ImageContainer> Images { get; set; }
         public DbSet<FileContainer> Files { get; set; }
-
+        public DbSet<PreparatoryUser> PreparatoryUsers { get; set; }
 
         public TelegramDb() : base("Telegram")
         {
