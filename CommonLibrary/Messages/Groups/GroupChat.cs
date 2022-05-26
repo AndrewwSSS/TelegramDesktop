@@ -13,7 +13,8 @@ namespace CommonLibrary.Messages.Groups
     public enum GroupType
     {
         Personal,
-        Public
+        Public,
+        Private
     }
 
     [Serializable]
@@ -39,7 +40,7 @@ namespace CommonLibrary.Messages.Groups
             Messages = new List<ChatMessage>();
             Members = new List<User>();
         }
-
+        
 
         public bool AddMessage(ChatMessage message)
         {

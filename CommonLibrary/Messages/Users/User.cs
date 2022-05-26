@@ -18,14 +18,14 @@ namespace CommonLibrary.Messages.Users
         public string Password { get; set; }
         public bool Banned { get; set; }
         public DateTime RegistrationDate { get; set; }
-        public DateTime LastVisitDate { get; set; }
+        public DateTime VisitDate { get; set; }
         public virtual List<User> BlockedUsers { get; set; } 
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
         public virtual List<ChatMessage> Messages { get; set; }
 
         [NotMapped]
-        public DateTime LocalLastVistDate => LastVisitDate.ToLocalTime();
+        public DateTime LocalLastVistDate => VisitDate.ToLocalTime();
 
 
         public User()

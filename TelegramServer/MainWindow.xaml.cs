@@ -94,7 +94,7 @@ namespace TelegramServer
                                 Name = signUpMessage.Name,
                                 Password = signUpMessage.Password,
                                 RegistrationDate = DateTime.UtcNow,
-                                LastVisitDate = default
+                                VisitDate = default
                             };
 
                             DbContext.Users.Add(NewUser);
@@ -135,7 +135,7 @@ namespace TelegramServer
 
 
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo));
-                            user.LastVisitDate = DateTime.UtcNow;
+                            user.VisitDate = DateTime.UtcNow;
 
                             client.Disconnected += OnClientDisconnected;
                             Clients[user] = client;
@@ -170,13 +170,15 @@ namespace TelegramServer
                 case "ChatMessage":
                     {
                         ChatMessage chatMessage = (ChatMessage)msg;
-                        GroupChat groupChat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.GroupId);
-                        User fromUser = DbContext.Users.First(u => u.Id == chatMessage.FromUserId);
+                        GroupChat chat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.GroupId);
+                        User sender = DbContext.Users.First(u => u.Id == chatMessage.FromUserId);
 
-                        groupChat.Messages.Add(chatMessage);
+                        sender.Messages.Add(chatMessage);
+                        chat.Messages.Add(chatMessage);
 
                         DbContext.SaveChanges();
-                        SendMessageToUsers(chatMessage, fromUser.Id, groupChat.Members);
+
+                        SendMessageToUsers(chatMessage, sender.Id, chat.Members);
 
                         break;
 
