@@ -71,8 +71,7 @@ namespace MessageLibrary
         }
 
         public void StreamTo(Stream stream) => bf.Serialize(stream, this);
-
-        
+ 
         public static Message FromNetworkStream(NetworkStream stream) => bf.Deserialize(stream) as Message;
 
         public static T FromNetworkStream<T>(NetworkStream stream) where T : Message => bf.Deserialize(stream) as T;

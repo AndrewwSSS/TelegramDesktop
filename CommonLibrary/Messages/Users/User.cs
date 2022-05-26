@@ -1,10 +1,8 @@
 ﻿using CommonLibrary.Messages.Groups;
-using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace CommonLibrary.Messages.Users
 {
@@ -24,12 +22,11 @@ namespace CommonLibrary.Messages.Users
         public virtual List<User> BlockedUsers { get; set; } 
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
-       
-        public DateTime LocalLastVistDate
-        {
-            get => LastVisitDate.ToLocalTime();
-        }
-        
+        public virtual List<ChatMessage> Messages { get; set; }
+
+        [NotMapped]
+        public DateTime LocalLastVistDate => LastVisitDate.ToLocalTime();
+
 
         public User()
         {
@@ -38,20 +35,14 @@ namespace CommonLibrary.Messages.Users
             MessagesToSend = new List<BaseMessage>();
             Banned = false;
         }
+
         public User(int id) : this()
         {
             Id = id;
         }
 
 
-        [NotMapped]
-        public List<ChatMessage> Messages
-             => Chats.Select(chat => chat.Messages)
-             .Aggregate((x, y) =>
-             {
-                 x.AddRange(y);
-                 return x;
-             });
+    
 
     }
 }

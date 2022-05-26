@@ -184,7 +184,6 @@ namespace MessageLibrary
                     {
                         Console.WriteLine($"TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
                         Disconnected?.Invoke(this);
-                        ReceiveAsync();
                     }
                 });
             }

@@ -148,7 +148,6 @@ namespace TelegramServer
                                 UsersOnline.Add(user);
                             });
 
-
                             if (user.MessagesToSend.Count > 0)
                             {
 
@@ -309,10 +308,10 @@ namespace TelegramServer
                     }
                 case "ClientDisconnectMessage":
                     {
-                        ClientDisconnectMessage clientDisconnect = (ClientDisconnectMessage)msg;
-                        User DisconnectedUser = DbContext.Users.First(u => u.Id == clientDisconnect.UserId);
+                        //ClientDisconnectMessage clientDisconnect = (ClientDisconnectMessage)msg;
+                        //User DisconnectedUser = DbContext.Users.First(u => u.Id == clientDisconnect.UserId);
 
-                        UserDisconnect(DisconnectedUser);
+                        //UserDisconnect(DisconnectedUser);
 
                         break;
                     }
@@ -356,16 +355,23 @@ namespace TelegramServer
 
         private void OnClientDisconnected(TcpClientWrap client)
         {
-            User DisconnectedUser = Clients.First((c) => c.Value == client).Key;
+            User DisconnectedUser = Clients.FirstOrDefault((c) => c.Value == client).Key;
+
+            Action Disconnect = () =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    UsersOnline.Remove(DisconnectedUser);
+                    UsersOffline.Add(DisconnectedUser);
+                    Clients.Remove(DisconnectedUser);
+                    DbContext.SaveChanges();
+                });
+            };
 
             if (Dispatcher.CheckAccess())
-                UserDisconnect(DisconnectedUser);
+                Disconnect.Invoke();
             else
-            {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-                   new UserDisconnectedeHandler(UserDisconnect),
-                   DisconnectedUser);
-            }
+                Dispatcher.Invoke(() => { Disconnect.Invoke(); });
         }
 
         #endregion ServerEvents
@@ -399,11 +405,12 @@ namespace TelegramServer
 
         }
 
-
+        //TODO
         private void BlockOfflineUser_Click(object sender, RoutedEventArgs e) {
             MessageBox.Show(LB_UsersOffline.SelectedItem.GetType().Name);
         }
 
+        //TODO
         private void BlockOnlineUser_Click(object sender, RoutedEventArgs e)
         {
 
@@ -434,16 +441,7 @@ namespace TelegramServer
 
         private bool isUserOnline(User user) => Clients.ContainsKey(user);
 
-        private void UserDisconnect(User user)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                UsersOnline.Remove(user);
-                UsersOffline.Add(user);
-                Clients.Remove(user);
-                DbContext.SaveChanges();
-            });
-        }
+ 
 
      
         private void ClearGroups()
