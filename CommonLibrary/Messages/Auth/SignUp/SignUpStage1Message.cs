@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace CommonLibrary.Messages.Auth
+namespace CommonLibrary.Messages.Auth.SignUp
 {
     [Serializable]
     public class SignUpStage1Message : BaseMessage

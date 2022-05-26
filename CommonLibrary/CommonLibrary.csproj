@@ -47,8 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Containers\GroupItemWrap.cs" />
-    <Compile Include="Messages\Auth\СonfirmationSingUpMessage.cs" />
-    <Compile Include="Messages\Auth\СonfirmationSingUpResultMessage.cs" />
+    <Compile Include="Messages\Auth\SignUp\SignUpStage2Message.cs" />
+    <Compile Include="Messages\Auth\SignUp\SignUpStage2ResultMessage.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
@@ -66,12 +66,12 @@
     <Compile Include="Messages\ChatMessage.cs" />
     <Compile Include="Messages\Groups\GroupChat.cs" />
     <Compile Include="Containers\ImageContainer.cs" />
-    <Compile Include="Messages\Auth\LoginMessage.cs" />
-    <Compile Include="Messages\Auth\LoginResultMessage.cs" />
+    <Compile Include="Messages\Auth\Login\LoginMessage.cs" />
+    <Compile Include="Messages\Auth\Login\LoginResultMessage.cs" />
     <Compile Include="Containers\MessageItemWrap.cs" />
     <Compile Include="Messages\Groups\PublicGroupInfo.cs" />
-    <Compile Include="Messages\Auth\SignUpResultMessage.cs" />
-    <Compile Include="Messages\Auth\SignUpMessage.cs" />
+    <Compile Include="Messages\Auth\SignUp\SignUpStage1ResultMessage.cs" />
+    <Compile Include="Messages\Auth\SignUp\SignUpStage1Message.cs" />
     <Compile Include="Messages\Users\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,6 +1,8 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Auth.Login;
+using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -117,12 +119,12 @@ namespace TelegramServer
                             DbContext.SaveChanges();
 
 
-                            client.SendAsync(new SingUpStage1Message(AuthenticationResult.Success));
+                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Success));
 
                         }
                         else
                         {
-                            client.SendAsync(new SignUpResultMessage(AuthenticationResult.Denied,
+                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Denied,
                                             "Email or login already used to create an account"));
 
                         }
