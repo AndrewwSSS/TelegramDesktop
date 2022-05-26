@@ -196,8 +196,9 @@ namespace TelegramServer
                                 if (SuitableGroups == null)
                                     SuitableGroups = new List<PublicGroupInfo>();
 
-                                PublicGroupInfo SuitableGroup
-                                        = new PublicGroupInfo(groupChat.Name, groupChat.Description, groupChat.Id);
+                                PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name,
+                                                                                    groupChat.Description,
+                                                                                    groupChat.Id);
 
 
                                 SuitableGroup.Messages.AddRange(groupChat.Messages);
@@ -205,16 +206,9 @@ namespace TelegramServer
 
                                 foreach (var groupMember in groupChat.Members)
                                 {
-                                    PublicUserInfo publicUser = new PublicUserInfo()
-                                    {
-                                        Id = groupMember.Id,
-                                        Name = groupMember.Name,
-                                        Login = groupMember.Login,
-                                        Description = groupMember.Description
-                                    };
-
-                                    SuitableGroup.Members.Add(publicUser);
-                                    publicUser.Images.AddRange(groupMember.Images);
+           
+                                    SuitableGroup.MembersId.Add(groupMember.Id);
+                                    
                                 }
 
                                 SuitableGroups.Add(SuitableGroup);
@@ -280,20 +274,12 @@ namespace TelegramServer
                         {
                             newGroup.Members.AddRange(newGroupMembers);
 
-                            List<PublicUserInfo> PublicUsersInfo = new List<PublicUserInfo>();
+                            List<int> UsersId = new List<int>();
 
                             foreach (var member in newGroupMembers)
                             {
                                 member.Chats.Add(newGroup);
-
-                                PublicUsersInfo.Add(new PublicUserInfo()
-                                {
-                                    Id = member.Id,
-                                    Login = member.Login,
-                                    Name = member.Name,
-                                    Description = member.Description
-                                });
-
+                                UsersId.Add(member.Id);
                             }
 
                             DbContext.SaveChanges();
@@ -303,7 +289,7 @@ namespace TelegramServer
                                                                             newGroup.Description,
                                                                             newGroup.Id);
 
-                            GroupInfo.Members = PublicUsersInfo;
+                            GroupInfo.MembersId = UsersId;
 
                             SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
                                                      sender.Id,
