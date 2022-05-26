@@ -57,6 +57,7 @@
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\ClientDisconnectMessage.cs" />
     <Compile Include="Messages\Groups\GroupUpdateMessage.cs" />
+    <Compile Include="Messages\Users\PreparatoryUser.cs" />
     <Compile Include="Messages\Users\PublicUserInfo.cs" />
     <Compile Include="UserEntity.cs" />
     <Compile Include="Containers\FileContainer.cs" />

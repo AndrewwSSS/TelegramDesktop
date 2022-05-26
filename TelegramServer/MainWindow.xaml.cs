@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Messages;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
@@ -8,9 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace TelegramServer
@@ -53,6 +52,25 @@ namespace TelegramServer
 
             foreach (var user in DbContext.Users)
                 UsersOffline.Add(user);
+
+            //MailAddress from = new MailAddress("telegramdesktopbyadat@gmail.com");
+            //MailAddress to = new MailAddress("");
+
+
+            //MailMessage message = new MailMessage(from, to);
+            //message.IsBodyHtml = false;
+            //message.Subject = "test";
+            //message.Body = "some code...";
+
+
+            //SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+            //{
+            //    Credentials = new NetworkCredential("telegramdesktopbyadat@gmail.com", ""),
+            //    EnableSsl = true
+            //};
+
+            //smtp.Send(message);
+
         }
 
 
@@ -93,8 +111,6 @@ namespace TelegramServer
                                 Login = signUpMessage.Login,
                                 Name = signUpMessage.Name,
                                 Password = signUpMessage.Password,
-                                RegistrationDate = DateTime.UtcNow,
-                                VisitDate = DateTime.UtcNow
                             };
 
                             DbContext.Users.Add(NewUser);
@@ -251,8 +267,14 @@ namespace TelegramServer
 
                         if(createNewGroupMessage.Image != null)
                         {
-                            newGroup.ImagesId.Add(createNewGroupMessage.Image.Id);
-                            DbContext.Images.Add(createNewGroupMessage.Image);
+                            ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
+                            DbContext.Images.Add(newImage);
+                            
+                            DbContext.SaveChanges();
+                            DbContext.Images.Load();
+
+                            newGroup.ImagesId.Add(newImage.Id);
+                            
                         }
                         
 
@@ -317,7 +339,7 @@ namespace TelegramServer
                                 Login = newGroupMember.Login,
                             };
 
-                            userInfo.Images.AddRange(newGroupMember.Images);
+                            userInfo.ImagesId.AddRange(newGroupMember.ImagesId);
 
 
                             SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUser = userInfo },

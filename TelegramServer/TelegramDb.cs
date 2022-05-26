@@ -16,8 +16,7 @@ namespace TelegramServer
 
         public TelegramDb() : base("Telegram")
         {
-   
-            //Database.SetInitializer<TelegramDb>(null);
+
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

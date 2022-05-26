@@ -56,38 +56,37 @@ namespace CommonLibrary.Containers
         }
 
 
-        public ImageContainer(byte[] data)
-        {
+        public ImageContainer(byte[] data) {
             this.Data = data;
         }
 
 
-        public static ImageContainer FromImage(Image img)
-        {
-            ImageContainer result = new ImageContainer();
-            result.Name = "unnamed" + GetImageFormat(img);
+        //public static ImageContainer FromImage(Image img)
+        //{
+        //    ImageContainer result = new ImageContainer();
+        //    result.Name = "unnamed" + GetImageFormat(img);
 
-            using (var stream = new MemoryStream())
-            {
-                img.Save(stream, img.RawFormat);
-                result.Data = stream.ToArray();
-            }
-            return result;
-        }
+        //    using (var stream = new MemoryStream())
+        //    {
+        //        img.Save(stream, img.RawFormat);
+        //        result.Data = stream.ToArray();
+        //    }
+        //    return result;
+        //}
 
-        public static ImageContainer FromFile(string path)
-        {
-            if (!File.Exists(path))
-                throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
-            if (!AllowedExtensions.Contains(new FileInfo(path).Extension))
-                throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
-            ImageContainer result = new ImageContainer
-            {
-                Name = Path.GetFileName(path),
-                Data = File.ReadAllBytes(path)
-            };
-            return result;
-        }
+        //public static ImageContainer FromFile(string path)
+        //{
+        //    if (!File.Exists(path))
+        //        throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
+        //    if (!AllowedExtensions.Contains(new FileInfo(path).Extension))
+        //        throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
+        //    //ImageContainer result = new ImageContainer
+        //    //{
+        //    //    Name = Path.GetFileName(path),
+        //    //    Data = File.ReadAllBytes(path)
+        //    //};
+        //    //return result;
+        //}
 
         public static string GetImageFormat(Image img)
         {

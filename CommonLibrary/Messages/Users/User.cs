@@ -19,6 +19,7 @@ namespace CommonLibrary.Messages.Users
         public bool Banned { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime VisitDate { get; set; }
+
         public virtual List<User> BlockedUsers { get; set; } 
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
