@@ -99,7 +99,7 @@ namespace TelegramServer
             {
                 case "SignUpMessage":
                     {
-                        SignUpMessage signUpMessage = (SignUpMessage)msg;
+                        SignUpStage1Message signUpMessage = (SignUpStage1Message)msg;
 
 
                         if (DbContext.Users.Any(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) != true)
@@ -117,7 +117,7 @@ namespace TelegramServer
                             DbContext.SaveChanges();
 
 
-                            client.SendAsync(new SignUpResultMessage(AuthenticationResult.Success));
+                            client.SendAsync(new SingUpStage1Message(AuthenticationResult.Success));
 
                         }
                         else
