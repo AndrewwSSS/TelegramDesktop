@@ -15,8 +15,8 @@ namespace Telegram
 {
     public partial class MainWindow
     {
-        ObservableCollection<GroupItemWrap> Groups { get; set; }
-        ObservableCollection<GroupItemWrap> FoundGroups { get; set; }
+        public ObservableCollection<GroupItemWrap> Groups { get; set; } = new ObservableCollection<GroupItemWrap>();
+        public ObservableCollection<GroupItemWrap> FoundGroups { get; set; } = new ObservableCollection<GroupItemWrap>();
 
         private void LoadUsers() => Users.AddRange(CacheManager.Instance.LoadAllUsers());
         private void LoadGroups() => CacheManager.Instance.LoadAllGroups().ForEach(g=>Groups.Add(g));
