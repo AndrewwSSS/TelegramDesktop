@@ -423,7 +423,8 @@ namespace TelegramServer
                                          {
                                              Id = user.Id,
                                              Login = user.Login,
-                                             Description = user.Description
+                                             Description = user.Description,
+                                             Name = user.Name
                                          };
 
                                          foreach(var image in DbContext.Images.Where(im => user.ImagesId.Contains(im.Id)))
