@@ -10,9 +10,9 @@ namespace CommonLibrary.Messages.Auth.Login
         public AuthenticationResult Result { get; set; }
         public string Message { get; set; }
         public PublicUserInfo UserInfo { get; set; }
+        public string Guid { get; set; }
 
-
-        public LoginResultMessage(AuthenticationResult Result, PublicUserInfo info)
+        public LoginResultMessage(AuthenticationResult Result, PublicUserInfo info, string guid)
         {
             this.Result = Result;
             UserInfo = info;

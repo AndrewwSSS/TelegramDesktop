@@ -144,6 +144,9 @@ namespace TelegramServer
                                 Name = sender.Name
                             };
 
+                            string guid = Guid.NewGuid().ToString();
+                            sender.Clients.Add(new UserClient(loginMessage.MachineName, guid));
+
 
                             UserInfo.ImagesId.AddRange(sender.ImagesId);
 
@@ -151,7 +154,7 @@ namespace TelegramServer
                                 UserInfo.Login = sender.Login;
 
 
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo));
+                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, guid));
                             sender.VisitDate = DateTime.UtcNow;
 
                             client.Disconnected += OnClientDisconnected;
@@ -182,6 +185,11 @@ namespace TelegramServer
                         else
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied,
                                                                     "wrong login/email or password"));
+                        break;
+                    }
+                case "FastLoginMessage":
+                    {
+
                         break;
                     }
                 case "ChatMessage":
