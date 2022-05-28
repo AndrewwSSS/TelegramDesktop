@@ -389,7 +389,8 @@ namespace TelegramServer
                                              Description = user.Description
                                          };
 
-                                         foreach(var )
+                                         foreach(var image in DbContext.Images.Where(im => user.ImagesId.Contains(im.Id)))
+                                             userItem.Images.Add(image);
                                         
 
                                     }

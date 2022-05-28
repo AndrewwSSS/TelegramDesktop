@@ -18,7 +18,7 @@ namespace CommonLibrary.Containers
 
         public PublicUserInfo User { get; set; }
 
-        public List<ImageContainer> Images 
+        public ObservableCollection<ImageContainer> Images 
         { 
             get => images;
             set
