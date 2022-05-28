@@ -199,22 +199,22 @@ namespace TelegramServer
 
                         if(sender != null)
                         {
-                            UserClient userClient = sender.Clients.First(c => c.MachineName == fastLoginMessage.MachineName);
+                            UserClient userClient = sender.Clients.FirstOrDefault(c => c.MachineName == fastLoginMessage.MachineName);
 
                             if(userClient != null && userClient.Guid == fastLoginMessage.Guid)
-                                client.Send(new FastLoginResultMessage(AuthenticationResult.Success));
+                                client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
                             else
                             {
-                                userClient = sender.Clients.First(c => c.Guid == fastLoginMessage.Guid);
+                                userClient = sender.Clients.FirstOrDefault(c => c.Guid == fastLoginMessage.Guid);
 
                                 if(userClient != null)
                                 {
                                     //tmp
                                     userClient.MachineName = fastLoginMessage.Guid;
-                                    client.Send(new FastLoginResultMessage(AuthenticationResult.Success));
+                                    client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
                                 }
                                 else
-                                    client.Send(new FastLoginResultMessage(AuthenticationResult.Denied));
+                                    client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Denied));
 
                             }
 
@@ -461,7 +461,7 @@ namespace TelegramServer
                     UsersOnline.Remove(DisconnectedUser);
                     UsersOffline.Add(DisconnectedUser);
                     Clients.Remove(DisconnectedUser);
-                    DbContext.SaveChanges();
+                    //DbContext.SaveChanges();
                 });
             };
 

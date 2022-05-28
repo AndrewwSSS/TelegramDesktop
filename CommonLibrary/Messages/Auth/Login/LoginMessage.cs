@@ -17,6 +17,7 @@ namespace CommonLibrary.Messages.Auth.Login
         {
             this.Login = Login;
             this.Password = Password;
+            this.MachineName = MachineName; 
         }
 
         public LoginMessage() { }

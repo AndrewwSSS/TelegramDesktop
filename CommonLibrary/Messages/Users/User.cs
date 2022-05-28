@@ -37,6 +37,7 @@ namespace CommonLibrary.Messages.Users
             MessagesToSend = new List<BaseMessage>();
             Clients = new List<UserClient>();
             Banned = false;
+            Messages = new List<ChatMessage>();
             
         }
 
