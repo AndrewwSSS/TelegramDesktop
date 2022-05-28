@@ -16,6 +16,7 @@ namespace CommonLibrary.Messages.Auth.Login
         {
             this.Result = Result;
             UserInfo = info;
+            Guid = guid;
         }
 
         public LoginResultMessage(AuthenticationResult Result, string Message)
