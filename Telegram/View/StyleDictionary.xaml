@@ -453,6 +453,9 @@
 
                         </Grid>
                         <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding LastMessage, Converter={StaticResource notnull}}" Value="True" >
+                                <Setter TargetName="T_LastMsg" Property="Text" Value="{Binding LastMessage.Text}"/>
+                            </DataTrigger>
                             <DataTrigger
                                             Binding="{Binding
                                                 RelativeSource={RelativeSource
