@@ -177,6 +177,7 @@ namespace MessageLibrary
                             }
                             stream.Position = 0;
                             Message msg = Message.FromMemoryStream(stream);
+
                             MessageReceived?.Invoke(this, msg);
 
                             ReceiveAsync();

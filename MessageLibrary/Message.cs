@@ -79,6 +79,7 @@ namespace MessageLibrary
 
         public static Message FromByteArray(byte[] buffer) => bf.Deserialize(new MemoryStream(buffer)) as Message;
         
+
         public static T FromByteArray<T>(byte[] buffer) where T : Message => bf.Deserialize(new MemoryStream(buffer)) as T;
     }
 }
