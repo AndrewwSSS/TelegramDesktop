@@ -18,21 +18,20 @@ namespace CommonLibrary.Messages
     public class DataRequestMessage : Message
     {
         public RequestType Type { get; set; }
-        public int[] GroupId { get; set; }
-        public DataRequestMessage()
-        {
+        public int[] ItemsId { get; set; }
 
-        }
+        public DataRequestMessage() { }
 
         public DataRequestMessage(int id, RequestType type)
         {
-            GroupId = new int[] { id };
+            ItemsId = new int[] { id };
             Type = type;
         }
+
         public DataRequestMessage(IEnumerable<int> array, RequestType type)
         {
             if (array != null)
-                GroupId = array.ToArray();
+                ItemsId = array.ToArray();
             Type = type;
         }
 

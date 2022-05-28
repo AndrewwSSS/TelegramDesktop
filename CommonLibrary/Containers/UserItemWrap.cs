@@ -15,6 +15,7 @@ namespace CommonLibrary.Containers
     {
         private ObservableCollection<ImageContainer> images;
 
+
         public PublicUserInfo User { get; set; }
 
         public ObservableCollection<ImageContainer> Images 
@@ -27,14 +28,16 @@ namespace CommonLibrary.Containers
             }
         }
 
+
+
         public UserItemWrap()
         {
 
         }
-        public UserItemWrap(PublicUserInfo user)
-        {
-            User = user;
-        }
+
+        public UserItemWrap(PublicUserInfo user) => User = user;
+
+
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
