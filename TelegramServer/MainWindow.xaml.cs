@@ -238,7 +238,7 @@ namespace TelegramServer
                         {
 
                             if (newGroupMembers.Any(newGroupMember
-                                => newGroupMember.BlockedUsers.Any(blockedUser => blockedUser.Id == sender.Id)))
+                                => newGroupMember.BlockedUsersId.Any(blockedUserId => blockedUserId == sender.Id)))
                             {
 
                                 client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Denied,

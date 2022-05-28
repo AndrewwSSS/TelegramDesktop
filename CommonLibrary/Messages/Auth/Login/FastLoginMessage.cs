@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MessageLibrary;
+using System;
 
 namespace CommonLibrary.Messages.Auth.Login
 {
-    internal class FastLoginMessage
+    [Serializable]
+    public class FastLoginMessage : Message
     {
+        public string DesktopName { get; set; }
+        public string Guid { get; set; }
+
+        public FastLoginMessage(string descName, string guid)
+        {
+            DesktopName = descName;
+            Guid = guid;
+        }
     }
 }

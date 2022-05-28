@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Containers\GroupItemWrap.cs" />
+    <Compile Include="Messages\Auth\Login\FastLoginMessage.cs" />
+    <Compile Include="Messages\Auth\Login\FastLoginResultMessage.cs" />
     <Compile Include="Messages\Auth\SignUp\SignUpStage2Message.cs" />
     <Compile Include="Messages\Auth\SignUp\SignUpStage2ResultMessage.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="Messages\Groups\GroupUpdateMessage.cs" />
     <Compile Include="Messages\Users\PreparatoryUser.cs" />
     <Compile Include="Messages\Users\PublicUserInfo.cs" />
+    <Compile Include="Messages\Users\UserClient.cs" />
     <Compile Include="UserEntity.cs" />
     <Compile Include="Containers\FileContainer.cs" />
     <Compile Include="Messages\ChatMessage.cs" />
