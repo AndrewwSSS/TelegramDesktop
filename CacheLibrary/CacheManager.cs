@@ -48,16 +48,16 @@ namespace CacheLibrary
         #endregion
 
         #region Groups
-        public void SaveGroup(PublicGroupInfo group) => Save(Path.Combine(DIR_GROUPS, $"{group.Id}.bin"), group);
+        public void SaveGroup(GroupItemWrap group) => Save(Path.Combine(DIR_GROUPS, $"{group.GroupChat.Id}.bin"), group);
         public UserItemWrap LoadGroup(int id)
         {
             var fileName = TryGetFile(DIR_GROUPS, $"{id}.bin");
             return fileName == null ? null : Load<UserItemWrap>(Path.Combine(DIR_GROUPS, fileName));
         }
-        private PublicGroupInfo LoadGroup(string path) => Load<PublicGroupInfo>(Path.Combine(DIR_GROUPS, path));
-        public List<PublicGroupInfo> LoadAllGroups()
+        private GroupItemWrap LoadGroup(string path) => Load<GroupItemWrap>(Path.Combine(DIR_GROUPS, path));
+        public List<GroupItemWrap> LoadAllGroups()
         {
-            var result = new List<PublicGroupInfo>();
+            var result = new List<GroupItemWrap>();
             foreach (var fileName in Directory.GetFiles(Path.Combine(CachePath, DIR_GROUPS), "*.bin"))
             {
                 result.Add(LoadGroup(Path.GetFileName(fileName)));

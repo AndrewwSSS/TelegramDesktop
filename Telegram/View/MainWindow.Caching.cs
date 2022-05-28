@@ -6,6 +6,7 @@ using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,17 +15,14 @@ namespace Telegram
 {
     public partial class MainWindow
     {
+        ObservableCollection<GroupItemWrap> Groups { get; set; }
+        ObservableCollection<GroupItemWrap> FoundGroups { get; set; }
         private void RequestData(IEnumerable<int> id, RequestType type) => Client?.SendAsync(new DataRequestMessage(id, type));
         private void AcceptUserRequest(DataRequestResultMessage<UserItemWrap> msg) {
             foreach (var user in msg.Result)
             {
                 CacheUser(user);
             }
-        }
-        private void AcceptGroupRequest(DataRequestResultMessage<PublicGroupInfo> msg)
-        {
-            foreach (var group in msg.Result)
-                CacheGroup(group);
         }
         
         private void CacheUser(UserItemWrap user)
@@ -35,15 +33,12 @@ namespace Telegram
             CacheManager.Instance.SaveUser(user);
         }
         
-        private void CacheGroup(PublicGroupInfo group)
+        private void CacheGroup(GroupItemWrap group)
         {
             if (!Groups.Contains(group))
-            
                 Groups.Add(group);
             
             CacheManager.Instance.SaveGroup(group);
-
-            RequestData(group.MembersId.Where(id => Users.FirstOrDefault(u => u.Id == id) == null), RequestType.User);            
         }
 
         

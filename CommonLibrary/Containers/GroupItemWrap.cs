@@ -3,6 +3,7 @@ using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,7 +16,7 @@ namespace CommonLibrary.Containers
     {
         private PublicGroupInfo group;
 
-        public List<UserItemWrap> Members { get; set; } = new List<UserItemWrap>();
+        public ObservableCollection<UserItemWrap> Members { get; set; } = new ObservableCollection< UserItemWrap >();
         public PublicGroupInfo GroupChat
         {
             get => group;

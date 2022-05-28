@@ -8,9 +8,11 @@ namespace CommonLibrary.Messages.Groups
     public class GroupJoinResultMessage : BaseMessage
     {
         public AuthenticationResult Result { get; set; }
-    
-        public GroupJoinResultMessage(AuthenticationResult Result) => this.Result = Result;
-
+        public int GroupId { get; set; }
+        public GroupJoinResultMessage(AuthenticationResult Result, int groupId) {
+            this.Result = Result;
+            GroupId = groupId;
+        }
         public GroupJoinResultMessage() { }
     }
 }

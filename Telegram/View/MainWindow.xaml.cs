@@ -85,8 +85,7 @@ namespace Telegram
 
             CacheManager.Instance.CachePath = "Cache\\";
             LoadCache();
-            //LoadGroups();
-            Groups.CollectionChanged += Groups_CollectionChanged;
+
 
             DataContext = this;
             InitializeComponent();
@@ -98,8 +97,8 @@ namespace Telegram
             //    Members = new List<PublicUserInfo>() { me, ivan }
             //});
             Me = me;
-            CacheUser(me);
-            CacheUser(ivan);
+            Users.Add(new UserItemWrap(me));
+            Users.Add(new UserItemWrap(ivan));
 
 
             RighMenuState = MenuState.Hidden;
@@ -130,7 +129,7 @@ namespace Telegram
 
             Closing += OnClosed;
         }
-
+        private List<GroupItemWrap> CachedGroups { get; set; } = new List<GroupItemWrap>();
         private void OnClosed(object sender, EventArgs e)
         {
 
@@ -150,9 +149,13 @@ namespace Telegram
                     if (result.Result == AuthenticationResult.Success)
                     {
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-                        var newGroup = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
+                        var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
                         {
                             MembersId = new List<int>() { Me.Id }
+                        };
+                        var newGroup = new GroupItemWrap(info)
+                        {
+                            Members = new ObservableCollection<UserItemWrap>(Users.FindAll(u => u.User == Me))
                         };
                         Groups.Add(newGroup);
                     }
@@ -162,6 +165,12 @@ namespace Telegram
                     var arrMsg = msg as ArrayMessage<BaseMessage>;
                     foreach (var obj in arrMsg.Array)
                         Client_MessageReceived(client, obj);
+                }
+                else if (msg is DataRequestResultMessage<UserItemWrap>)
+                {
+                    var drr = msg as DataRequestResultMessage<UserItemWrap>;
+                    foreach(var user in drr.Result)
+                        Users.Add(user);
                 }
                 else if (msg is ArrayMessage<PublicGroupInfo>)
                 {
@@ -191,8 +200,7 @@ namespace Telegram
                     var result = msg as GroupJoinResultMessage;
                     if (result.Result == AuthenticationResult.Success)
                     {
-                        CacheGroup(Buffers.GroupJoinInfo);
-
+                        Groups.Add(CachedGroups.Find(g => g.GroupChat.Id == result.GroupId));
                         B_JoinGroup.Visibility = Visibility.Hidden;
                     }
                 }
@@ -229,11 +237,11 @@ namespace Telegram
             if (msg.RepostUserId != -1)
                 item.RepostUser = Users.First(u => u.User.Id == msg.RepostUserId);
 
-            var group = Groups.FirstOrDefault(g => g.Id == msg.GroupId);
+            var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msg.GroupId);
 
             if (group == null)
             {
-                group = FoundGroups.FirstOrDefault(g => g.Id == msg.GroupId);
+                group = FoundGroups.FirstOrDefault(g => g.GroupChat.Id == msg.GroupId);
                 if (group == null)
                     return;
             }
@@ -251,7 +259,7 @@ namespace Telegram
         private void ShowGroupMessages(PublicGroupInfo group)
         {
             Messages.Clear();
-            if (CurGroup.Messages != null)
+            if (CurGroup.GroupChat.Messages != null)
                 foreach (var msg in group.Messages)
                     AddMessage(msg);
         }
@@ -362,7 +370,7 @@ namespace Telegram
                 if (e.Key == Key.Enter)
                     if (Client.IsConnected)
                     {
-                        Client.SendAsync(new GroupLookupMessage(textBox.Text));
+                        Client.SendAsync(new GroupLookupMessage(textBox.Text, Me.Id));
                     }
         }
 
@@ -406,7 +414,7 @@ namespace Telegram
             if (lb.SelectedIndex == -1)
                 return;
 
-            CurGroup = (lb.SelectedItem as GroupItemWrap).GroupChat;
+            CurGroup = lb.SelectedItem as GroupItemWrap;
         }
 
         private void FoundGroupSelected(object sender, SelectionChangedEventArgs e)
@@ -414,7 +422,7 @@ namespace Telegram
             ListBox lb = sender as ListBox;
             if (lb.SelectedIndex == -1)
                 return;
-            CurGroup = lb.SelectedItem as PublicGroupInfo;
+            CurGroup = lb.SelectedItem as GroupItemWrap;
             if (!Groups.Contains(CurGroup))
                 B_JoinGroup.Visibility = Visibility.Visible;
         }
@@ -437,18 +445,21 @@ namespace Telegram
             Client.SendAsync(new GroupJoinMessage(groupInfo.Id, Me.Id));
         }
 
+        private GroupItemWrap CurGroup { get; set; }
+
         private void TB_SendMsg_OnEnter(object sender, KeyEventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
                 var textBox = sender as TextBox;
-                if (curGroup!=null &&e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
+                if (CurGroup != null &&e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
-                    ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.Id);
+                    ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.GroupChat.Id);
                     Client.SendAsync(msg);
                     
-                    CurGroup.Messages.Add(msg);
-                    VisualGroups.First(wrap => wrap.GroupChat == CurGroup).OnPropertyChanged("LastMessage");
+                    CurGroup.GroupChat.Messages.Add(msg);
+                    CurGroup.OnPropertyChanged("Messages");
+                    CurGroup.OnPropertyChanged("LastMessage");
                     
                     AddMessage(msg);
                     textBox.Text = "";
