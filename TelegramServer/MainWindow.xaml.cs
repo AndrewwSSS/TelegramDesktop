@@ -331,7 +331,7 @@ namespace TelegramServer
                             newGroupMember.Chats.Add(group);
                             group.AddMember(newGroupMember);
 
-                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success));
+                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
                             PublicUserInfo userInfo = new PublicUserInfo()
                             {
