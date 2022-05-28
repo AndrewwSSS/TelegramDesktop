@@ -11,12 +11,12 @@ namespace CommonLibrary.Messages.Users
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string MachineName { get; set; }
         public string Guid { get; set; }
 
-        public UserClient(string name, string guid)
+        public UserClient(string machineName, string guid)
         {
-            Name = name;
+            MachineName = machineName;
             Guid = guid;
         }
 

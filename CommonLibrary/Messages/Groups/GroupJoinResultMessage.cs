@@ -9,10 +9,15 @@ namespace CommonLibrary.Messages.Groups
     {
         public AuthenticationResult Result { get; set; }
         public int GroupId { get; set; }
+
         public GroupJoinResultMessage(AuthenticationResult Result, int groupId) {
             this.Result = Result;
             GroupId = groupId;
         }
+
+        public GroupJoinResultMessage(AuthenticationResult Result) => this.Result = Result;
+
+
         public GroupJoinResultMessage() { }
     }
 }

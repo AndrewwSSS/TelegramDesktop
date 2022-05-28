@@ -144,6 +144,9 @@ namespace TelegramServer
                                 Name = sender.Name
                             };
 
+                            string guid = Guid.NewGuid().ToString();
+                            sender.Clients.Add(new UserClient(loginMessage.MachineName, guid));
+
 
                             UserInfo.ImagesId.AddRange(sender.ImagesId);
 
@@ -151,7 +154,7 @@ namespace TelegramServer
                                 UserInfo.Login = sender.Login;
 
 
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo));
+                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, guid));
                             sender.VisitDate = DateTime.UtcNow;
 
                             client.Disconnected += OnClientDisconnected;
@@ -182,6 +185,23 @@ namespace TelegramServer
                         else
                             client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied,
                                                                     "wrong login/email or password"));
+                        break;
+                    }
+                case "FastLoginMessage":
+                    {
+                        FastLoginMessage fastLoginMessage = (FastLoginMessage)msg;
+
+                        User sender = DbContext.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
+
+                        if(sender != null)
+                        {
+                            UserClient userClient = sender.Clients.Where(c => c.Name) 
+
+
+
+                        }
+
+
                         break;
                     }
                 case "ChatMessage":
@@ -323,7 +343,7 @@ namespace TelegramServer
                             newGroupMember.Chats.Add(group);
                             group.AddMember(newGroupMember);
 
-                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success));
+                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
                             PublicUserInfo userInfo = new PublicUserInfo()
                             {
