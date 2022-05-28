@@ -135,7 +135,8 @@ namespace MessageLibrary
             StateObject state = (StateObject)ar.AsyncState;
             state.Socket.EndSend(ar);
 
-            MessageSent?.Invoke(this, Message.FromByteArray(state.Buffer));
+            byte[] obj = state.Buffer.ToList().GetRange(4, state.Buffer.Length-4).ToArray();
+            MessageSent?.Invoke(this, Message.FromByteArray(obj));
         }
 
         public Message Receive()

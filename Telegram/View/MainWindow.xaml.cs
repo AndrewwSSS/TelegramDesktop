@@ -64,6 +64,7 @@ namespace Telegram
 
         private ObservableCollection<MessageItemWrap> messages;
         private TcpClientWrap client;
+        private GroupItemWrap curGroup;
 
         public PublicUserInfo Me { get; set; }
         public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
@@ -77,7 +78,7 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
-      
+
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
         public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description")) { }
         public MainWindow(PublicUserInfo me)
@@ -158,6 +159,7 @@ namespace Telegram
                             Members = new ObservableCollection<UserItemWrap>(Users.FindAll(u => u.User == Me))
                         };
                         Groups.Add(newGroup);
+                        CachedGroups.Add(newGroup);
                     }
                 }
                 else if (msg is ArrayMessage<BaseMessage>)
@@ -166,13 +168,16 @@ namespace Telegram
                     foreach (var obj in arrMsg.Array)
                         Client_MessageReceived(client, obj);
                 }
-                else if (msg is DataRequestResultMessage<UserItemWrap>)
+                else if (msg is DataRequestResultMessage<UserContainer>)
                 {
-                    var drr = msg as DataRequestResultMessage<UserItemWrap>;
-                    foreach (var user in drr.Result)
+                    var drr = msg as DataRequestResultMessage<UserContainer>;
+                    foreach (var container in drr.Result)
                     {
+                        UserItemWrap user = new UserItemWrap(container.User);
+                        if (container.Images != null)
+                            user.Images = new ObservableCollection<ImageContainer>(container.Images);
                         Users.Add(user);
-                        foreach(var group in CachedGroups.Where(g=>g.GroupChat.MembersId.Contains(user.User.Id)))
+                        foreach (var group in CachedGroups.Where(g => g.GroupChat.MembersId.Contains(container.User.Id)))
                         {
                             group.Members.Add(user);
                         }
@@ -185,11 +190,21 @@ namespace Telegram
                     {
                         B_CloseFoundGroups.IsEnabled = true;
                         LB_FoundGroups.Visibility = Visibility.Visible;
+
                         FoundGroups.Clear();
-                        foreach(var group in array)
+                        List<int> requestedId = new List<int>();
+                        foreach (var group in array)
                         {
+                            var cachedGroup = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == group.Id);
+                            if(cachedGroup != null)
+                            {
+                                FoundGroups.Add(cachedGroup);
+                                continue;
+                            }
                             GroupItemWrap item = new GroupItemWrap(group);
-                            foreach(var uId in group.MembersId)
+                            foreach (var uId in group.MembersId.Where(
+                                id => !requestedId.Contains(id)
+                                ))
                             {
                                 var user = Users.FirstOrDefault(u => u.User.Id == uId);
                                 if (user == null)
@@ -197,6 +212,7 @@ namespace Telegram
                                 else
                                     item.Members.Add(user);
                                 FoundGroups.Add(item);
+                                CachedGroups.Add(item);
                             }
                         }
                     }
@@ -227,12 +243,13 @@ namespace Telegram
                     var info = msg as GroupUpdateMessage;
                     if (info.NewUser != null)
                     {
-                        var user = Users.FirstOrDefault(u=>u.User.Id == info.NewUser.Id);
-                        if(user == null)
+                        var user = Users.FirstOrDefault(u => u.User.Id == info.NewUser.Id);
+                        if (user == null)
                         {
                             Client.SendAsync(new DataRequestMessage(info.NewUser.Id, RequestType.User));
-                        } else
-                        Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
+                        }
+                        else
+                            Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
                     }
                 }
             });
@@ -398,13 +415,17 @@ namespace Telegram
 
         private void B_AddGroup_OnClick(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() => Buffers.GroupName = TB_NewGroupName.Text);
+            Dispatcher.Invoke(() =>
+            {
+                Buffers.GroupName = TB_NewGroupName.Text;
+                AddGroupButton.IsEnabled = false;
+                HideMenus(null, null);
+            });
             Client.MessageSent -= Client_MessageSent;
             Client.MessageSent += Client_MessageSent;
             var msg = new CreateGroupMessage(Buffers.GroupName, Me.Id);
             Client.SendAsync(msg);
-            AddGroupButton.IsEnabled = false;
-            HideMenus(null, null);
+
         }
 
         private void Client_MessageSent(TcpClientWrap client, Message msg)
@@ -442,7 +463,7 @@ namespace Telegram
         {
             Button button = sender as Button;
             button.IsEnabled = false;
-            FoundGroups = null;
+            FoundGroups.Clear();
             LB_FoundGroups.Visibility = Visibility.Hidden;
             B_JoinGroup.Visibility = Visibility.Hidden;
         }
@@ -451,26 +472,34 @@ namespace Telegram
         {
             if (LB_FoundGroups.SelectedIndex == -1)
                 return;
-            var groupInfo = LB_FoundGroups.SelectedItem as PublicGroupInfo;
-            Client.SendAsync(new GroupJoinMessage(groupInfo.Id, Me.Id));
+            var group = LB_FoundGroups.SelectedItem as GroupItemWrap;
+            Client.SendAsync(new GroupJoinMessage(group.GroupChat.Id, Me.Id));
         }
 
-        public GroupItemWrap CurGroup { get; set; }
+        public GroupItemWrap CurGroup { 
+
+            get => curGroup;
+            set
+            {
+                curGroup = value;
+                OnPropertyChanged();
+            }
+        }
 
         private void TB_SendMsg_OnEnter(object sender, KeyEventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
                 var textBox = sender as TextBox;
-                if (CurGroup != null &&e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
+                if (CurGroup != null && e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
                     ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.GroupChat.Id);
                     Client.SendAsync(msg);
-                    
+
                     CurGroup.GroupChat.Messages.Add(msg);
                     CurGroup.OnPropertyChanged("Messages");
                     CurGroup.OnPropertyChanged("LastMessage");
-                    
+
                     AddMessage(msg);
                     textBox.Text = "";
                 }
