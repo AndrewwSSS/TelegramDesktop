@@ -84,6 +84,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Migrations\202205281251569_M1.cs" />
+    <Compile Include="Migrations\202205281251569_M1.designer.cs">
+      <DependentUpon>202205281251569_M1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="TelegramDb.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -95,23 +100,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\202205231442216_InitialCreate.cs" />
-    <Compile Include="Migrations\202205231442216_InitialCreate.designer.cs">
-      <DependentUpon>202205231442216_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205231622258_M12.cs" />
-    <Compile Include="Migrations\202205231622258_M12.designer.cs">
-      <DependentUpon>202205231622258_M12.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205231704064_M13.cs" />
-    <Compile Include="Migrations\202205231704064_M13.designer.cs">
-      <DependentUpon>202205231704064_M13.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205241215257_M14.cs" />
-    <Compile Include="Migrations\202205241215257_M14.designer.cs">
-      <DependentUpon>202205241215257_M14.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -125,17 +113,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\202205231442216_InitialCreate.resx">
-      <DependentUpon>202205231442216_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205231622258_M12.resx">
-      <DependentUpon>202205231622258_M12.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205231704064_M13.resx">
-      <DependentUpon>202205231704064_M13.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205241215257_M14.resx">
-      <DependentUpon>202205241215257_M14.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202205281251569_M1.resx">
+      <DependentUpon>202205281251569_M1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -160,9 +139,7 @@
       <Name>MessageLibrary</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Logo.ico" />
   </ItemGroup>

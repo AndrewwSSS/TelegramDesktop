@@ -19,7 +19,9 @@ namespace CommonLibrary.Messages.Users
         public bool Banned { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime VisitDate { get; set; }
-        public virtual List<User> BlockedUsers { get; set; } 
+
+        public virtual List<UserClient> Clients { get; set; }
+        public virtual List<int> BlockedUsersId { get; set; } 
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<BaseMessage> MessagesToSend { get; set; }
         public virtual List<ChatMessage> Messages { get; set; }
@@ -30,7 +32,7 @@ namespace CommonLibrary.Messages.Users
 
         public User()
         {
-            BlockedUsers = new List<User>();
+            BlockedUsersId = new List<int>();
             Chats = new List<GroupChat>();
             MessagesToSend = new List<BaseMessage>();
             Banned = false;

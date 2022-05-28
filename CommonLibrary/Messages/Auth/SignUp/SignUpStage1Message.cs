@@ -1,10 +1,10 @@
 ﻿using System;
 
 
-namespace CommonLibrary.Messages.Auth
+namespace CommonLibrary.Messages.Auth.SignUp
 {
     [Serializable]
-    public class SignUpMessage : BaseMessage
+    public class SignUpStage1Message : BaseMessage
     {
 
         public string Login { get; set; }
@@ -12,7 +12,7 @@ namespace CommonLibrary.Messages.Auth
         public string Password { get; set; }
         public string Email { get; set; }
 
-        public SignUpMessage() { }
+        public SignUpStage1Message() { }
 
 
     }

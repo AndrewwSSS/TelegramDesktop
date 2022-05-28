@@ -1,7 +1,7 @@
 ﻿using System;
 using MessageLibrary;
 
-namespace CommonLibrary.Messages.Auth
+namespace CommonLibrary.Messages.Auth.Login
 {
     [Serializable]
     public class LoginMessage : Message

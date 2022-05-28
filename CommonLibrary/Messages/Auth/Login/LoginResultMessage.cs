@@ -2,7 +2,7 @@
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 
-namespace CommonLibrary.Messages.Auth
+namespace CommonLibrary.Messages.Auth.Login
 {
     [Serializable]
     public class LoginResultMessage : Message

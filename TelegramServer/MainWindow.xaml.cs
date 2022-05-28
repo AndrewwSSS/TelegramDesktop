@@ -1,5 +1,8 @@
-﻿using CommonLibrary.Messages;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Auth.Login;
+using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -8,9 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace TelegramServer
@@ -21,7 +22,6 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-        private ObservableCollection<GroupChat> Chats;
         private Dictionary<User, TcpClientWrap> Clients;
         private TelegramDb DbContext;
         private TcpServerWrap Server;
@@ -39,7 +39,7 @@ namespace TelegramServer
           
 
             DbContext.GroupChats.Load();
-            Chats = DbContext.GroupChats.Local;
+            
 
             Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
@@ -49,10 +49,29 @@ namespace TelegramServer
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
-            LB_Groups.ItemsSource = Chats;
+            LB_Groups.ItemsSource = DbContext.GroupChats.Local;
 
             foreach (var user in DbContext.Users)
                 UsersOffline.Add(user);
+
+            //MailAddress from = new MailAddress("telegramdesktopbyadat@gmail.com");
+            //MailAddress to = new MailAddress("");
+
+
+            //MailMessage message = new MailMessage(from, to);
+            //message.IsBodyHtml = false;
+            //message.Subject = "test";
+            //message.Body = "some code...";
+
+
+            //SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+            //{
+            //    Credentials = new NetworkCredential("telegramdesktopbyadat@gmail.com", ""),
+            //    EnableSsl = true
+            //};
+
+            //smtp.Send(message);
+
         }
 
 
@@ -82,7 +101,7 @@ namespace TelegramServer
             {
                 case "SignUpMessage":
                     {
-                        SignUpMessage signUpMessage = (SignUpMessage)msg;
+                        SignUpStage1Message signUpMessage = (SignUpStage1Message)msg;
 
 
                         if (DbContext.Users.Any(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) != true)
@@ -93,8 +112,6 @@ namespace TelegramServer
                                 Login = signUpMessage.Login,
                                 Name = signUpMessage.Name,
                                 Password = signUpMessage.Password,
-                                RegistrationDate = DateTime.UtcNow,
-                                VisitDate = DateTime.UtcNow
                             };
 
                             DbContext.Users.Add(NewUser);
@@ -102,12 +119,12 @@ namespace TelegramServer
                             DbContext.SaveChanges();
 
 
-                            client.SendAsync(new SignUpResultMessage(AuthenticationResult.Success));
+                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Success));
 
                         }
                         else
                         {
-                            client.SendAsync(new SignUpResultMessage(AuthenticationResult.Denied,
+                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Denied,
                                             "Email or login already used to create an account"));
 
                         }
@@ -187,27 +204,18 @@ namespace TelegramServer
                     {
                         GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                         List<PublicGroupInfo> SuitableGroups = null;
+                        User sender = DbContext.Users.FirstOrDefault(u => u.Id == groupLookupMessage.);
 
-                        foreach (var groupChat in DbContext.GroupChats)
+                        foreach (var group in DbContext.GroupChats)
                         {
-                            if (groupChat.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower()))
+                            if (group.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower())
+                                && )
                             {
 
                                 if (SuitableGroups == null)
                                     SuitableGroups = new List<PublicGroupInfo>();
 
-                                PublicGroupInfo SuitableGroup = new PublicGroupInfo(groupChat.Name,
-                                                                                    groupChat.Description,
-                                                                                    groupChat.Id);
-
-                                SuitableGroup.Messages.AddRange(groupChat.Messages);
-                                SuitableGroup.ImagesId.AddRange(groupChat.ImagesId);
-
-                                foreach (var groupMember in groupChat.Members)
-                                    SuitableGroup.MembersId.Add(groupMember.Id);
-
-
-                                SuitableGroups.Add(SuitableGroup);
+                                SuitableGroups.Add(PublicGroupInfoFromGroup(group));
 
                             }
                         }
@@ -232,7 +240,7 @@ namespace TelegramServer
                         {
 
                             if (newGroupMembers.Any(newGroupMember
-                                => newGroupMember.BlockedUsers.Any(blockedUser => blockedUser.Id == sender.Id)))
+                                => newGroupMember.BlockedUsersId.Any(blockedUserId => blockedUserId == sender.Id)))
                             {
 
                                 client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Denied,
@@ -251,8 +259,14 @@ namespace TelegramServer
 
                         if(createNewGroupMessage.Image != null)
                         {
-                            newGroup.ImagesId.Add(createNewGroupMessage.Image.Id);
-                            DbContext.Images.Add(createNewGroupMessage.Image);
+                            ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
+                            DbContext.Images.Add(newImage);
+                            
+                            DbContext.SaveChanges();
+                            DbContext.Images.Load();
+
+                            newGroup.ImagesId.Add(newImage.Id);
+                            
                         }
                         
 
@@ -317,7 +331,7 @@ namespace TelegramServer
                                 Login = newGroupMember.Login,
                             };
 
-                            userInfo.Images.AddRange(newGroupMember.Images);
+                            userInfo.ImagesId.AddRange(newGroupMember.ImagesId);
 
 
                             SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUser = userInfo },
@@ -420,17 +434,30 @@ namespace TelegramServer
                 DbContext.SaveChanges();
         }
 
-        private bool isUserOnline(User user) => Clients.ContainsKey(user);
-
-        private void ClearGroups()
+        public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group, int MaxMessagesCount = 50)
         {
-            if(DbContext != null)
-            {
-                DbContext.GroupChats.RemoveRange(DbContext.GroupChats);
-                DbContext.SaveChanges();
-            }
+            PublicGroupInfo result = new PublicGroupInfo(group.Name,
+                                                         group.Description,
+                                                         group.Id);
+
+            if (group.Messages.Count >= MaxMessagesCount)
+                result.Messages.AddRange(group.Messages.GetRange(0, MaxMessagesCount-1));
+            else
+                result.Messages.AddRange(group.Messages);
+
+            result.ImagesId.AddRange(group.ImagesId);
+
+            foreach (var groupMember in group.Members)
+                result.MembersId.Add(groupMember.Id);
+
+
+            return result;
         }
 
+
+        private bool isUserOnline(User user) => Clients.ContainsKey(user);
+
+  
 
 
     
