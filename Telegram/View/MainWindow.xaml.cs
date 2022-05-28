@@ -169,8 +169,14 @@ namespace Telegram
                 else if (msg is DataRequestResultMessage<UserItemWrap>)
                 {
                     var drr = msg as DataRequestResultMessage<UserItemWrap>;
-                    foreach(var user in drr.Result)
+                    foreach (var user in drr.Result)
+                    {
                         Users.Add(user);
+                        foreach(var group in CachedGroups.Where(g=>g.GroupChat.MembersId.Contains(user.User.Id)))
+                        {
+                            group.Members.Add(user);
+                        }
+                    }
                 }
                 else if (msg is ArrayMessage<PublicGroupInfo>)
                 {
@@ -207,11 +213,12 @@ namespace Telegram
                 else if (msg is ChatMessage)
                 {
                     var chatMsg = msg as ChatMessage;
-                    var group = Groups.First(g => g.Id == chatMsg.GroupId);
-                    if (group.Messages == null)
-                        group.Messages = new List<ChatMessage>();
-                    group.Messages.Add(chatMsg);
-                    VisualGroups.First(wrap => wrap.GroupChat == group).OnPropertyChanged("LastMessage");
+                    var group = Groups.First(g => g.GroupChat.Id == chatMsg.GroupId);
+                    if (group.GroupChat.Messages == null)
+                        group.GroupChat.Messages = new List<ChatMessage>();
+                    group.GroupChat.Messages.Add(chatMsg);
+                    group.OnPropertyChanged("Messages");
+                    group.OnPropertyChanged("LastMessage");
                     if (group == CurGroup)
                         AddMessage(chatMsg);
                 }
@@ -220,9 +227,12 @@ namespace Telegram
                     var info = msg as GroupUpdateMessage;
                     if (info.NewUser != null)
                     {
-                        CacheUser(info.NewUser);
-                        Groups.First(g => g.Id == info.GroupId).MembersId.Add(info.NewUser.Id);
-                        OnPropertyChanged("Groups");
+                        var user = Users.FirstOrDefault(u=>u.User.Id == info.NewUser.Id);
+                        if(user == null)
+                        {
+                            Client.SendAsync(new DataRequestMessage(info.NewUser.Id, RequestType.User));
+                        } else
+                        Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
                     }
                 }
             });
@@ -256,7 +266,7 @@ namespace Telegram
                 Messages.Add(item);
             }
         }
-        private void ShowGroupMessages(PublicGroupInfo group)
+        private void ShowGroupMessages(GroupItemWrap group)
         {
             Messages.Clear();
             if (CurGroup.GroupChat.Messages != null)
@@ -381,10 +391,9 @@ namespace Telegram
             HideMenus(null, null);
             AddGroupMenuState = MenuState.Open;
             AddGroupMenu.Opacity = 0;
-            AddGroupMenu.BeginAnimation(Border.OpacityProperty, fadeIn);
+            AddGroupMenu.BeginAnimation(OpacityProperty, fadeIn);
 
-            MainGrid.BeginAnimation(Border.OpacityProperty, MainGridDark);
-
+            MainGrid.BeginAnimation(OpacityProperty, MainGridDark);
         }
 
         private void B_AddGroup_OnClick(object sender, RoutedEventArgs e)
@@ -415,6 +424,7 @@ namespace Telegram
                 return;
 
             CurGroup = lb.SelectedItem as GroupItemWrap;
+            ShowGroupMessages(CurGroup);
         }
 
         private void FoundGroupSelected(object sender, SelectionChangedEventArgs e)
@@ -425,6 +435,7 @@ namespace Telegram
             CurGroup = lb.SelectedItem as GroupItemWrap;
             if (!Groups.Contains(CurGroup))
                 B_JoinGroup.Visibility = Visibility.Visible;
+            ShowGroupMessages(CurGroup);
         }
 
         private void B_CloseFoundGroups_Click(object sender, RoutedEventArgs e)
@@ -441,7 +452,6 @@ namespace Telegram
             if (LB_FoundGroups.SelectedIndex == -1)
                 return;
             var groupInfo = LB_FoundGroups.SelectedItem as PublicGroupInfo;
-            Buffers.GroupJoinInfo = groupInfo;
             Client.SendAsync(new GroupJoinMessage(groupInfo.Id, Me.Id));
         }
 

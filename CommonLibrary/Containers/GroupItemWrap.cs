@@ -27,7 +27,8 @@ namespace CommonLibrary.Containers
                 OnPropertyChanged("LastMessage");
             }
         }
-        public List<ImageContainer> Images { get; set; } = new List<ImageContainer>();
+        public ObservableCollection<ImageContainer> Images { get; set; } = new ObservableCollection<ImageContainer>();
+        public List<ChatMessage> Messages => GroupChat.Messages;
         public ChatMessage LastMessage => GroupChat.Messages.LastOrDefault();
         public GroupItemWrap(PublicGroupInfo group)
         {

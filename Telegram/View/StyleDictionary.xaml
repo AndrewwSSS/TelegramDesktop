@@ -313,11 +313,11 @@
                                                 <Setter.Value>
                                                         <ControlTemplate>
                                                             <Border Grid.Column="0" Grid.Row="1" Height="48" Width="48" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
-                                                                <!--<Image Source="{Binding Images[0].ImageSource}">
+                                                                <Image Source="{Binding Images[0].ImageSource}">
                                                                     <Image.Clip>
                                                                         <EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/>
                                                                     </Image.Clip>
-                                                                </Image>-->
+                                                                </Image>
                                                             </Border>
                                                         </ControlTemplate>
                                                 </Setter.Value>
@@ -337,7 +337,7 @@
                                                                             Background="HotPink">
                                                                 <TextBlock 
                                                                                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                Text="{Binding Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
+                                                                                Text="{Binding User.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
                                                                 </TextBlock>
                                                             </Border>
                                                         </ControlTemplate>
@@ -351,7 +351,7 @@
                             </ContentControl>
                             <TextBlock Grid.Column="1" 
                                        HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                       Text="{Binding Name}" 
+                                       Text="{Binding User.Name}" 
                                        Foreground="{StaticResource GreyBrush}" 
                                        FontSize="20"
                                        />
@@ -364,116 +364,6 @@
             </Setter>
             
         </Style.Setters>
-    </Style>
-    <Style TargetType="ListBox" x:Key="LBGroupWrapper">
-        <Style.Resources>
-            <BooleanToVisibilityConverter x:Key="boolToVis"/>
-        </Style.Resources>
-        <Style.Setters>
-
-            <Setter Property="Visibility" Value="{Binding HasItems, 
-                                          RelativeSource={RelativeSource Self}, 
-                                          Converter={StaticResource boolToVis}}"/>
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="0"/>
-                        <Setter Property="Margin" Value="0"/>
-                    </Style>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="ItemTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <DataTemplate.Resources>
-                            <entities:NotNullConverter x:Key="notnull"></entities:NotNullConverter>
-                        </DataTemplate.Resources>
-                        <Grid Name="border"  Background="{StaticResource BgBrush}">
-                            <!--Аватар группы-->
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <ContentControl Grid.Column="0">
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Style.Resources>
-                                            <entities:NotNullConverter x:Key="notnull" />
-
-                                        </Style.Resources>
-                                        <Style.Setters>
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate>
-                                                        <Border Grid.Column="0" Grid.Row="1" Height="48" Width="48" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
-                                                            <Image Source="{Binding GroupChat.Images[0].ImageSource}">
-                                                                <Image.Clip>
-                                                                    <EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/>
-                                                                </Image.Clip>
-                                                            </Image>
-                                                        </Border>
-                                                    </ControlTemplate>
-
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style.Setters>
-
-                                        <Style.Triggers>
-                                            <DataTrigger Value="0" Binding="{Binding GroupChat.Images.Count}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <Border 
-                                                                            Grid.Column="0" Grid.Row="1"
-                                                                            Height="48" Width="48" 
-                                                                            Margin="0,0,5,0" 
-                                                                            CornerRadius="360"
-                                                                            Background="HotPink">
-                                                                <TextBlock 
-                                                                                VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                Text="{Binding GroupChat.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
-                                                                </TextBlock>
-                                                            </Border>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
-                            <StackPanel Margin="0, 5" Grid.Column="1">
-                                <TextBlock Text="{Binding GroupChat.Name}" Foreground="{StaticResource GreyBrush}" FontSize="12"/>
-                                <TextBlock Name="T_LastMsg" Foreground="{StaticResource DarkGreyBrush}" FontSize="12" Text="Нет новых сообщений"/>
-                            </StackPanel>
-
-                        </Grid>
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding LastMessage, Converter={StaticResource notnull}}" Value="True">
-                                <Setter TargetName="T_LastMsg" Property="Text" Value="{Binding LastMessage.Text}"/>
-                            </DataTrigger>
-                            <DataTrigger
-                                            Binding="{Binding
-                                                RelativeSource={RelativeSource
-                                                Mode=FindAncestor,
-                                                AncestorType={x:Type ListBoxItem}},
-                                                Path=IsSelected}"
-                                            Value="True">
-                                <Setter
-                                            TargetName="border"
-                                            Property="Background"
-                                            Value="{StaticResource MsgBgBrush}"/>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Background" Value="{StaticResource DarkBgBrush}"/>
-        </Style.Setters>
-
     </Style>
 
     <Style TargetType="ListBox" x:Key="LBGroup">
@@ -544,7 +434,7 @@
                                                                             Background="HotPink">
                                                                 <TextBlock 
                                                                                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                Text="{Binding Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
+                                                                                Text="{Binding GroupChat.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
                                                                 </TextBlock>
                                                             </Border>
                                                         </ControlTemplate>
@@ -557,7 +447,7 @@
                                 </ContentControl.Style>
                             </ContentControl>
                             <StackPanel Margin="0, 5" Grid.Column="1">
-                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource GreyBrush}" FontSize="12"/>
+                                <TextBlock Text="{Binding GroupChat.Name}" Foreground="{StaticResource GreyBrush}" FontSize="12"/>
                                 <TextBlock Name="T_LastMsg" Foreground="{StaticResource DarkGreyBrush}" FontSize="12" Text="Нет новых сообщений"/>
                             </StackPanel>
 

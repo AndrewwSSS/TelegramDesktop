@@ -224,9 +224,9 @@
                         <ListBox x:Name="LB_Groups" 
                                  Grid.Row="1"  
                                  Grid.ColumnSpan="2"
-                                 ItemsSource="{Binding VisualGroups}"
+                                 ItemsSource="{Binding Groups}"
                                  SelectionChanged="GroupSelected"
-                                 Style="{StaticResource LBGroupWrapper}"
+                                 Style="{StaticResource LBGroup}"
                                  >
                         </ListBox>
                         <ListBox x:Name="LB_FoundGroups"
@@ -377,7 +377,7 @@
                                                                                 Background="HotPink">
                                                                                 <TextBlock 
                                                                                     VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                    Text="{Binding FromUser.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
+                                                                                    Text="{Binding FromUser.User.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
                                                                                 </TextBlock>
                                                                             </Border>
                                                                         </ControlTemplate>
@@ -413,7 +413,7 @@
                                                     <TextBlock 
                                                     Grid.Row="1"
                                                     Grid.Column="1"
-                                                    FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.Name}" Margin="0,0,0,2"/>
+                                                    FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.User.Name}" Margin="0,0,0,2"/>
                                                     <!--Сообщение, на которое отвечаем-->
                                                     <Grid PreviewMouseDown="Responce_OnClick" Grid.Row="2" Grid.Column="1" Margin="0,2,0,5">
                                                         <Grid.ColumnDefinitions>
@@ -427,7 +427,7 @@
                                                             Grid.Row="1"
                                                             Grid.Column="1"
                                                             FontSize="12" Foreground="{StaticResource LightBlueBrush}" 
-                                                            Text="{Binding RespondingTo.FromUser.Name}"
+                                                            Text="{Binding RespondingTo.FromUser.User.Name}"
                                                             Margin="0,0,0,5"/>
                                                             <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Message.Text}"/>
                                                         </StackPanel>

@@ -1,6 +1,9 @@
 ﻿using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Auth.Login;
+using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
+using System;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -43,11 +46,11 @@ namespace Telegram.View
         public static MainWindow wnd;
         private void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
-            if (msg is SignUpResultMessage)
+            if (msg is SignUpStage1ResultMessage)
             {
                 Dispatcher.Invoke(() =>
                 {
-                    var result = msg as SignUpResultMessage;
+                    var result = msg as SignUpStage1ResultMessage;
                     if (result.Result == AuthenticationResult.Success)
                         MessageBox.Show("Регистрация прошла успешно.");
                     else
@@ -86,7 +89,7 @@ namespace Telegram.View
                 MessageBox.Show("Не все поля заполнены");
                 return;
             }
-            var msg = new LoginMessage(email, password);
+            var msg = new LoginMessage(email, password, Environment.MachineName);
             tabControl.IsEnabled = false;
             client.SendAsync(msg);
         }
@@ -119,7 +122,7 @@ namespace Telegram.View
                 MessageBox.Show("Пароль должен быть не менее восьми символов в длину и содержать большую букву и цифру");
                 return;
             }
-            var msg = new SignUpMessage() { 
+            var msg = new SignUpStage1Message() { 
                 Login = login,
                 Password = password,
                 Email = email,
