@@ -6,10 +6,12 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class GroupLookupMessage : Message
     {
+        public int UserId { get; set; }
         public string GroupName { get; set; }
 
-        public GroupLookupMessage(string GroupName){
+        public GroupLookupMessage(string GroupName, int userId){
             this.GroupName = GroupName;
+            this.UserId = userId; 
         }
 
 

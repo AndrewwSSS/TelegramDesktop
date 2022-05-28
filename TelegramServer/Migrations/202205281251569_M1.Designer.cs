@@ -13,7 +13,7 @@ namespace TelegramServer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202205281238191_M1"; }
+            get { return "202205281251569_M1"; }
         }
         
         string IMigrationMetadata.Source

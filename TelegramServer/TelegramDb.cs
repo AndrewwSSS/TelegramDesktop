@@ -16,7 +16,7 @@ namespace TelegramServer
 
         public TelegramDb() : base("Telegram")
         {
-
+            
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
