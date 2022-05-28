@@ -377,11 +377,12 @@ namespace TelegramServer
                             }
                             case RequestType.User:
                             {
+                                List<UserContainer> results = new List<UserContainer>();
                                 foreach(var user in DbContext.Users)
                                 {
                                     if(message.ItemsId.Contains(user.Id))
                                     {
-                                         UserItemWrap userItem = new UserItemWrap();
+                                         UserContainer userItem = new UserContainer();
                                          userItem.User = new PublicUserInfo()
                                          {
                                              Id = user.Id,
@@ -391,13 +392,15 @@ namespace TelegramServer
 
                                          foreach(var image in DbContext.Images.Where(im => user.ImagesId.Contains(im.Id)))
                                              userItem.Images.Add(image);
+
+                                         results.Add(userItem);
                                         
 
                                     }
 
                                 }
-
-
+                                
+                                client.Send(new DataRequestResultMessage<UserContainer>(results));
                                 break;
                             }
 

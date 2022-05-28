@@ -9,12 +9,17 @@ namespace CommonLibrary.Messages.Auth.Login
         // Email or Login
         public string Login { get; set; }
 
+        public string MachineName { get; set; }
+
         public string Password { get; set; }
 
-        public LoginMessage(string Login, string Password)
+        public LoginMessage(string Login, string Password, string MachineName)
         {
             this.Login = Login;
             this.Password = Password;
         }
+
+        public LoginMessage() { }
+
     }
 }
