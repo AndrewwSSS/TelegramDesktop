@@ -455,7 +455,7 @@ namespace Telegram
             Client.SendAsync(new GroupJoinMessage(groupInfo.Id, Me.Id));
         }
 
-        private GroupItemWrap CurGroup { get; set; }
+        public GroupItemWrap CurGroup { get; set; }
 
         private void TB_SendMsg_OnEnter(object sender, KeyEventArgs e)
         {
