@@ -23,8 +23,8 @@ namespace Telegram
         private void LoadCache()
         {
             LoadUsers();
-            //LoadGroups();
-            //CacheManager.Instance.LoadAllGroups();
+            LoadGroups();
+            CacheManager.Instance.LoadAllGroups();
         }
         private void SaveCache()
         {

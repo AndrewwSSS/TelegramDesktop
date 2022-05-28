@@ -35,7 +35,9 @@ namespace CommonLibrary.Messages.Users
             BlockedUsersId = new List<int>();
             Chats = new List<GroupChat>();
             MessagesToSend = new List<BaseMessage>();
+            Clients = new List<UserClient>();
             Banned = false;
+            
         }
 
         public User(int id) : this()

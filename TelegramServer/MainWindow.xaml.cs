@@ -99,23 +99,25 @@ namespace TelegramServer
         {
             switch (msg.GetType().Name)
             {
-                case "SignUpMessage":
+                case "SignUpStage1Message":
                     {
                         SignUpStage1Message signUpMessage = (SignUpStage1Message)msg;
 
 
                         if (DbContext.Users.Any(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login) != true)
                         {
-                            User NewUser = new User()
+                            User newUser = new User()
                             {
                                 Email = signUpMessage.Email,
                                 Login = signUpMessage.Login,
                                 Name = signUpMessage.Name,
                                 Password = signUpMessage.Password,
+                                RegistrationDate = DateTime.Now,
+                                VisitDate = DateTime.Now
                             };
 
-                            DbContext.Users.Add(NewUser);
-                            Dispatcher.Invoke(() => UsersOffline.Add(NewUser));
+                            DbContext.Users.Add(newUser);
+                            Dispatcher.Invoke(() => UsersOffline.Add(newUser));
                             DbContext.SaveChanges();
 
 
@@ -160,13 +162,15 @@ namespace TelegramServer
                             client.Disconnected += OnClientDisconnected;
                             Clients[sender] = client;
 
-                            DbContext.SaveChanges();
 
                             Dispatcher.Invoke(() =>
                             {
                                 UsersOffline.Remove(sender);
                                 UsersOnline.Add(sender);
                             });
+
+
+                            DbContext.SaveChanges();
 
                             if (sender.MessagesToSend.Count > 0)
                             {
@@ -195,7 +199,24 @@ namespace TelegramServer
 
                         if(sender != null)
                         {
-                            UserClient userClient = sender.Clients.Where(c => c.Name) 
+                            UserClient userClient = sender.Clients.First(c => c.MachineName == fastLoginMessage.MachineName);
+
+                            if(userClient != null && userClient.Guid == fastLoginMessage.Guid)
+                                client.Send(new FastLoginResultMessage(AuthenticationResult.Success));
+                            else
+                            {
+                                userClient = sender.Clients.First(c => c.Guid == fastLoginMessage.Guid);
+
+                                if(userClient != null)
+                                {
+                                    //tmp
+                                    userClient.MachineName = fastLoginMessage.Guid;
+                                    client.Send(new FastLoginResultMessage(AuthenticationResult.Success));
+                                }
+                                else
+                                    client.Send(new FastLoginResultMessage(AuthenticationResult.Denied));
+
+                            }
 
 
 
@@ -380,8 +401,6 @@ namespace TelegramServer
 
                                 client.Send(new DataRequestResultMessage<FileContainer>(results));
 
-
-
                                 break;
                             }
                             case RequestType.Image:
@@ -390,9 +409,6 @@ namespace TelegramServer
                                             = DbContext.Images.Where(image => message.ItemsId.Contains(image.Id)).ToArray();
 
                                 client.Send(new DataRequestResultMessage<ImageContainer>(results));
-
-
-
                                 break;
                             }
                             case RequestType.User:
