@@ -189,6 +189,10 @@ namespace TelegramServer
                     }
                 case "FastLoginMessage":
                     {
+                        FastLoginMessage fastLoginMessage = (FastLoginMessage)msg;
+
+                        User sender = 
+
 
                         break;
                     }
