@@ -13,7 +13,7 @@ namespace CommonLibrary.Containers
     [Serializable]
     public class UserItemWrap : INotifyPropertyChanged
     {
-        private ObservableCollection<ImageContainer> images;
+        private ObservableCollection<ImageContainer> images = new ObservableCollection<ImageContainer>();
 
 
         public PublicUserInfo User { get; set; }

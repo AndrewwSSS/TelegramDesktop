@@ -13,17 +13,16 @@ namespace CommonLibrary.Messages.Groups
         public int FromUserId { get; set; }
 
 
-        public CreateGroupMessage(string Name, int FromUserId, List<int> MembersId = null, byte[] Image = null) : this()
+        public CreateGroupMessage(string Name, int FromUserId, List<int> MembersId = null, byte[] Image = null)
         {
             this.Name = Name;
             this.Image = Image;
             this.MembersId = MembersId;
             this.FromUserId = FromUserId;
-
         }
 
         public CreateGroupMessage() {
-            MembersId = new List<int>();
+
         }
 
     }
