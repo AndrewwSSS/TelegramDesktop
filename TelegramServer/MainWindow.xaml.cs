@@ -186,16 +186,18 @@ namespace TelegramServer
                     }
                 case "ChatMessage":
                     {
-                        ChatMessage chatMessage = (ChatMessage)msg;
-                        GroupChat chat = DbContext.GroupChats.First(gc => gc.Id == chatMessage.GroupId);
-                        User sender = DbContext.Users.First(u => u.Id == chatMessage.FromUserId);
+                        ChatMessage newMessage = (ChatMessage)msg;
+                        GroupChat chat = DbContext.GroupChats.First(gc => gc.Id == newMessage.GroupId);
+                        User sender = DbContext.Users.First(u => u.Id == newMessage.FromUserId);
 
-                        sender.Messages.Add(chatMessage);
-                        chat.Messages.Add(chatMessage);
+                        sender.Messages.Add(newMessage);
+                        chat.Messages.Add(newMessage);
+
+                     
 
                         DbContext.SaveChanges();
 
-                        SendMessageToUsers(chatMessage, sender.Id, chat.Members);
+                        SendMessageToUsers(newMessage, sender.Id, chat.Members);
 
                         break;
 
@@ -341,6 +343,66 @@ namespace TelegramServer
                         }
                         else
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Denied));
+
+                        break;
+                    }
+                case "DataRequestMessage":
+                    {
+                        DataRequestMessage message = (DataRequestMessage)msg;
+                       
+
+                        switch (message.Type)
+                        {
+                            case RequestType.File:
+                            {
+                               FileContainer[] results
+                                        = DbContext.Files.Where(file => message.ItemsId.Contains(file.Id)).ToArray();
+
+                                client.Send(new DataRequestResultMessage<FileContainer>(results));
+
+
+
+                                break;
+                            }
+                            case RequestType.Image:
+                            {
+                                ImageContainer[] results
+                                            = DbContext.Images.Where(image => message.ItemsId.Contains(image.Id)).ToArray();
+
+                                client.Send(new DataRequestResultMessage<ImageContainer>(results));
+
+
+
+                                break;
+                            }
+                            case RequestType.User:
+                            {
+                                foreach(var user in DbContext.Users)
+                                {
+                                    if(message.ItemsId.Contains(user.Id))
+                                    {
+                                         UserItemWrap userItem = new UserItemWrap();
+                                         userItem.User = new PublicUserInfo()
+                                         {
+                                             Id = user.Id,
+                                             Login = user.Login,
+                                             Description = user.Description
+                                         };
+
+                                         foreach(var )
+                                        
+
+                                    }
+
+                                }
+
+
+                                break;
+                            }
+
+
+                        }
+
 
                         break;
                     }
