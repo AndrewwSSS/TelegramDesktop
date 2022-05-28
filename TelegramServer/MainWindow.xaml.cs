@@ -191,7 +191,15 @@ namespace TelegramServer
                     {
                         FastLoginMessage fastLoginMessage = (FastLoginMessage)msg;
 
-                        User sender = 
+                        User sender = DbContext.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
+
+                        if(sender != null)
+                        {
+                            UserClient userClient = sender.Clients.Where(c => c.Name) 
+
+
+
+                        }
 
 
                         break;
