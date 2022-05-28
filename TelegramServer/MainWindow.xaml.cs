@@ -204,12 +204,12 @@ namespace TelegramServer
                     {
                         GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                         List<PublicGroupInfo> SuitableGroups = null;
-                        User sender = DbContext.Users.FirstOrDefault(u => u.Id == groupLookupMessage.);
+                        User sender = DbContext.Users.FirstOrDefault(u => u.Id == groupLookupMessage.UserId);
 
                         foreach (var group in DbContext.GroupChats)
                         {
                             if (group.Name.ToLower().Contains(groupLookupMessage.GroupName.ToLower())
-                                && )
+                                && !sender.Chats.Any(chat => chat.Id == group.Id))
                             {
 
                                 if (SuitableGroups == null)
