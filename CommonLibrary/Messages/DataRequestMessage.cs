@@ -9,9 +9,9 @@ namespace CommonLibrary.Messages
 {
     public enum RequestType
     {
-        GroupChat,
         User,
-        Image
+        Image,
+        File
     }
 
     [Serializable]
