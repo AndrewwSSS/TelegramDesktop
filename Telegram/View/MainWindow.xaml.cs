@@ -62,12 +62,8 @@ namespace Telegram
         public ThicknessAnimation OpenLeftMenuAnim = new ThicknessAnimation();
         public ThicknessAnimation CloseLeftMenuAnim = new ThicknessAnimation();
 
-        private ObservableCollection<PublicGroupInfo> groups = new ObservableCollection<PublicGroupInfo>();
         private ObservableCollection<MessageItemWrap> messages;
         private TcpClientWrap client;
-        private ObservableCollection<PublicGroupInfo> foundGroups;
-        private PublicGroupInfo curGroup;
-        private ObservableCollection<GroupItemWrap> visualGroups = new ObservableCollection<GroupItemWrap>();
 
         public PublicUserInfo Me { get; set; }
         public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
@@ -81,46 +77,8 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
-        public ObservableCollection<GroupItemWrap> VisualGroups
-        {
-            get => visualGroups; set
-            {
-                visualGroups = value;
-                OnPropertyChanged();
-            }
-        }
-        public ObservableCollection<PublicGroupInfo> Groups
-        {
-            get => groups;
-            set
-            {
-
-                groups = value;
-                
-                OnPropertyChanged();
-            }
-        }
-        public ObservableCollection<PublicGroupInfo> FoundGroups
-        {
-            get => foundGroups;
-            set
-            {
-                foundGroups = value;
-                OnPropertyChanged();
-            }
-        }
-        public PublicGroupInfo CurGroup
-        {
-            get => curGroup;
-            set
-            {
-                curGroup = value;
-                OnPropertyChanged();
-                if(curGroup!=null)
-                ShowGroupMessages(CurGroup);
-            }
-        }
-        public List<PublicUserInfo> Users { get; set; } = new List<PublicUserInfo>();
+      
+        public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
         public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description")) { }
         public MainWindow(PublicUserInfo me)
         {
@@ -173,16 +131,6 @@ namespace Telegram
             Closing += OnClosed;
         }
 
-        private void Groups_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if(e.OldItems != null)
-            foreach (var item in e.OldItems)
-                VisualGroups.Remove(new GroupItemWrap(item as PublicGroupInfo));
-            if(e.NewItems != null)
-            foreach (var item in e.NewItems)
-                VisualGroups.Add(new GroupItemWrap(item as PublicGroupInfo));
-        }
-
         private void OnClosed(object sender, EventArgs e)
         {
 
@@ -204,7 +152,7 @@ namespace Telegram
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
                         var newGroup = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
                         {
-                            Members = new List<PublicUserInfo>() { Me }
+                            MembersId = new List<int>() { Me.Id }
                         };
                         Groups.Add(newGroup);
                     }
@@ -222,7 +170,20 @@ namespace Telegram
                     {
                         B_CloseFoundGroups.IsEnabled = true;
                         LB_FoundGroups.Visibility = Visibility.Visible;
-                        FoundGroups = new ObservableCollection<PublicGroupInfo>(array.ToList());
+                        FoundGroups.Clear();
+                        foreach(var group in array)
+                        {
+                            GroupItemWrap item = new GroupItemWrap(group);
+                            foreach(var uId in group.MembersId)
+                            {
+                                var user = Users.FirstOrDefault(u => u.User.Id == uId);
+                                if (user == null)
+                                    Client.SendAsync(new DataRequestMessage(uId, RequestType.User));
+                                else
+                                    item.Members.Add(user);
+                                FoundGroups.Add(item);
+                            }
+                        }
                     }
                 }
                 else if (msg is GroupJoinResultMessage)
@@ -252,7 +213,7 @@ namespace Telegram
                     if (info.NewUser != null)
                     {
                         CacheUser(info.NewUser);
-                        Groups.First(g => g.Id == info.GroupId).Members.Add(info.NewUser);
+                        Groups.First(g => g.Id == info.GroupId).MembersId.Add(info.NewUser.Id);
                         OnPropertyChanged("Groups");
                     }
                 }
@@ -262,11 +223,11 @@ namespace Telegram
         private void AddMessage(ChatMessage msg)
         {
             MessageItemWrap item = new MessageItemWrap(msg);
-            item.FromUser = Users.First(u => u.Id == msg.FromUserId);
+            item.FromUser = Users.First(u => u.User.Id == msg.FromUserId);
             if (msg.RespondingTo != -1)
                 item.RespondingTo = Messages.First(m => m.Message.Id == msg.RespondingTo);
             if (msg.RepostUserId != -1)
-                item.RepostUser = Users.First(u => u.Id == msg.RepostUserId);
+                item.RepostUser = Users.First(u => u.User.Id == msg.RepostUserId);
 
             var group = Groups.FirstOrDefault(g => g.Id == msg.GroupId);
 
@@ -289,12 +250,9 @@ namespace Telegram
         }
         private void ShowGroupMessages(PublicGroupInfo group)
         {
-            foreach (var user in group.Members)
-                CacheUser(user);
-
             Messages.Clear();
             if (CurGroup.Messages != null)
-                foreach (var msg in CurGroup.Messages)
+                foreach (var msg in group.Messages)
                     AddMessage(msg);
         }
         private void BTNFullScreen_Click(object sender, RoutedEventArgs e)

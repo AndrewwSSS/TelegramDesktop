@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Containers\GroupItemWrap.cs" />
+    <Compile Include="Containers\UserItemWrap.cs" />
+    <Compile Include="Messages\DataRequestResultMessage.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="Messages\Groups\GroupLookupMessage.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\ClientDisconnectMessage.cs" />
+    <Compile Include="Messages\DataRequestMessage.cs" />
     <Compile Include="Messages\Groups\GroupUpdateMessage.cs" />
     <Compile Include="Messages\Users\PublicUserInfo.cs" />
     <Compile Include="UserEntity.cs" />

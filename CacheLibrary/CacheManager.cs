@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Messages.Groups;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using System;
 using System.Collections.Generic;
@@ -29,16 +30,16 @@ namespace CacheLibrary
         private const string DIR_USERS = "Users\\";
         private const string DIR_GROUPS = "Groups\\";
         #region Users
-        public void SaveUser(PublicUserInfo user) => Save(Path.Combine(DIR_USERS, $"{user.Id}.bin"), user);
-        public PublicUserInfo LoadUser(int id)
+        public void SaveUser(UserItemWrap user) => Save(Path.Combine(DIR_USERS, $"{user.User.Id}.bin"), user);
+        public UserItemWrap LoadUser(int id)
         {
             var fileName = TryGetFile(DIR_USERS, $"{id}.bin");
-            return fileName == null ? null : Load<PublicUserInfo>(Path.Combine(DIR_USERS, fileName));
+            return fileName == null ? null : Load<UserItemWrap>(Path.Combine(DIR_USERS, fileName));
         }
-        private PublicUserInfo LoadUser(string path) => Load<PublicUserInfo>(Path.Combine(DIR_USERS, path));
-        public List<PublicUserInfo> LoadAllUsers()
+        private UserItemWrap LoadUser(string path) => Load<UserItemWrap>(Path.Combine(DIR_USERS, path));
+        public List<UserItemWrap> LoadAllUsers()
         {
-            var result = new List<PublicUserInfo>();
+            var result = new List<UserItemWrap>();
             foreach (var fileName in Directory.GetFiles(Path.Combine(CachePath, DIR_USERS), "*.bin")) {
                 result.Add(LoadUser(Path.GetFileName(fileName)));
             };
@@ -47,11 +48,11 @@ namespace CacheLibrary
         #endregion
 
         #region Groups
-        public void SaveGroup(PublicGroupInfo user) => Save(Path.Combine(DIR_GROUPS, $"{user.Id}.bin"), user);
-        public PublicUserInfo LoadGroup(int id)
+        public void SaveGroup(PublicGroupInfo group) => Save(Path.Combine(DIR_GROUPS, $"{group.Id}.bin"), group);
+        public UserItemWrap LoadGroup(int id)
         {
             var fileName = TryGetFile(DIR_GROUPS, $"{id}.bin");
-            return fileName == null ? null : Load<PublicUserInfo>(Path.Combine(DIR_GROUPS, fileName));
+            return fileName == null ? null : Load<UserItemWrap>(Path.Combine(DIR_GROUPS, fileName));
         }
         private PublicGroupInfo LoadGroup(string path) => Load<PublicGroupInfo>(Path.Combine(DIR_GROUPS, path));
         public List<PublicGroupInfo> LoadAllGroups()
