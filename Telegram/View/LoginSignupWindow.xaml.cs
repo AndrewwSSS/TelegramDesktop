@@ -90,11 +90,14 @@ namespace Telegram.View
             }
             else if(msg is FastLoginResultMessage)
             {
-                var result = msg as FastLoginResultMessage;
-                if(result.Result == AuthenticationResult.Success)
+                Dispatcher.Invoke(() =>
                 {
-                    GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
-                }
+                    var result = msg as FastLoginResultMessage;
+                    if (result.Result == AuthenticationResult.Success)
+                    {
+                        GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
+                    }
+                });
             }
         }
         private void GoToMainWnd(PublicUserInfo info)

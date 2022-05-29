@@ -327,7 +327,7 @@
                                  Grid.Row="1">
                             <ListBox ItemsSource="{Binding Messages}" Background="{StaticResource DarkBgBrush}"
                                  BorderThickness="0"
-                                 IsHitTestVisible="False">
+                                 >
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -452,15 +452,6 @@
                                                 <Setter TargetName="resend" Property="Height" Value="0" />
                                                 <Setter TargetName="author" Property="Height" Value="Auto" />
                                             </DataTrigger>
-                                            <!--<DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <MultiBinding Converter="{StaticResource last}">
-                                                    <Binding Path="Messages" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}"/>
-                                                    <Binding Path="Self"/>
-                                                </MultiBinding>
-                                            </DataTrigger.Binding>
-                                            <Setter TargetName="userIcon" Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>-->
                                         </DataTemplate.Triggers>
 
                                     </DataTemplate>

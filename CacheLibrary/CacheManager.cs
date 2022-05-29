@@ -31,11 +31,15 @@ namespace CacheLibrary
         private const string DIR_USERS = "Users\\";
         private const string DIR_GROUPS = "Groups\\";
         #region Users
-        public void SaveUser(UserItemWrap user) => Save(Path.Combine(DIR_USERS, $"{user.User.Id}.bin"), user);
+        public void SaveUser(UserItemWrap user)
+        {
+            UserContainer container = new UserContainer(user);
+            Save(Path.Combine(DIR_USERS, $"{user.User.Id}.bin"), user);
+        }
         public UserItemWrap LoadUser(int id)
         {
-            var fileName = TryGetFile(DIR_USERS, $"{id}.bin");
-            return fileName == null ? null : Load<UserItemWrap>(Path.Combine(DIR_USERS, fileName));
+            var fileName = Path.Combine(DIR_USERS, $"{id}.bin");
+            return Load<UserContainer>(fileName).ToWrap();
         }
         private UserItemWrap LoadUser(string path) => Load<UserItemWrap>(Path.Combine(DIR_USERS, path));
         public List<UserItemWrap> LoadAllUsers()
@@ -49,16 +53,16 @@ namespace CacheLibrary
         #endregion
 
         #region Groups
-        public void SaveGroup(GroupItemWrap group) => Save(Path.Combine(DIR_GROUPS, $"{group.GroupChat.Id}.bin"), group);
+        public void SaveGroup(PublicGroupInfo group) => Save(Path.Combine(DIR_GROUPS, $"{group.Id}.bin"), group);
         public UserItemWrap LoadGroup(int id)
         {
-            var fileName = TryGetFile(DIR_GROUPS, $"{id}.bin");
-            return fileName == null ? null : Load<UserItemWrap>(Path.Combine(DIR_GROUPS, fileName));
+            var fileName = Path.Combine(DIR_GROUPS, $"{id}.bin");
+            return Load<UserItemWrap>(fileName);
         }
-        private GroupItemWrap LoadGroup(string path) => Load<GroupItemWrap>(Path.Combine(DIR_GROUPS, path));
-        public List<GroupItemWrap> LoadAllGroups()
+        private PublicGroupInfo LoadGroup(string path) => Load<PublicGroupInfo>(Path.Combine(DIR_GROUPS, path));
+        public List<PublicGroupInfo> LoadAllGroups()
         {
-            var result = new List<GroupItemWrap>();
+            var result = new List<PublicGroupInfo>();
             foreach (var fileName in Directory.GetFiles(Path.Combine(CachePath, DIR_GROUPS), "*.bin"))
             {
                 result.Add(LoadGroup(Path.GetFileName(fileName)));
@@ -67,13 +71,7 @@ namespace CacheLibrary
         }
         #endregion
 
-        private string TryGetFile(string dir, string name)
-        {
-            var result= new DirectoryInfo(Path.Combine(CachePath, dir))
-                .GetFiles()
-                .FirstOrDefault(f => Path.GetFileNameWithoutExtension(f.Name).Equals(name));
-            return result == null ? null : result.Name;
-        }
+        
         private void Save(string fileName, object obj)
         {
             if (string.IsNullOrEmpty(CachePath))

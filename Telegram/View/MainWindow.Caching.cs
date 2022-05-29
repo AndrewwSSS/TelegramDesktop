@@ -19,7 +19,20 @@ namespace Telegram
         public ObservableCollection<GroupItemWrap> FoundGroups { get; set; } = new ObservableCollection<GroupItemWrap>();
 
         private void LoadUsers() => Users.AddRange(CacheManager.Instance.LoadAllUsers());
-        private void LoadGroups() => CacheManager.Instance.LoadAllGroups().ForEach(g=>Groups.Add(g));
+        private void LoadGroups() {
+            List<PublicGroupInfo> list = CacheManager.Instance.LoadAllGroups();
+            foreach(var info in list)
+            {
+                GroupItemWrap item = new GroupItemWrap(info);
+                foreach(var id in info.MembersId)
+                {
+                    UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == id);
+                    if (user != null)
+                        item.Members.Add(user);
+                }
+                Groups.Add(item);
+            }
+        }
         private void LoadCache()
         {
             LoadUsers();
@@ -31,7 +44,7 @@ namespace Telegram
             foreach (var user in Users)
                 CacheManager.Instance.SaveUser(user);
             foreach (var group in Groups)
-                CacheManager.Instance.SaveGroup(group);
+                CacheManager.Instance.SaveGroup(group.GroupChat);
         }
     }
 }
