@@ -4,6 +4,7 @@ using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Auth.Login;
 using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.System;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
@@ -249,6 +250,7 @@ namespace TelegramServer
                         }
                         break;
                     }
+
                 case "ChatMessage":
                     {
                         ChatMessage newMessage = (ChatMessage)msg;
