@@ -19,13 +19,14 @@ namespace CacheLibrary
             
         private CacheManager()
         {
-                Directory.CreateDirectory(Path.Combine(CachePath, DIR_USERS));
-                Directory.CreateDirectory(Path.Combine(CachePath, DIR_GROUPS));
+            Directory.CreateDirectory(Path.Combine(CachePath, DIR_USERS));
+            Directory.CreateDirectory(Path.Combine(CachePath, DIR_GROUPS));
+            Directory.CreateDirectory(Path.Combine(CachePath, DIR_LOGIN));
         }
 
         public string CachePath { get; set; } = "Cache\\";
 
-        public static BinaryFormatter bf = new BinaryFormatter();
+        private static BinaryFormatter bf = new BinaryFormatter();
 
         private const string DIR_USERS = "Users\\";
         private const string DIR_GROUPS = "Groups\\";
@@ -96,5 +97,34 @@ namespace CacheLibrary
             using (FileStream reader = new FileStream(path, FileMode.Open))
                 return (T)bf.Deserialize(reader);
         }
+
+        const string DIR_LOGIN = "Login\\";
+        public void SaveGuid(string guid)
+        {
+            using (StreamWriter writer = new StreamWriter(Path.Combine(CachePath, DIR_LOGIN, "fast_login_guid.txt")))
+                writer.Write(guid);
+        }
+        public string LoadGuid()
+        {
+            if (!File.Exists(Path.Combine(CachePath, DIR_LOGIN, "fast_login_guid.txt")))
+                return null;
+            using (StreamReader reader = new StreamReader(Path.Combine(CachePath, DIR_LOGIN, "fast_login_guid.txt")))
+                return reader.ReadToEnd();
+        }
+        public void SaveUserId(int id)
+        {
+            using (StreamWriter writer = new StreamWriter(Path.Combine(CachePath, DIR_LOGIN, "user_id.txt")))
+                writer.Write(id);
+        }
+        public int LoadUserId()
+        {
+            int result = -1;
+            if (!File.Exists(Path.Combine(CachePath, DIR_LOGIN, "user_id.txt")))
+                return result;
+            using (StreamReader reader = new StreamReader(Path.Combine(CachePath, DIR_LOGIN, "user_id.txt")))
+                int.TryParse(reader.ReadToEnd(), out result);
+            return result;
+        }
+
     }
 }

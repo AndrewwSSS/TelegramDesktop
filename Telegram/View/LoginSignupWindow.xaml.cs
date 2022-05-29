@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Messages.Auth;
+﻿using CacheLibrary;
+using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Auth.Login;
 using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Users;
@@ -19,6 +20,7 @@ namespace Telegram.View
         public LoginSignupWindow()
         {
             InitializeComponent();
+                
 
             tabControl.IsEnabled = false;
             client = App.Client;
@@ -31,15 +33,24 @@ namespace Telegram.View
                 client?.Disconnect();
         }
         private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
-
+        int myId = -1;
         private void Client_Connected(TcpClientWrap client)
         {
             Dispatcher.Invoke(() =>
             {
-                tabControl.IsEnabled = true;
+                string guid = CacheManager.Instance.LoadGuid();
+                
+                client.MessageReceived += Client_MessageReceived;
+                if (guid != null)
+                {
+                    myId = CacheManager.Instance.LoadUserId();
+                    if (myId != -1)
+                        client.SendAsync(new FastLoginMessage(Environment.MachineName, guid, myId));
+                }
+                else
+                    tabControl.IsEnabled = true;
                 client.Connected -= Client_Connected;
                 client.ConnectFailed -= Client_ConnectFailed;
-                client.MessageReceived += Client_MessageReceived;
             });
         }
 
@@ -65,19 +76,33 @@ namespace Telegram.View
                     if(result.Result == AuthenticationResult.Success)
                     {
                         var info = result.UserInfo;
+                        CacheManager.Instance.SaveGuid(result.Guid);
+                        CacheManager.Instance.SaveUserId(info.Id);
                         if (info.Login == null)
                             info.Login = TB_Login_Id.Text;
                         client.MessageReceived -= Client_MessageReceived;
 
-
-                        wnd = new MainWindow(info);
-                        wnd.Client = App.Client;
-                        wnd.Show();
-                        Close();
+                        GoToMainWnd(info);
+                        
                     } else
                         tabControl.IsEnabled = true;
                 });
             }
+            else if(msg is FastLoginResultMessage)
+            {
+                var result = msg as FastLoginResultMessage;
+                if(result.Result == AuthenticationResult.Success)
+                {
+                    GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
+                }
+            }
+        }
+        private void GoToMainWnd(PublicUserInfo info)
+        {
+            wnd = new MainWindow(info);
+            wnd.Client = App.Client;
+            wnd.Show();
+            Close();
         }
 
         private void ButtonLoginSend_Click(object sender, RoutedEventArgs e)
