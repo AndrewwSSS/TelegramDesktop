@@ -10,9 +10,10 @@ namespace CommonLibrary.Messages.Groups
         public string GroupName { get; set; }
         public string Guid { get; set; }
 
-        public GroupLookupMessage(string GroupName, int userId){
+        public GroupLookupMessage(string GroupName, int userId, string Guid){
             this.GroupName = GroupName;
             this.UserId = userId; 
+            this.Guid = Guid;
         }
 
 

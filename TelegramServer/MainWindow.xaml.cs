@@ -273,7 +273,7 @@ namespace TelegramServer
                         GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                         List<PublicGroupInfo> SuitableGroups = null;
 
-                        UserClient senderClient = Clients.FirstOrDefault(c => c.Gu);
+                        UserClient senderClient = Clients.FirstOrDefault(c => c.Key.Guid == groupLookupMessage.Guid);
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == groupLookupMessage.UserId);
 
 

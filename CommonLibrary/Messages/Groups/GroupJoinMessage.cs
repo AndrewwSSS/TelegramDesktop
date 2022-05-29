@@ -15,6 +15,7 @@ namespace CommonLibrary.Messages.Groups
         {
             this.GroupId = GroupId;
             this.UserId = UserId;
+            this.Guid = Guid;
         }
 
         public GroupJoinMessage() { }
