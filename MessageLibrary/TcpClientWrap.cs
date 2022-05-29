@@ -163,6 +163,12 @@ namespace MessageLibrary
                             MemoryStream stream = new MemoryStream();
                             byte[] buffer = new byte[BUFFER_SIZE];
                             int firstReceive = Tcp.Client.Receive(buffer, BUFFER_SIZE, SocketFlags.None);
+                            if(firstReceive == 0)
+                            {
+
+                                ReceiveAsync();
+                                return;
+                            }    
                             stream.Write(buffer, 4, firstReceive - 4);
 
                             int remaining;
