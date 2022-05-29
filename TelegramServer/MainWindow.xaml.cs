@@ -257,11 +257,8 @@ namespace TelegramServer
                         User sender = DbContext.Users.First(u => u.Id == newMessage.FromUserId);
                         UserClient senderClient = Clients.FirstOrDefault(c => c.Value == client).Key;
 
-
                         sender.Messages.Add(newMessage);
                         chat.Messages.Add(newMessage);
-
-                     
 
                         DbContext.SaveChanges();
 
@@ -302,7 +299,11 @@ namespace TelegramServer
                     {
                         CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
                         List<User> newGroupMembers = null;
-                        User sender = DbContext.Users.First(u => u.Id == createNewGroupMessage.FromUserId);
+
+                        //User sender = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
+
+                        UserClient senderClient = Clients.FirstOrDefault(c => c.Value == client).Key;
+                        User sender = senderClient.User;  
 
                         newGroupMembers = DbContext.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
 
@@ -374,6 +375,7 @@ namespace TelegramServer
 
                             SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
                                                      sender.Id,
+                                                     senderClient.Id,
                                                      newGroupMembers);
                         }
 
@@ -550,9 +552,10 @@ namespace TelegramServer
             {
                 if(user.Id == senderId)
                 {
-                    foreach(var senderClient in user.Clients)
+                    foreach(var userClient in user.Clients)
                     {
-                        if(senderClient.Id == senderId)
+                        if(userClient.Id != senderClientId)
+                            userClient.MessagesToSend.Add(msg);
                     }
                 }
                 else
@@ -560,19 +563,11 @@ namespace TelegramServer
                     foreach (var userClient in user.Clients)
                     {
                         if (isUserOnline(userClient))
-                        {
                             Clients[userClient].SendAsync(msg);
-                        }
                         else
-                        {
                             userClient.MessagesToSend.Add(msg);
-                        }
                     }
                 }
-              
-
-
-            
             }
 
             if(changesExist)

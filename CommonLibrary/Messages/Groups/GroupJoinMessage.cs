@@ -9,8 +9,9 @@ namespace CommonLibrary.Messages.Groups
     {
         public int GroupId { get; set; }
         public int UserId { get; set; }
+        public string Guid { get; set; }
 
-        public GroupJoinMessage(int GroupId, int UserId)
+        public GroupJoinMessage(int GroupId, int UserId, string Guid)
         {
             this.GroupId = GroupId;
             this.UserId = UserId;
