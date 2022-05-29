@@ -23,8 +23,10 @@ namespace CommonLibrary.Messages.Users
         public virtual List<UserClient> Clients { get; set; }
         public virtual List<int> BlockedUsersId { get; set; } 
         public virtual List<GroupChat> Chats { get; set; }
-        public virtual List<BaseMessage> MessagesToSend { get; set; }
         public virtual List<ChatMessage> Messages { get; set; }
+
+        public DateTime LocalRegistrationDate => RegistrationDate.ToLocalTime();
+        public DateTime LocalVisitDate => VisitDate.ToLocalTime();
 
         [NotMapped]
         public DateTime LocalLastVistDate => VisitDate.ToLocalTime();
@@ -34,7 +36,6 @@ namespace CommonLibrary.Messages.Users
         {
             BlockedUsersId = new List<int>();
             Chats = new List<GroupChat>();
-            MessagesToSend = new List<BaseMessage>();
             Clients = new List<UserClient>();
             Banned = false;
             Messages = new List<ChatMessage>();

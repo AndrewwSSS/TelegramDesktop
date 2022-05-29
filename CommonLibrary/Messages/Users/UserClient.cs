@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,14 +14,19 @@ namespace CommonLibrary.Messages.Users
 
         public string MachineName { get; set; }
         public string Guid { get; set; }
+        public User User { get; set; }
+        public virtual List<BaseMessage> MessagesToSend { get; set; }
 
-        public UserClient(string machineName, string guid)
+        public UserClient(string machineName, string guid) : this()
         {
             MachineName = machineName;
             Guid = guid;
         }
 
-        public UserClient() { }
+        public UserClient()
+        {
+            MessagesToSend = new List<BaseMessage>();
+        }
 
     }
 }
