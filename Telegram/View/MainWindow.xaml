@@ -566,7 +566,7 @@
 
         <Grid>
             <Border x:Name="AddGroupMenu"
-                    Opacity="0"
+                    Visibility="Hidden"
                 CornerRadius="5"
                         Background="{StaticResource BgBrush}"
                         HorizontalAlignment="Center" VerticalAlignment="Center">

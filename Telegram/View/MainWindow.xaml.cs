@@ -360,11 +360,14 @@ namespace Telegram
                 var fadeAway = MakeDoubleAnim(0, 0.1);
                 fadeAway.Completed += (v1, v2) =>
                 {
-                    Dispatcher.Invoke(() =>
-                    MainGrid.BeginAnimation(OpacityProperty, MainGridDarkReverse));
+                    Dispatcher.Invoke(() => {
+                        MainGrid.BeginAnimation(OpacityProperty, MainGridDarkReverse);
+                        AddGroupMenu.Visibility = Visibility.Hidden;
+                        });
                 };
                 AddGroupMenuState = MenuState.Hidden;
                 AddGroupMenu.BeginAnimation(OpacityProperty, fadeAway);
+                
             }
         }
 
@@ -389,6 +392,7 @@ namespace Telegram
 
             HideMenus(null, null);
             AddGroupMenuState = MenuState.Open;
+            AddGroupMenu.Visibility = Visibility.Visible;
             AddGroupMenu.Opacity = 0;
             AddGroupMenu.BeginAnimation(OpacityProperty, fadeIn);
 
