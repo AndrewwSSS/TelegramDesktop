@@ -38,14 +38,14 @@ namespace Telegram.View
         {
             Dispatcher.Invoke(() =>
             {
-                string guid = CacheManager.Instance.LoadGuid();
+                App.MyGuid = CacheManager.Instance.LoadGuid();
                 
                 client.MessageReceived += Client_MessageReceived;
-                if (guid != null)
+                if (!String.IsNullOrEmpty(App.MyGuid))
                 {
                     myId = CacheManager.Instance.LoadUserId();
                     if (myId != -1)
-                        client.SendAsync(new FastLoginMessage(Environment.MachineName, guid, myId));
+                        client.SendAsync(new FastLoginMessage(Environment.MachineName, App.MyGuid, myId));
                 }
                 else
                     tabControl.IsEnabled = true;
@@ -76,6 +76,7 @@ namespace Telegram.View
                     if(result.Result == AuthenticationResult.Success)
                     {
                         var info = result.UserInfo;
+                        App.MyGuid = result.Guid;
                         CacheManager.Instance.SaveGuid(result.Guid);
                         CacheManager.Instance.SaveUserId(info.Id);
                         if (info.Login == null)
@@ -94,9 +95,8 @@ namespace Telegram.View
                 {
                     var result = msg as FastLoginResultMessage;
                     if (result.Result == AuthenticationResult.Success)
-                    {
                         GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
-                    }
+                    
                 });
             }
         }

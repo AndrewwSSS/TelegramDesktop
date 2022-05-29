@@ -17,5 +17,11 @@ namespace TESTS
             ArrayMessage<PublicGroupInfo> msg = new ArrayMessage<PublicGroupInfo>(list);
             Message result = Message.FromByteArray(msg.ToByteArray());
         }
+
+        [TestMethod]
+        public void TestUserCaching()
+        {
+
+        }
     }
 }
