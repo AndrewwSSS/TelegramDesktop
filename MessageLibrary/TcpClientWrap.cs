@@ -184,7 +184,7 @@ namespace MessageLibrary
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
+                            Console.WriteLine($"Inner TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
                             Disconnected?.Invoke(this);
                         }
                     });
@@ -192,7 +192,8 @@ namespace MessageLibrary
             }
             catch(Exception ex)
             {
-
+                Console.WriteLine($"Out TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
+                Disconnected?.Invoke(this);
             }
         }
 
