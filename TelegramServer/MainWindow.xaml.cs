@@ -22,7 +22,7 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-        private Dictionary<UserClient, TcpClientWrap> Clients;
+        private Dictionary<UserClient, TcpClientWrap> ClientsOnline;
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;     
 
@@ -32,7 +32,7 @@ namespace TelegramServer
 
 
             DbTelegram = new TelegramDb();
-            Clients = new Dictionary<UserClient, TcpClientWrap>();
+            ClientsOnline = new Dictionary<UserClient, TcpClientWrap>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
           
@@ -137,7 +137,6 @@ namespace TelegramServer
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
 
 
-
                         if (sender != null && sender.Password == loginMessage.Password)
                         {
                             PublicUserInfo UserInfo = new PublicUserInfo()
@@ -146,7 +145,9 @@ namespace TelegramServer
                                 Name = sender.Name
                             };
 
-                            UserClient newUserClient = new UserClient(loginMessage.MachineName, Guid.NewGuid().ToString());
+                            UserClient newUserClient
+                                = new UserClient(loginMessage.MachineName, Guid.NewGuid().ToString());
+
                             newUserClient.User = sender;
                             sender.Clients.Add(newUserClient);
                            
@@ -161,7 +162,7 @@ namespace TelegramServer
 
                             client.Disconnected += OnClientDisconnected;
 
-                            Clients[newUserClient] = client;
+                            ClientsOnline[newUserClient] = client;
 
                             
 
@@ -214,7 +215,7 @@ namespace TelegramServer
                             if(userClient != null && userClient.Guid == fastLoginMessage.Guid)
                             {
                                 client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
-
+                                ClientsOnline[userClient] = client;
                                 Dispatcher.Invoke(() =>
                                 {
                                     UsersOffline.Remove(sender);
@@ -230,6 +231,8 @@ namespace TelegramServer
                                     //tmp
                                     userClient.MachineName = fastLoginMessage.Guid;
                                     client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
+                                    ClientsOnline[userClient] = client;
+
 
                                     Dispatcher.Invoke(() =>
                                     {
@@ -240,14 +243,8 @@ namespace TelegramServer
                                 }
                                 else
                                     client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Denied));
-
                             }
-
-
-
                         }
-
-
                         break;
                     }
                 case "ChatMessage":
@@ -255,7 +252,7 @@ namespace TelegramServer
                         ChatMessage newMessage = (ChatMessage)msg;
                         GroupChat chat = DbTelegram.GroupChats.First(gc => gc.Id == newMessage.GroupId);
                         
-                        UserClient senderClient = Clients.FirstOrDefault(c => c.Value == client).Key;
+                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
                         User sender = senderClient.User;
 
                         sender.Messages.Add(newMessage);
@@ -273,8 +270,8 @@ namespace TelegramServer
                         GroupLookupMessage groupLookupMessage = (GroupLookupMessage)msg;
                         List<PublicGroupInfo> SuitableGroups = null;
 
-                        UserClient senderClient = Clients.FirstOrDefault(c => c.Key.Guid == groupLookupMessage.Guid);
-                        User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == groupLookupMessage.UserId);
+                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == groupLookupMessage.Guid).Key;
+                        User sender = senderClient.User;
 
 
                         foreach (var group in DbTelegram.GroupChats)
@@ -304,9 +301,7 @@ namespace TelegramServer
                         CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
                         List<User> newGroupMembers = null;
 
-                        //User sender = DbContext.Users.FirstOrDefault(u => u.Id == createNewGroupMessage.FromUserId);
-
-                        UserClient senderClient = Clients.FirstOrDefault(c => c.Value == client).Key;
+                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
                         User sender = senderClient.User;  
 
                         newGroupMembers = DbTelegram.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
@@ -468,8 +463,6 @@ namespace TelegramServer
                                              userItem.Images.Add(image);
 
                                          results.Add(userItem);
-                                        
-
                                     }
 
                                 }
@@ -489,7 +482,8 @@ namespace TelegramServer
 
         private void OnClientDisconnected(TcpClientWrap client)
         {
-            UserClient DisconnectedClient = Clients.FirstOrDefault((c) => c.Value == client).Key;
+            UserClient DisconnectedClient
+                = ClientsOnline.FirstOrDefault((c) => c.Value == client).Key;
 
             Action Disconnect = () =>
             {
@@ -497,7 +491,7 @@ namespace TelegramServer
                 {
                     UsersOnline.Remove(DisconnectedClient.User);
                     UsersOffline.Add(DisconnectedClient.User);
-                    Clients.Remove(DisconnectedClient);
+                    ClientsOnline.Remove(DisconnectedClient);
                 });
             };
 
@@ -571,7 +565,7 @@ namespace TelegramServer
                     foreach (var userClient in user.Clients)
                     {
                         if (isUserOnline(userClient))
-                            Clients[userClient].SendAsync(msg);
+                            ClientsOnline[userClient].SendAsync(msg);
                         else
                             userClient.MessagesToSend.Add(msg);
                     }
@@ -603,7 +597,7 @@ namespace TelegramServer
         }
 
 
-        private bool isUserOnline(UserClient userClient) => Clients.ContainsKey(userClient);
+        private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsKey(userClient);
 
   
 

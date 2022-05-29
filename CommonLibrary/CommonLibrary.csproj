@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Containers\GroupItemWrap.cs" />
     <Compile Include="Containers\UserItemWrap.cs" />
+    <Compile Include="Messages\Auth\Logout\LogoutMessage.cs" />
     <Compile Include="Messages\DataRequestResultMessage.cs" />
     <Compile Include="Messages\Auth\Login\FastLoginMessage.cs" />
     <Compile Include="Messages\Auth\Login\FastLoginResultMessage.cs" />
@@ -88,5 +89,6 @@
       <Name>MessageLibrary</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
