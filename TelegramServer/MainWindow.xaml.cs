@@ -215,6 +215,7 @@ namespace TelegramServer
                             if(userClient != null && userClient.Guid == fastLoginMessage.Guid)
                             {
                                 client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
+                                client.Disconnected += OnClientDisconnected;
                                 ClientsOnline[userClient] = client;
                                 Dispatcher.Invoke(() =>
                                 {
@@ -231,6 +232,7 @@ namespace TelegramServer
                                     //tmp
                                     userClient.MachineName = fastLoginMessage.Guid;
                                     client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
+                                    client.Disconnected += OnClientDisconnected;
                                     ClientsOnline[userClient] = client;
 
 
@@ -491,6 +493,7 @@ namespace TelegramServer
                 {
                     UsersOnline.Remove(DisconnectedClient.User);
                     UsersOffline.Add(DisconnectedClient.User);
+
                     ClientsOnline.Remove(DisconnectedClient);
                 });
             };
