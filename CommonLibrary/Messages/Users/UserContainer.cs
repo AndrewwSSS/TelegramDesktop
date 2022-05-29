@@ -20,6 +20,7 @@ namespace CommonLibrary.Messages.Users
         }
         public UserContainer(UserItemWrap user)
         {
+            User = user.User;
             Images = user.Images.ToList();
         }
         public UserItemWrap ToWrap()

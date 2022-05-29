@@ -92,6 +92,7 @@ namespace Telegram
             InitializeComponent();
             HideRightMenu();
             Me = me;
+            Users.Add(new UserItemWrap(me));
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
