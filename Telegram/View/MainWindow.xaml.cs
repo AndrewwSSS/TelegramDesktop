@@ -91,16 +91,7 @@ namespace Telegram
             DataContext = this;
             InitializeComponent();
             HideRightMenu();
-            //Groups.Add(new PublicGroupInfo("TEST", "", -1)
-            //{
-            //    Id = 0,
-            //    Messages = new List<ChatMessage>() { new ChatMessage("Прувет!") },
-            //    Members = new List<PublicUserInfo>() { me, ivan }
-            //});
             Me = me;
-            Users.Add(new UserItemWrap(me));
-            Users.Add(new UserItemWrap(ivan));
-
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
@@ -116,17 +107,7 @@ namespace Telegram
 
 
             Messages = new ObservableCollection<MessageItemWrap>();
-            var respTo = new ChatMessage("Всем привет, это телеграм").SetFrom(Me);
-            //Groups[0].Messages = new List<ChatMessage>()
-            //{
-            //    respTo,
-            //    new ChatMessage("Скоро командный проект").SetFrom(Me).SetResendUser(ivan),
-            //    new ChatMessage("Да, готовьтесь").SetFrom(ivan).SetRespondingTo(respTo),
-            //    new ChatMessage("тест").SetFrom(Me),
-            //    new ChatMessage("тест").SetFrom(Me),
-            //    new ChatMessage("тест").SetFrom(Me),
-            //    new ChatMessage("тест").SetFrom(Me)
-            //};
+
 
             Closing += OnClosed;
         }
@@ -397,7 +378,7 @@ namespace Telegram
                 if (e.Key == Key.Enter)
                     if (Client.IsConnected)
                     {
-                        Client.SendAsync(new GroupLookupMessage(textBox.Text, Me.Id));
+                        Client.SendAsync(new GroupLookupMessage(textBox.Text, Me.Id, App.MyGuid));
                     }
         }
 
@@ -473,7 +454,7 @@ namespace Telegram
             if (LB_FoundGroups.SelectedIndex == -1)
                 return;
             var group = LB_FoundGroups.SelectedItem as GroupItemWrap;
-            Client.SendAsync(new GroupJoinMessage(group.GroupChat.Id, Me.Id));
+            Client.SendAsync(new GroupJoinMessage(group.GroupChat.Id, Me.Id, App.MyGuid));
         }
 
         public GroupItemWrap CurGroup { 

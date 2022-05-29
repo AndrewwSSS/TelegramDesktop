@@ -16,5 +16,6 @@ namespace Telegram
     public partial class App : Application
     {
         public static TcpClientWrap Client { get;  set; }= new TcpClientWrap(IPAddress.Parse("26.87.230.148"), 5000);
+        public static string MyGuid { get; set; }
     }
 }

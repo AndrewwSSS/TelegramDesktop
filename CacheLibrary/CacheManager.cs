@@ -34,14 +34,14 @@ namespace CacheLibrary
         public void SaveUser(UserItemWrap user)
         {
             UserContainer container = new UserContainer(user);
-            Save(Path.Combine(DIR_USERS, $"{user.User.Id}.bin"), user);
+            Save(Path.Combine(DIR_USERS, $"{user.User.Id}.bin"), container);
         }
         public UserItemWrap LoadUser(int id)
         {
             var fileName = Path.Combine(DIR_USERS, $"{id}.bin");
             return Load<UserContainer>(fileName).ToWrap();
         }
-        private UserItemWrap LoadUser(string path) => Load<UserItemWrap>(Path.Combine(DIR_USERS, path));
+        private UserItemWrap LoadUser(string path) => Load<UserContainer>(Path.Combine(DIR_USERS, path)).ToWrap();
         public List<UserItemWrap> LoadAllUsers()
         {
             var result = new List<UserItemWrap>();
