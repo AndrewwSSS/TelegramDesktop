@@ -1,0 +1,57 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Style TargetType="ContextMenu">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+
+                        <Border Background="#17212b"   
+                                CornerRadius="5"
+                                Width="200">
+
+                            <StackPanel IsItemsHost="True"
+                                        KeyboardNavigation.DirectionalNavigation="Cycle"
+                                        Margin="0, 5, 0, 5"                                              />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        
+                        <Border x:Name="Border">
+                            
+                            <TextBlock Text="{TemplateBinding Header}"
+                                       Foreground="#e9ecf0"
+                                       FontSize="15"
+                                       x:Name="TextBlock"
+                                       Margin="10, 0, 0, 0"
+                                       Padding="5"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+
+                                <Setter TargetName="Border"
+                                        Property="Background"
+                                        Value="#232e3c"
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+
+</ResourceDictionary>

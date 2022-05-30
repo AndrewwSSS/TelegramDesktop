@@ -481,7 +481,7 @@ namespace TelegramServer
                     }
                 case "ClientDisconnectMessage":
                     {
-                        client.DisconnectAsync();
+                        //client.DisconnectAsync();
                         break;
                     }
             }
@@ -491,18 +491,6 @@ namespace TelegramServer
         {
             UserClient DisconnectedClient
                 = ClientsOnline.FirstOrDefault((c) => c.Value == client).Key;
-
-            //Action Disconnect = () =>
-            //{
-            //    UsersOnline.Remove(DisconnectedClient.User);
-            //    UsersOffline.Add(DisconnectedClient.User);
-
-            //    ClientsOnline.Remove(DisconnectedClient);
-            //};
-
-            //if (Dispatcher.CheckAccess())
-            //    Disconnect.Invoke();
-            //else
 
             Dispatcher.Invoke(() =>
             {

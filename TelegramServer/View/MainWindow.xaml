@@ -14,13 +14,14 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="BrushDictionary.xaml"/>
+                <ResourceDictionary Source="StylesDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
     <Window.Style>
         <Style TargetType="Window">
-            <Setter Property="Background" Value="{StaticResource BgBrush}"/>
+            <Setter Property="Background" Value="#0e1621"/>
         </Style>
     </Window.Style>
 
@@ -75,56 +76,9 @@
                 </GradientBrush.GradientStops>
             </LinearGradientBrush>
 
-            <Style TargetType="ContextMenu">
-                <Style.Setters>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ContextMenu">
-                                
-                                <Border Background="{StaticResource BgBrush}"
-                                        BorderThickness="2"
-                                        CornerRadius="5"
-                                        BorderBrush="{StaticResource DarkGreyBrush}"
-                                        Width="200"
-                                        >
-                                    
-                                    <StackPanel IsItemsHost="True"
-                                                KeyboardNavigation.DirectionalNavigation="Cycle"
-                                                Margin="2, 10, 2, 10"
-                                                />
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style.Setters>
-            </Style>
+           
             
-            <Style TargetType="MenuItem">
-                <Style.Setters>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="MenuItem">
-                                <Border x:Name="Border">
-                                    <TextBlock Text="{TemplateBinding Header}"
-                                               Foreground="{StaticResource DarkGreyBrush}"
-                                               FontSize="15"
-                                               x:Name="TextBlock"/>
-                                </Border>
-
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource DarkGreyBrush}"/>
-                                        <Setter TargetName="TextBlock" Property="Foreground" Value="{StaticResource BgBrush}"/>
-                                    </Trigger>
-
-
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style.Setters>
-            </Style>
-
+        
             <Style x:Key="ScrollBarLineButton" TargetType="{x:Type RepeatButton}">
 
                 <Setter Property="Visibility" Value="Hidden"/>
@@ -307,9 +261,9 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="Button">
                                 <Border  x:Name="border" 
-                                            Background="{StaticResource BgBrush}"
-                                            BorderThickness="1"
-                                            BorderBrush="{StaticResource DarkGreyBrush}">
+                                         Background="#282E33"
+                                        
+                                         CornerRadius="5">
 
                                     <TextBlock Text="{TemplateBinding Property=Content}"
                                                    Foreground="White" 
@@ -322,13 +276,24 @@
                                     <Trigger Property="IsMouseOver" Value="true">
                                         <Setter TargetName="border"
                                                     Property="Background"
-                                                    Value="{StaticResource MsgBgBrush}"/>
+                                                    Value="#2b5278"/>
                                     </Trigger>
 
-                                    <Trigger Property="IsEnabled" Value="False">
+                                    <Trigger Property="IsEnabled"
+                                             Value="False">
+                                        
                                         <Setter TargetName="border"
-                                                    Property="Background"
-                                                    Value="{StaticResource DarkBgBrush}"/>
+                                                Property="Background"
+                                                Value="#19191D"/>
+                                        
+                                        <Setter TargetName="border"
+                                                Property="BorderThickness"
+                                                Value="1"/>
+
+                                        <Setter TargetName="border"
+                                                Property="BorderBrush"
+                                                Value="#b0b0b0"/>
+
                                     </Trigger>
 
                                 </ControlTemplate.Triggers>
@@ -344,9 +309,10 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <Border Background="{StaticResource BlueBrush}"
+                                <Border Background="#182533"
                                         Margin="5, 5, 2, 5"
-                                        CornerRadius="5">
+                                        CornerRadius="5"
+                                        Width="Auto">
                                     <Grid Margin="5">
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
@@ -361,11 +327,13 @@
 
                                             <TextBlock Grid.Column="0"
                                                        Text="Name:"
-                                                       FontSize="17"/>
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
                                                        Text="{Binding Name}"
-                                                       FontSize="17"/>
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
                                         </Grid>
 
                                         <Grid Grid.Row="1">
@@ -376,11 +344,13 @@
 
                                             <TextBlock Grid.Column="0"
                                                        Text="Members count:"
-                                                       FontSize="17"/>
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
                                                        Text="{Binding Path=Members.Count}"
-                                                       FontSize="17"/>
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
                                         </Grid>
 
                                     </Grid>
@@ -398,8 +368,7 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
 
-                                <Border Background="{StaticResource LightBlueBrush}"
-                                        BorderBrush="{StaticResource DarkBgBrush}"
+                                <Border Background="#182533" 
                                         BorderThickness="2"
                                         CornerRadius="5"
                                         Margin="2, 5, 2, 5">
@@ -418,12 +387,14 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0"
-                                               Text="Login:"
-                                               FontSize="17"/>
+                                                       Text="Login:"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
-                                               Text="{Binding Login}"
-                                               FontSize="17"/>
+                                                       Text="{Binding Login}"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
                                         </Grid>
 
                                         <Grid Grid.Row="1">
@@ -433,12 +404,14 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0"
-                                               Text="Name:"
-                                               FontSize="17"/>
+                                                       Text="Name:"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
-                                               Text="{Binding Name}"
-                                               FontSize="17"/>
+                                                       Text="{Binding Name}"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
                                         </Grid>
 
                                         <Grid Grid.Row="2">
@@ -448,13 +421,15 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0"
-                                                   Text="Last visit date:"
-                                                   FontSize="17"/>
+                                                       Text="Last visit date:"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
 
 
                                             <TextBlock Grid.Column="1"
-                                                   Text="{Binding LocalLastVistDate}"
-                                                   FontSize="17"/>
+                                                       Text="{Binding LocalLastVistDate}"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
 
 
                                         </Grid>
@@ -486,11 +461,11 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
-                                <Border Background="{StaticResource LightBlueBrush}"
+                                <Border Background="#182533"
                                         BorderBrush="Green"
                                         BorderThickness="2"
                                         CornerRadius="5"
-                                         Margin="2, 5, 2, 5">
+                                        Margin="2, 5, 2, 5">
 
                                     <Grid Margin="5">
                                         <Grid.RowDefinitions>
@@ -507,11 +482,13 @@
 
                                             <TextBlock Grid.Column="0"
                                                        Text="Login:"
-                                                       FontSize="17"/>
+                                                       FontSize="17"
+                                                       Foreground="#f5f5f5"/>
 
                                             <TextBlock Grid.Column="1"
                                                        Text="{Binding Login}"
-                                                       FontSize="17"/>
+                                                       FontSize="17"
+                                                       Foreground="#f5f5f5"/>
                                         </Grid>
 
                                         <Grid Grid.Row="1">
@@ -521,12 +498,14 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0"
-                                               Text="Name:"
-                                               FontSize="17"/>
+                                                       Text="Name:"
+                                                       FontSize="17"
+                                                       Foreground="#f5f5f5"/>
 
                                             <TextBlock Grid.Column="1"
-                                               Text="{Binding Name}"
-                                               FontSize="17"/>
+                                                       Text="{Binding Name}"
+                                                       FontSize="17"
+                                                       Foreground="#f5f5f5"/>
                                         </Grid>
                                     </Grid>
 
@@ -587,7 +566,7 @@
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            FontSize="20"
-                           Foreground="{StaticResource DarkGreyBrush}"/>
+                           Foreground="#b0b0b0"/>
 
                 <TextBox Grid.Column="1"
                          VerticalContentAlignment="Center"
@@ -595,8 +574,8 @@
                          FontSize="20"
                          Text="5000"
                          x:Name="TB_ListenerPort"
-                         Background="{StaticResource BgBrush}"
-                         Foreground="{StaticResource DarkGreyBrush}"/>
+                         Background="#282E33"
+                         Foreground="#b0b0b0"/>
             </Grid>
 
 
@@ -614,12 +593,12 @@
                       FontSize="20"
                       Grid.Row="1"
                       Margin="5, 5, 5, 0"
-                      Foreground="{StaticResource DarkGreyBrush}"
-                      BorderBrush="{StaticResource DarkGreyBrush}">
+                      Foreground="#b0b0b0"
+                      BorderBrush="#b0b0b0">
 
                 <ListBox Grid.Row="1" 
                          x:Name="LB_UsersOnline"
-                         Background="{StaticResource BgBrush}"
+                         Background="#0e1621"
                          BorderThickness="0"
                          ScrollViewer.CanContentScroll="False"
                          ItemContainerStyle="{StaticResource ListBoxItemUserOnline}"/>
@@ -629,13 +608,13 @@
             <GroupBox Grid.Column="1"
                       Header="Users offline"
                       FontSize="20"
-                      Foreground="{StaticResource DarkGreyBrush}"
-                      BorderBrush="{StaticResource DarkGreyBrush}"
+                      Foreground="#b0b0b0"
+                      BorderBrush="#b0b0b0"
                       Margin="5, 5, 5, 0">
 
                 <ListBox Grid.Row="1" 
                          x:Name="LB_UsersOffline"
-                         Background="{StaticResource BgBrush}"
+                         Background="#0e1621"
                          BorderThickness="0"
                          ScrollViewer.CanContentScroll="False"
                          ItemContainerStyle="{StaticResource ListBoxItemUserOffline}"/>
@@ -649,10 +628,10 @@
                   Header="Groups"
                   FontSize="20"
                   Margin="5"
-                  Foreground="{StaticResource DarkGreyBrush}"
-                  BorderBrush="{StaticResource DarkGreyBrush}">
+                  Foreground="#b0b0b0"
+                  BorderBrush="#b0b0b0">
 
-            <ListBox Background="{StaticResource BgBrush}"
+            <ListBox Background="#0e1621"
                      BorderThickness="0"
                      ItemContainerStyle="{StaticResource ListBoxItemGroup}"
                      x:Name="LB_Groups"
