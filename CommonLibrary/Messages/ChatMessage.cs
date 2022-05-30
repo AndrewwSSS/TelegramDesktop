@@ -10,7 +10,7 @@ namespace CommonLibrary.Messages
   
         public int FromUserId { get; set; }
         public int RepostUserId { get; set; } = -1;
-        public int RespondingTo { get; set; } = -1;
+        public ChatMessage RespondingTo { get; set; }
 
         public List<int> ImagesId { get; set; }
         public List<int> FilesId { get; set; }
@@ -59,7 +59,7 @@ namespace CommonLibrary.Messages
 
         public ChatMessage SetRespondingTo(ChatMessage msg)
         {
-            RespondingTo = msg.Id;
+            RespondingTo = msg;
             return this;
         }
 

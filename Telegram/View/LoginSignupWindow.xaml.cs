@@ -33,7 +33,7 @@ namespace Telegram.View
                 client?.Disconnect();
         }
         private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
-        int myId = -1;
+        int myId { get; set; } = -1;
         private void Client_Connected(TcpClientWrap client)
         {
             Dispatcher.Invoke(() =>
@@ -41,7 +41,7 @@ namespace Telegram.View
                 App.MyGuid = CacheManager.Instance.LoadGuid();
                 
                 client.MessageReceived += Client_MessageReceived;
-                if (!String.IsNullOrEmpty(App.MyGuid))
+                if (!string.IsNullOrEmpty(App.MyGuid))
                 {
                     myId = CacheManager.Instance.LoadUserId();
                     if (myId != -1)

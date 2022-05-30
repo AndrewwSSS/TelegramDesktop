@@ -1,7 +1,9 @@
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Groups;
 using MessageLibrary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TESTS
 {
@@ -11,11 +13,12 @@ namespace TESTS
         [TestMethod]
         public void TestMethod1()
         {
-            List<PublicGroupInfo> list = new List<PublicGroupInfo>() {
-                new PublicGroupInfo("adat","",-1)
+            List<ChatMessage> list = new List<ChatMessage>() {
+                new ChatMessage("adat")
             };
-            ArrayMessage<PublicGroupInfo> msg = new ArrayMessage<PublicGroupInfo>(list);
-            Message result = Message.FromByteArray(msg.ToByteArray());
+            ArrayMessage<ChatMessage> msg = new ArrayMessage<ChatMessage>(list);
+            byte[] arr = msg.ToByteArray();
+            Message result = Message.FromByteArray(arr.ToList().GetRange(4,arr.Length-4).ToArray());
         }
 
         [TestMethod]

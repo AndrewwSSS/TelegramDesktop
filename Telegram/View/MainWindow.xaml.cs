@@ -22,6 +22,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using Telegram.Utility;
+using Telegram.WPF_Entities;
 
 namespace Telegram
 {
@@ -38,6 +39,8 @@ namespace Telegram
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public UICommand MessageDoubleClick { get; set; }
 
         public TcpClientWrap Client
         {
@@ -81,10 +84,16 @@ namespace Telegram
 
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
         public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description")) { }
+        
         public MainWindow(PublicUserInfo me)
         {
 
             CacheManager.Instance.CachePath = "Cache\\";
+            MessageDoubleClick = new UICommand((o) => true, (obj) =>
+              {
+                  MessageItemWrap wrap = (MessageItemWrap)obj;
+                  Buffers.RespondingTo = wrap;
+              });
             LoadCache();
 
 
@@ -115,9 +124,6 @@ namespace Telegram
         private List<GroupItemWrap> CachedGroups { get; set; } = new List<GroupItemWrap>();
         private void OnClosed(object sender, EventArgs e)
         {
-
-            if (Me != null)
-                Client?.Send(new ClientDisconnectMessage(Me.Id));
             Client?.Disconnect();
             SaveCache();
         }
@@ -227,9 +233,7 @@ namespace Telegram
                     {
                         var user = Users.FirstOrDefault(u => u.User.Id == info.NewUser.Id);
                         if (user == null)
-                        {
                             Client.SendAsync(new DataRequestMessage(info.NewUser.Id, RequestType.User));
-                        }
                         else
                             Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
                     }
@@ -241,10 +245,10 @@ namespace Telegram
         {
             MessageItemWrap item = new MessageItemWrap(msg);
             item.FromUser = Users.First(u => u.User.Id == msg.FromUserId);
-            if (msg.RespondingTo != -1)
-                item.RespondingTo = Messages.First(m => m.Message.Id == msg.RespondingTo);
+            
+            item.RespondingTo = new MessageItemWrap(msg.RespondingTo);
             if (msg.RepostUserId != -1)
-                item.RepostUser = Users.First(u => u.User.Id == msg.RepostUserId);
+                item.RepostUser = Users.FirstOrDefault(u => u.User.Id == msg.RepostUserId);
 
             var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msg.GroupId);
 
@@ -480,6 +484,8 @@ namespace Telegram
                 if (CurGroup != null && e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
                     ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.GroupChat.Id);
+                    if (Buffers.RespondingTo != null)
+                        msg.SetRespondingTo(Buffers.RespondingTo.Message);
                     Client.SendAsync(msg);
 
                     CurGroup.GroupChat.Messages.Add(msg);
