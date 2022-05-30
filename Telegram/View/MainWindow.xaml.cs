@@ -245,8 +245,12 @@ namespace Telegram
         {
             MessageItemWrap item = new MessageItemWrap(msg);
             item.FromUser = Users.First(u => u.User.Id == msg.FromUserId);
-            
-            item.RespondingTo = new MessageItemWrap(msg.RespondingTo);
+
+            if (msg.RespondingTo != null)
+            {
+                item.RespondingTo = new MessageItemWrap(msg.RespondingTo);
+                item.RespondingTo.FromUser = Users.Find(u => u.User.Id == msg.RespondingTo.FromUserId);
+            }
             if (msg.RepostUserId != -1)
                 item.RepostUser = Users.FirstOrDefault(u => u.User.Id == msg.RepostUserId);
 
@@ -483,7 +487,9 @@ namespace Telegram
                 var textBox = sender as TextBox;
                 if (CurGroup != null && e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
-                    ChatMessage msg = new ChatMessage(textBox.Text).SetFrom(Me).SetGroupId(CurGroup.GroupChat.Id);
+                    ChatMessage msg = new ChatMessage(textBox.Text)
+                    .SetFrom(Me)
+                    .SetGroupId(CurGroup.GroupChat.Id);
                     if (Buffers.RespondingTo != null)
                         msg.SetRespondingTo(Buffers.RespondingTo.Message);
                     Client.SendAsync(msg);
