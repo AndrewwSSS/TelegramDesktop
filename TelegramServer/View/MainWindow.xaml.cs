@@ -95,6 +95,7 @@ namespace TelegramServer
 
         private void ClientMessageRecived(TcpClientWrap client, Message msg)
         {
+            Console.WriteLine($"Message recieved. Type {msg.GetType().Name}");
             switch (msg.GetType().Name)
             {
                 case "SignUpStage1Message":
@@ -164,9 +165,7 @@ namespace TelegramServer
 
                             ClientsOnline[newUserClient] = client;
 
-                            
-
-
+                           
                             Dispatcher.Invoke(() =>
                             {
                                 UsersOffline.Remove(sender);
@@ -217,6 +216,7 @@ namespace TelegramServer
                                 client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
                                 client.Disconnected += OnClientDisconnected;
                                 ClientsOnline[userClient] = client;
+
                                 Dispatcher.Invoke(() =>
                                 {
                                     UsersOffline.Remove(sender);
@@ -230,7 +230,7 @@ namespace TelegramServer
                                 if(userClient != null)
                                 {
                                     //tmp
-                                    userClient.MachineName = fastLoginMessage.Guid;
+                                    userClient.MachineName = fastLoginMessage.MachineName;
                                     client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
                                     client.Disconnected += OnClientDisconnected;
                                     ClientsOnline[userClient] = client;
@@ -479,6 +479,11 @@ namespace TelegramServer
 
                         break;
                     }
+                case "ClientDisconnectMessage":
+                    {
+                        //client.DisconnectAsync();
+                        break;
+                    }
             }
         }
 
@@ -487,21 +492,13 @@ namespace TelegramServer
             UserClient DisconnectedClient
                 = ClientsOnline.FirstOrDefault((c) => c.Value == client).Key;
 
-            Action Disconnect = () =>
+            Dispatcher.Invoke(() =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    UsersOnline.Remove(DisconnectedClient.User);
-                    UsersOffline.Add(DisconnectedClient.User);
+                UsersOnline.Remove(DisconnectedClient.User);
+                UsersOffline.Add(DisconnectedClient.User);
 
-                    ClientsOnline.Remove(DisconnectedClient);
-                });
-            };
-
-            if (Dispatcher.CheckAccess())
-                Disconnect.Invoke();
-            else
-                Dispatcher.Invoke(() => { Disconnect.Invoke(); });
+                ClientsOnline.Remove(DisconnectedClient);
+            });
         }
 
         #endregion ServerEvents
