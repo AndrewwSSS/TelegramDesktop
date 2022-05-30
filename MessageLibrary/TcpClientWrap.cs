@@ -101,12 +101,12 @@ namespace MessageLibrary
         public void Disconnect()
         {
             Disconnected?.Invoke(this);
+            client?.Client?.Close();
             client?.Close();
         }
         public void DisconnectAsync()
         {
-            Disconnected?.Invoke(this);
-            Task.Run(() => client?.Close());
+            Task.Run(Disconnect);
         }
         public bool Send(Message message)
         {
@@ -165,8 +165,7 @@ namespace MessageLibrary
                             int firstReceive = Tcp.Client.Receive(buffer, BUFFER_SIZE, SocketFlags.None);
                             if(firstReceive == 0)
                             {
-
-                                ReceiveAsync();
+                                Disconnected?.Invoke(this);
                                 return;
                             }    
                             stream.Write(buffer, 4, firstReceive - 4);
