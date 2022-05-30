@@ -43,7 +43,7 @@
 
                                 <Setter TargetName="Border"
                                         Property="Background"
-                                        Value="#232e3c"
+                                        Value="#232e3c"/>
                             </Trigger>
 
                         </ControlTemplate.Triggers>

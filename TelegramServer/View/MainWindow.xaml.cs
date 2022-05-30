@@ -158,8 +158,8 @@ namespace TelegramServer
                                 UserInfo.Login = sender.Login;
 
 
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, newUserClient.Guid));
-                            sender.VisitDate = DateTime.UtcNow;
+                            //client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, newUserClient.Guid));
+                            
 
                             client.Disconnected += OnClientDisconnected;
 
@@ -176,9 +176,7 @@ namespace TelegramServer
                             DbTelegram.SaveChanges();
 
                             if(sender.Messages.Count != 0)
-                            {
                                 client.SendAsync(new ArrayMessage<ChatMessage>(sender.Messages));
-                            }
 
                            
 
@@ -492,6 +490,9 @@ namespace TelegramServer
             UserClient DisconnectedClient
                 = ClientsOnline.FirstOrDefault((c) => c.Value == client).Key;
 
+            DisconnectedClient.User.VisitDate = DateTime.UtcNow;
+            DbTelegram.SaveChanges();
+
             Dispatcher.Invoke(() =>
             {
                 UsersOnline.Remove(DisconnectedClient.User);
@@ -595,7 +596,6 @@ namespace TelegramServer
 
             return result;
         }
-
 
         private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsKey(userClient);
 
