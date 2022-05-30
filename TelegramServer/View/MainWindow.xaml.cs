@@ -158,7 +158,7 @@ namespace TelegramServer
                                 UserInfo.Login = sender.Login;
 
 
-                            //client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, newUserClient.Guid));
+                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, newUserClient.Guid));
                             
 
                             client.Disconnected += OnClientDisconnected;
