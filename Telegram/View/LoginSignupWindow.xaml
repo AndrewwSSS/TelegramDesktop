@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Telegram.View"
         mc:Ignorable="d"
+        MinHeight="450"
+        MinWidth="800"
         Title="Вход в телеграм" Height="450" Width="800">
     <Window.Resources>
         <ResourceDictionary>
