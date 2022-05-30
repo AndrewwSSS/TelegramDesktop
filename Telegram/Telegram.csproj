@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="View\MainWindow.Caching.cs" />
     <Compile Include="WPF Entities\AndConverter.cs" />
+    <Compile Include="WPF Entities\UICommand.cs" />
     <Compile Include="WPF Entities\NotNullConverter.cs" />
     <Page Include="View\BrushDictionary.xaml">
       <SubType>Designer</SubType>

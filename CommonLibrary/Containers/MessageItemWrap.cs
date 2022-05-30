@@ -12,6 +12,8 @@ namespace CommonLibrary.Containers
 {
     public class MessageItemWrap : INotifyPropertyChanged
     {
+        public MessageItemWrap Self => this;
+
         private bool showAvatar = false;
         public ChatMessage Message { get; set; }
         public UserItemWrap FromUser { get; set; }
