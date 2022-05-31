@@ -6,7 +6,7 @@ using System;
 namespace CommonLibrary.Messages
 {
     [Serializable]
-    public class PersonalChatCreatedMessage : Message
+    public class PersonalChatCreatedMessage : BaseMessage
     {
         public PublicGroupInfo Group { get; set; }
         

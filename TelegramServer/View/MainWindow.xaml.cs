@@ -323,12 +323,25 @@ namespace TelegramServer
 
 
                             DbTelegram.GroupChats.Add(newChat);
+                            newChat.Members.Add(sender);
+                            newChat.Members.Add(toUser);
                             DbTelegram.SaveChanges();
 
 
                             client.SendAsync(new FirstPersonalResultMessage(newChat.Id));
 
-                            SendMessageToUsers()
+
+                            PublicGroupInfo newChatInfo = new PublicGroupInfo()
+                            {
+                                Id = newChat.Id,
+                            };
+                            newChatInfo.MembersId.AddRange(new List<int>() { sender.Id, toUser.Id });
+
+                            SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
+                                               sender.Id,
+                                               senderClient.Id,
+                                               new List<User> { sender, toUser }
+                                               );
 
 
 
