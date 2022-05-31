@@ -97,6 +97,8 @@ namespace Telegram
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
         public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description")) { }
 
+        public List<int> FoundUsersPending = new List<int>();
+
         public MainWindow(PublicUserInfo me)
         {
 
@@ -110,12 +112,12 @@ namespace Telegram
                   });
               });
             LoadCache();
-
-
-            DataContext = this;
-            InitializeComponent();
-            HideRightMenu();
-            Me = me;
+            FoundUsers.Add(Users[0]);
+                                     
+            DataContext = this;      
+            InitializeComponent();   
+            HideRightMenu();         
+            Me = me;                 
             Users.Add(new UserItemWrap(me));
 
             RighMenuState = MenuState.Hidden;
@@ -143,7 +145,7 @@ namespace Telegram
             SaveCache();
         }
 
-        private void Client_MessageReceived(TcpClientWrap client, Message msg)
+        public void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
             Dispatcher.Invoke(() =>
             {
@@ -184,20 +186,26 @@ namespace Telegram
                         {
                             group.Members.Add(user);
                         }
+                        if (FoundUsersPending.Contains(user.User.Id)) {
+                            FoundUsers.Add(user);
+                            FoundUsersPending.Remove(user.User.Id);
+                        }
                     }
                 }
                 else if (msg is ChatLookupResultMessage)
                 {
                     var result = msg as ChatLookupResultMessage;
-                    var array = result.Groups;
-                    if (array != null && array.Count!= 0)
+                    var groups = result.Groups;
+                    var users = result.Users;
+                    if (users.Count != 0)
                     {
-                        B_CloseFoundGroups.IsEnabled = true;
-                        LB_FoundGroups.Visibility = Visibility.Visible;
-
+                        FoundUsers.Clear();
+                    }
+                    if (groups.Count!= 0)
+                    {
                         FoundGroups.Clear();
                         List<int> requestedId = new List<int>();
-                        foreach (var group in array)
+                        foreach (var group in groups)
                         {
                             var cachedGroup = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == group.Id);
                             if (cachedGroup != null)
@@ -449,6 +457,7 @@ namespace Telegram
 
         private void Client_MessageSent(TcpClientWrap client, Message msg)
         {
+
         }
 
         private void TB_GroupName_TextChanged(object sender, TextChangedEventArgs e)
@@ -478,12 +487,12 @@ namespace Telegram
             ShowGroupMessages(CurGroup);
         }
 
-        private void B_CloseFoundGroups_Click(object sender, RoutedEventArgs e)
+        private void B_CloseFoundLB_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
             button.IsEnabled = false;
             FoundGroups.Clear();
-            LB_FoundGroups.Visibility = Visibility.Hidden;
+            FoundUsers.Clear();
             B_JoinGroup.Visibility = Visibility.Hidden;
         }
 

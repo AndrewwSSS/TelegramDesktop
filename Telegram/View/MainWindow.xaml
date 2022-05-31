@@ -212,29 +212,73 @@
                             <TextBox KeyDown="TB_GroupLookUp_OnEnter" Margin="2"
                                      Style="{StaticResource SearchBoxStyle}"/>
                         </Grid>
-                        <Button x:Name="B_CloseFoundGroups"
-                                Click="B_CloseFoundGroups_Click"
-                                IsEnabled="False" 
+                        <Button x:Name="B_CloseFoundLB"
+                                Click="B_CloseFoundLB_Click"
                                 Grid.Row="0" Grid.Column="1" 
                                 Width="32" Height="32" 
+                                Content="X"
+                                
                                 Style="{StaticResource BLight}">
-                            X
+                            <Button.Resources>
+                                <entities:VisibilityToBoolConverter x:Key="visToBool"/>
+                            </Button.Resources>
+                            <Button.IsEnabled>
+                                <Binding ElementName="FoundListboxesGrid" Path="Visibility" Converter="{StaticResource visToBool}"/>
+                            </Button.IsEnabled>
                         </Button>
+
                         <ListBox x:Name="LB_Groups" 
-                                 Grid.Row="1"  
-                                 Grid.ColumnSpan="2"
+                                 Grid.Row="1" Grid.ColumnSpan="2"
                                  ItemsSource="{Binding Groups}"
                                  SelectionChanged="GroupSelected"
                                  Style="{StaticResource LBGroup}">
                         </ListBox>
-                        <ListBox x:Name="LB_FoundGroups"
+                        <StackPanel Background="{StaticResource DarkBgBrush}" x:Name="FoundListboxesGrid"
+                              
+                                    Grid.Row="1" Grid.ColumnSpan="2">
+                            <StackPanel.Resources>
+                                <BooleanToVisibilityConverter x:Key="boolToVis"/>
+                            </StackPanel.Resources>
+                            <ListBox x:Name="LB_FoundUsers"
+                                     Grid.Row="0"
+                                     ItemsSource="{Binding FoundUsers}"
+                                     Style="{StaticResource LBUsers}"
+                                     />
+                            <Border  Height="2" Margin="2,5" 
+                                     Background="{StaticResource DarkGreyBrush}" 
+                                     CornerRadius="2"
+                                     Visibility="{Binding ElementName=LB_FoundGroups, Path=HasItems, Converter={StaticResource boolToVis}}">
+                            </Border>
+                            <ListBox x:Name="LB_FoundGroups"
                                  Grid.Row="1"
-                                 Grid.ColumnSpan="2"
                                  ItemsSource="{Binding FoundGroups}"
                                  SelectionChanged="FoundGroupSelected"
                                  Style="{StaticResource LBGroup}"
-                                 Visibility="Hidden">
-                        </ListBox>
+                                 >
+                            </ListBox>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Resources>
+                                        <entities:OrConverter x:Key="or"/>
+                                    </Style.Resources>
+                                    <Style.Setters>
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </Style.Setters>
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource or}">
+                                                    <Binding ElementName="LB_FoundGroups" Path="HasItems"/>
+                                                    <Binding ElementName="LB_FoundUsers" Path="HasItems"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                        </StackPanel>
                         <TextBlock  Grid.Row="1" Margin="15"
                                 x:Name="TB_GroupsNotFound"   
                                 Visibility="Hidden"
@@ -321,170 +365,170 @@
                             </UniformGrid>
                         </Grid>
 
-                            <ListBox Grid.Row="1" 
+                        <ListBox Grid.Row="1" 
                                      x:Name="LB_Messages" 
                                      ItemsSource="{Binding Messages}" 
                                      Background="{StaticResource DarkBgBrush}"
                                      BorderThickness="0"
                                      Style="{StaticResource LB_Messages}"
                                      HorizontalContentAlignment="Stretch">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.InputBindings>
-                                                <MouseBinding MouseAction="LeftDoubleClick"
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.InputBindings>
+                                            <MouseBinding MouseAction="LeftDoubleClick"
                                     Command="{Binding DataContext.MessageDoubleClick, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
                                     CommandParameter="{Binding Self}" />
-                                            </Grid.InputBindings>
+                                        </Grid.InputBindings>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <Grid Grid.Column="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <!--Аватар пользователя-->
-                                                <ContentControl x:Name="userIcon" Grid.Column="0" VerticalAlignment="Bottom">
-                                                    <ContentControl.Style>
-                                                        <Style TargetType="ContentControl">
-                                                            <Style.Resources>
-                                                                <entities:NotNullConverter x:Key="notnull" />
+                                            <!--Аватар пользователя-->
+                                            <ContentControl x:Name="userIcon" Grid.Column="0" VerticalAlignment="Bottom">
+                                                <ContentControl.Style>
+                                                    <Style TargetType="ContentControl">
+                                                        <Style.Resources>
+                                                            <entities:NotNullConverter x:Key="notnull" />
 
-                                                            </Style.Resources>
-                                                            <Style.Setters>
+                                                        </Style.Resources>
+                                                        <Style.Setters>
 
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate>
+                                                                        <Border Grid.Column="0" Grid.Row="1" Height="32" Width="32" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
+                                                                            <Image Source="{Binding FromUser.Images[0].ImageSource}">
+                                                                                <Image.Clip>
+                                                                                    <EllipseGeometry Center="16,16" RadiusX="16" RadiusY="16"/>
+                                                                                </Image.Clip>
+                                                                            </Image>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style.Setters>
+
+                                                        <Style.Triggers>
+                                                            <DataTrigger Value="False" Binding="{Binding ShowAvatar}">
+                                                                <Setter Property="Visibility" Value="Hidden"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Value="0" Binding="{Binding FromUser.Images.Count}">
                                                                 <Setter Property="Template">
                                                                     <Setter.Value>
                                                                         <ControlTemplate>
-                                                                            <Border Grid.Column="0" Grid.Row="1" Height="32" Width="32" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
-                                                                                <Image Source="{Binding FromUser.Images[0].ImageSource}">
-                                                                                    <Image.Clip>
-                                                                                        <EllipseGeometry Center="16,16" RadiusX="16" RadiusY="16"/>
-                                                                                    </Image.Clip>
-                                                                                </Image>
-                                                                            </Border>
-                                                                        </ControlTemplate>
-
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </Style.Setters>
-
-                                                            <Style.Triggers>
-                                                                <DataTrigger Value="False" Binding="{Binding ShowAvatar}">
-                                                                    <Setter Property="Visibility" Value="Hidden"/>
-                                                                </DataTrigger>
-                                                                <DataTrigger Value="0" Binding="{Binding FromUser.Images.Count}">
-                                                                    <Setter Property="Template">
-                                                                        <Setter.Value>
-                                                                            <ControlTemplate>
-                                                                                <Border 
+                                                                            <Border 
                                                                                 Grid.Column="0" Grid.Row="1"
                                                                                 Height="32" Width="32" 
                                                                                 Margin="0,0,5,0" 
                                                                                 CornerRadius="360"
                                                                                 Background="HotPink">
-                                                                                    <TextBlock 
+                                                                                <TextBlock 
                                                                                     VerticalAlignment="Center" HorizontalAlignment="Center"
                                                                                     Text="{Binding FromUser.User.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
-                                                                                    </TextBlock>
-                                                                                </Border>
-                                                                            </ControlTemplate>
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </ContentControl.Style>
-                                                </ContentControl>
-                                                <!--Тело сообщения-->
-                                                <Border Name="border" Background="{StaticResource MsgBgBrush}" CornerRadius="8" Grid.Column="1">
-                                                    <Grid Margin="9" >
-                                                        <Grid.RowDefinitions>
-                                                            <!--Имя пользователя, от которого переслано сообщение(может не быть)-->
-                                                            <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
-                                                            <!--Имя пользователя, пославшего сообщение(может не быть)-->
-                                                            <RowDefinition x:Name="author" Height="0"></RowDefinition>
-                                                            <RowDefinition x:Name="response" Height="Auto"></RowDefinition>
-                                                            <RowDefinition Height="Auto"></RowDefinition>
-                                                        </Grid.RowDefinitions>
-                                                        <Grid.ColumnDefinitions>
-                                                            <!--Для иконки-->
-                                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                                        </Grid.ColumnDefinitions>
+                                                                                </TextBlock>
+                                                                            </Border>
+                                                                        </ControlTemplate>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ContentControl.Style>
+                                            </ContentControl>
+                                            <!--Тело сообщения-->
+                                            <Border Name="border" Background="{StaticResource MsgBgBrush}" CornerRadius="8" Grid.Column="1">
+                                                <Grid Margin="9" >
+                                                    <Grid.RowDefinitions>
+                                                        <!--Имя пользователя, от которого переслано сообщение(может не быть)-->
+                                                        <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
+                                                        <!--Имя пользователя, пославшего сообщение(может не быть)-->
+                                                        <RowDefinition x:Name="author" Height="0"></RowDefinition>
+                                                        <RowDefinition x:Name="response" Height="Auto"></RowDefinition>
+                                                        <RowDefinition Height="Auto"></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <!--Для иконки-->
+                                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
 
 
-                                                        <TextBlock  Margin="0,0,0,2" Text="{Binding RepostUser.Name, StringFormat={}переслано от {0}}" 
+                                                    <TextBlock  Margin="0,0,0,2" Text="{Binding RepostUser.Name, StringFormat={}переслано от {0}}" 
                                                        Foreground="{StaticResource LightBlueBrush}" FontSize="12"
                                                            Grid.Row="0"
                                                            Grid.Column="1"/>
-                                                        <TextBlock 
+                                                    <TextBlock 
                                                     Grid.Row="1"
                                                     Grid.Column="1"
                                                     FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.User.Name}" Margin="0,0,0,2"/>
-                                                        <!--Сообщение, на которое отвечаем-->
-                                                        <Grid PreviewMouseDown="Responce_OnClick" Grid.Row="2" Grid.Column="1" Margin="0,2,0,5">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                            </Grid.ColumnDefinitions>
+                                                    <!--Сообщение, на которое отвечаем-->
+                                                    <Grid PreviewMouseDown="Responce_OnClick" Grid.Row="2" Grid.Column="1" Margin="0,2,0,5">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
 
-                                                            <GridSplitter Grid.Column="0" Width="2" Margin="0,0,8,0" HorizontalAlignment="Stretch" Background="{StaticResource BlueBrush}"/>
-                                                            <StackPanel Grid.Column="1">
-                                                                <TextBlock
+                                                        <GridSplitter Grid.Column="0" Width="2" Margin="0,0,8,0" HorizontalAlignment="Stretch" Background="{StaticResource BlueBrush}"/>
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock
                                                             Grid.Row="1"
                                                             Grid.Column="1"
                                                             FontSize="12" Foreground="{StaticResource LightBlueBrush}" 
                                                             Text="{Binding RespondingTo.FromUser.User.Name}"
                                                             Margin="0,0,0,5"/>
-                                                                <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Message.Text}"/>
-                                                            </StackPanel>
-                                                        </Grid>
-                                                        <StackPanel Grid.Column="1" Grid.Row="3">
+                                                            <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Message.Text}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <StackPanel Grid.Column="1" Grid.Row="3">
 
-                                                            <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" TextWrapping="Wrap" Text="{Binding Message.Text}"></TextBlock>
-                                                            <TextBlock HorizontalAlignment="Right" 
+                                                        <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" TextWrapping="Wrap" Text="{Binding Message.Text}"></TextBlock>
+                                                        <TextBlock HorizontalAlignment="Right" 
                                                                Margin="9,0,0,0" 
                                                                FontSize="12" 
                                                                Foreground="{StaticResource DarkGreyBrush}" 
                                                                Text="{Binding FormattedTime}"></TextBlock>
-                                                        </StackPanel>
-                                                    </Grid>
-                                                </Border>
-                                            </Grid>
-                                            <Border Grid.Column="1" Background="Transparent"></Border>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
                                         </Grid>
-                                        <DataTemplate.Triggers>
-                                            
-                                            <DataTrigger Binding="{Binding RespondingTo}" Value="{x:Null}">
-                                                <Setter TargetName="response" Property="Height" Value="0"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding RepostUser}" Value="{x:Null}">
-                                                <Setter TargetName="resend" Property="Height" Value="0" />
-                                                <Setter TargetName="author" Property="Height" Value="Auto" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ShowUsername}" Value="false">
-                                                <Setter TargetName="author" Property="Height" Value="0"/>
-                                            </DataTrigger>
-                                            <DataTrigger
+                                        <Border Grid.Column="1" Background="Transparent"></Border>
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+
+                                        <DataTrigger Binding="{Binding RespondingTo}" Value="{x:Null}">
+                                            <Setter TargetName="response" Property="Height" Value="0"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RepostUser}" Value="{x:Null}">
+                                            <Setter TargetName="resend" Property="Height" Value="0" />
+                                            <Setter TargetName="author" Property="Height" Value="Auto" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ShowUsername}" Value="false">
+                                            <Setter TargetName="author" Property="Height" Value="0"/>
+                                        </DataTrigger>
+                                        <DataTrigger
                                                 Binding="{Binding
                                                     RelativeSource={RelativeSource
                                                     Mode=FindAncestor,
                                                     AncestorType={x:Type ListBoxItem}},
                                                     Path=IsSelected}"
                                                 Value="True">
-                                                    <Setter
+                                            <Setter
                                                 TargetName="border"
                                                 Property="Background"
                                                 Value="{StaticResource MsgBgBrushLight}"/>
-                                            </DataTrigger>
-                                        </DataTemplate.Triggers>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
 
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
                         <Grid Background="{StaticResource BgBrush}" Grid.Row="2" x:Name="SendMsgGrid">
                             <Grid.ColumnDefinitions>

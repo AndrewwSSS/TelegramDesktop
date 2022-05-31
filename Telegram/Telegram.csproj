@@ -62,8 +62,10 @@
     </Compile>
     <Compile Include="View\MainWindow.Caching.cs" />
     <Compile Include="WPF Entities\AndConverter.cs" />
+    <Compile Include="WPF Entities\OrConverter.cs" />
     <Compile Include="WPF Entities\UICommand.cs" />
     <Compile Include="WPF Entities\NotNullConverter.cs" />
+    <Compile Include="WPF Entities\VisibilityToBoolConverter.cs" />
     <Page Include="View\BrushDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
