@@ -186,10 +186,11 @@ namespace Telegram
                         }
                     }
                 }
-                else if (msg is ArrayMessage<PublicGroupInfo>)
+                else if (msg is ChatLookupResultMessage)
                 {
-                    var array = (msg as ArrayMessage<PublicGroupInfo>).Array;
-                    if (array != null && array.Length != 0)
+                    var result = msg as ChatLookupResultMessage;
+                    var array = result.Groups;
+                    if (array != null && array.Count!= 0)
                     {
                         B_CloseFoundGroups.IsEnabled = true;
                         LB_FoundGroups.Visibility = Visibility.Visible;
@@ -283,9 +284,16 @@ namespace Telegram
                 item.Message.FromUserId == Me.Id)
             {
                 if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
-                    Messages.Last().ShowAvatar = false;
+                        Messages.Last().ShowAvatar = false;
+                else
+                    item.ShowUsername = true;
+                if (item.Message.FromUserId == Me.Id)
+                    item.ShowUsername = false;
                 item.ShowAvatar = true;
                 Messages.Add(item);
+                LB_Messages.SelectedIndex = LB_Messages.Items.Count - 1;
+                LB_Messages.ScrollIntoView(LB_Messages.SelectedItem);
+
             }
         }
         private void ShowGroupMessages(GroupItemWrap group)
@@ -407,7 +415,7 @@ namespace Telegram
                 if (e.Key == Key.Enter)
                     if (Client.IsConnected)
                     {
-                        Client.SendAsync(new GroupLookupMessage(textBox.Text, Me.Id, App.MyGuid));
+                        Client.SendAsync(new ChatLookupMessage(textBox.Text, Me.Id, App.MyGuid));
                     }
         }
 

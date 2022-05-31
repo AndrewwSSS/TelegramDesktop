@@ -15,7 +15,6 @@ namespace CommonLibrary.Containers
     public class GroupItemWrap : INotifyPropertyChanged
     {
         private PublicGroupInfo group;
-
         public ObservableCollection<UserItemWrap> Members { get; set; } = new ObservableCollection< UserItemWrap >();
         public PublicGroupInfo GroupChat
         {

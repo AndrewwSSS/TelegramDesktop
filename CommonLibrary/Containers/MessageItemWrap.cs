@@ -12,9 +12,12 @@ namespace CommonLibrary.Containers
 {
     public class MessageItemWrap : INotifyPropertyChanged
     {
+        // для WPFов
         public MessageItemWrap Self => this;
 
         private bool showAvatar = false;
+        private bool showUsername = false;
+
         public ChatMessage Message { get; set; }
         public UserItemWrap FromUser { get; set; }
         public MessageItemWrap RespondingTo { get; set; }
@@ -26,6 +29,14 @@ namespace CommonLibrary.Containers
             set
             {
                 showAvatar = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool ShowUsername { 
+            get => showUsername;
+            set
+            {
+                showUsername = value;
                 OnPropertyChanged();
             }
         }
