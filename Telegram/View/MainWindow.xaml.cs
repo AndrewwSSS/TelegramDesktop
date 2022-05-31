@@ -186,10 +186,11 @@ namespace Telegram
                         }
                     }
                 }
-                else if (msg is ArrayMessage<PublicGroupInfo>)
+                else if (msg is ChatLookupResultMessage)
                 {
-                    var array = (msg as ArrayMessage<PublicGroupInfo>).Array;
-                    if (array != null && array.Length != 0)
+                    var result = msg as ChatLookupResultMessage;
+                    var array = result.Groups;
+                    if (array != null && array.Count!= 0)
                     {
                         B_CloseFoundGroups.IsEnabled = true;
                         LB_FoundGroups.Visibility = Visibility.Visible;
