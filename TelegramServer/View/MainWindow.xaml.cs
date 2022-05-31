@@ -301,6 +301,44 @@ namespace TelegramServer
 
                         break;
                     }
+                case "FirstPersonalMessage":
+                    {
+                        FirstPersonalMessage firstPersonalMessage
+                                = (FirstPersonalMessage)msg;
+
+                        UserClient senderClient =
+                            ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
+
+                        User sender = senderClient.User;
+
+                        User toUser = DbTelegram.Users.FirstOrDefault(u => u.Id == firstPersonalMessage.ToUserId);
+
+                        if(toUser != null && senderClient != null)
+                        {
+                            GroupChat newChat = new GroupChat()
+                            {
+                                DateCreated = DateTime.UtcNow,
+                                Type = GroupType.Personal
+                            };
+
+
+                            DbTelegram.GroupChats.Add(newChat);
+                            DbTelegram.SaveChanges();
+
+
+                            client.SendAsync(new FirstPersonalResultMessage(newChat.Id));
+
+                            SendMessageToUsers()
+
+
+
+
+                        }
+
+
+
+                        break;
+                    }
                 case "CreateGroupMessage":
                     {
                         CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
@@ -577,6 +615,7 @@ namespace TelegramServer
                 DbTelegram.SaveChanges();
         }
 
+ 
         public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group, int MaxMessagesCount = 50)
         {
             PublicGroupInfo result = new PublicGroupInfo(group.Name,
