@@ -14,10 +14,8 @@ namespace CommonLibrary.Messages.Groups
     {
         public int Id { get; set; }
         public GroupType GroupType { get; set; }
-
         public List<int> MembersId { get; set; }
         public List<ChatMessage> Messages { get; set; }
-         
 
         public PublicGroupInfo(string name, string desc, int id) : this()
         {

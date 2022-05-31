@@ -225,8 +225,7 @@
                                  Grid.ColumnSpan="2"
                                  ItemsSource="{Binding Groups}"
                                  SelectionChanged="GroupSelected"
-                                 Style="{StaticResource LBGroup}"
-                                 >
+                                 Style="{StaticResource LBGroup}">
                         </ListBox>
                         <ListBox x:Name="LB_FoundGroups"
                                  Grid.Row="1"
@@ -322,10 +321,12 @@
                             </UniformGrid>
                         </Grid>
 
-                        <ScrollViewer 
-                                 Grid.Row="1">
-                            <ListBox ItemsSource="{Binding Messages}" Background="{StaticResource DarkBgBrush}"
-                                 BorderThickness="0"
+                            <ListBox Grid.Row="1" 
+                                     x:Name="LB_Messages" 
+                                     ItemsSource="{Binding Messages}" 
+                                     Background="{StaticResource DarkBgBrush}"
+                                     BorderThickness="0"
+                                     Style="{StaticResource LB_Messages}"
                                      HorizontalContentAlignment="Stretch">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -341,7 +342,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Grid Grid.Column="0">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="auto"/>
+                                                    <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <!--Аватар пользователя-->
@@ -443,7 +444,7 @@
                                                         </Grid>
                                                         <StackPanel Grid.Column="1" Grid.Row="3">
 
-                                                            <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" Text="{Binding Message.Text}"></TextBlock>
+                                                            <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" TextWrapping="Wrap" Text="{Binding Message.Text}"></TextBlock>
                                                             <TextBlock HorizontalAlignment="Right" 
                                                                Margin="9,0,0,0" 
                                                                FontSize="12" 
@@ -464,6 +465,9 @@
                                                 <Setter TargetName="resend" Property="Height" Value="0" />
                                                 <Setter TargetName="author" Property="Height" Value="Auto" />
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding ShowUsername}" Value="false">
+                                                <Setter TargetName="author" Property="Height" Value="0"/>
+                                            </DataTrigger>
                                             <DataTrigger
                                                 Binding="{Binding
                                                     RelativeSource={RelativeSource
@@ -481,7 +485,6 @@
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                        </ScrollViewer>
 
                         <Grid Background="{StaticResource BgBrush}" Grid.Row="2" x:Name="SendMsgGrid">
                             <Grid.ColumnDefinitions>

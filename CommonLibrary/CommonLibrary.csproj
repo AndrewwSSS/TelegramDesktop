@@ -54,13 +54,14 @@
     <Compile Include="Messages\Auth\Login\FastLoginResultMessage.cs" />
     <Compile Include="Messages\Auth\SignUp\SignUpStage2Message.cs" />
     <Compile Include="Messages\Auth\SignUp\SignUpStage2ResultMessage.cs" />
+    <Compile Include="Messages\Groups\ChatLookupResultMessage.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
     <Compile Include="Messages\Auth\AuthenticationResult.cs" />
     <Compile Include="Messages\Groups\CreateGroupResultMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinResultMessage.cs" />
-    <Compile Include="Messages\Groups\GroupLookupMessage.cs" />
+    <Compile Include="Messages\Groups\ChatLookupMessage.cs" />
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\DataRequestMessage.cs" />
     <Compile Include="Messages\Groups\GroupUpdateMessage.cs" />
