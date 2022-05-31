@@ -267,10 +267,10 @@ namespace TelegramServer
                     }
                 case "ChatLookupMessage":
                     {
-                        ChatLookupMessage groupLookupMessage = (ChatLookupMessage)msg;
+                        ChatLookupMessage chatLookupMessage = (ChatLookupMessage)msg;
                     
 
-                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == groupLookupMessage.UserGuid).Key;
+                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == chatLookupMessage.UserGuid).Key;
                         User sender = senderClient.User;
 
                         ChatLookupResultMessage resultMessage =
@@ -279,21 +279,25 @@ namespace TelegramServer
 
                         foreach (var group in DbTelegram.GroupChats)
                         {
-                            if (group.Name.ToLower().Contains(groupLookupMessage.Name.ToLower())
-                                && !sender.Chats.Any(chat => chat.Id == group.Id))
+                            if (group.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
+                                && !sender.Chats.Any(chat => chat.Id == group.Id)
+                                && group.Type != GroupType.Personal)
                             {
                                 resultMessage.Groups.Add(PublicGroupInfoFromGroup(group));
 
                             }
                         }
 
+                        foreach(var user in DbTelegram.Users)
+                        {
+                            if(user.Name.Contains(chatLookupMessage.Name)
+                               && user.Login.Contains(chatLookupMessage.Name))
+                            {
+                                resultMessage.UsersId.Add(user.Id); 
+                            }
+                        }
 
-
-
-
-                     
-
-                        client.SendAsync(result);
+                        client.SendAsync(resultMessage);
 
                         break;
                     }
