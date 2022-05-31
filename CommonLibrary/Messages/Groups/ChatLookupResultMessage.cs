@@ -14,10 +14,17 @@ namespace CommonLibrary.Messages.Groups
         public List<PublicGroupInfo> Groups { get; set; }
         public List<int> UsersId { get; set; }
 
-        public ChatLookupResultMessage(IEnumerable<int> usersId, IEnumerable<PublicGroupInfo> groups) 
+        public ChatLookupResultMessage(IEnumerable<int> usersId, IEnumerable<PublicGroupInfo> groups) : this() 
         {
             UsersId = usersId.ToList();
             Groups = groups.ToList();
         }
+
+        public ChatLookupResultMessage()
+        {
+            UsersId = new List<int>();
+            Groups = new List<PublicGroupInfo>();
+        }
+
     }
 }

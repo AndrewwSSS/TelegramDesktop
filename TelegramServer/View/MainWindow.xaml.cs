@@ -265,13 +265,16 @@ namespace TelegramServer
                         break;
 
                     }
-                case "GroupLookupMessage":
+                case "ChatLookupMessage":
                     {
                         ChatLookupMessage groupLookupMessage = (ChatLookupMessage)msg;
-                        List<PublicGroupInfo> SuitableGroups = null;
+                    
 
                         UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == groupLookupMessage.UserGuid).Key;
                         User sender = senderClient.User;
+
+                        ChatLookupResultMessage resultMessage =
+                            new ChatLookupResultMessage();
 
 
                         foreach (var group in DbTelegram.GroupChats)
@@ -279,18 +282,16 @@ namespace TelegramServer
                             if (group.Name.ToLower().Contains(groupLookupMessage.Name.ToLower())
                                 && !sender.Chats.Any(chat => chat.Id == group.Id))
                             {
-
-                                if (SuitableGroups == null)
-                                    SuitableGroups = new List<PublicGroupInfo>();
-
-                                SuitableGroups.Add(PublicGroupInfoFromGroup(group));
+                                resultMessage.Groups.Add(PublicGroupInfoFromGroup(group));
 
                             }
                         }
 
 
-                        ArrayMessage<PublicGroupInfo> result
-                            = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+
+
+
+                     
 
                         client.SendAsync(result);
 
