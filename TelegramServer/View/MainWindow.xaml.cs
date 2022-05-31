@@ -202,10 +202,12 @@ namespace TelegramServer
                 case "FastLoginMessage":
                     {
                         FastLoginMessage fastLoginMessage = (FastLoginMessage)msg;
-
+                       
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
 
-                        if(sender != null)
+                        ClientMessageHandler onMessagesSent = null;
+
+                        if (sender != null)
                         {
                             UserClient userClient = sender.Clients.FirstOrDefault(c => c.MachineName == fastLoginMessage.MachineName);
 
@@ -214,6 +216,23 @@ namespace TelegramServer
                                 client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
                                 client.Disconnected += OnClientDisconnected;
                                 ClientsOnline[userClient] = client;
+
+                                
+
+
+                                if(userClient.MessagesToSend.Count > 0)
+                                {
+                                    onMessagesSent = (cl, message) =>
+                                    {
+                                        userClient.MessagesToSend.Clear();
+                                        client.MessageSent -= onMessagesSent;
+                                    };
+
+                                    client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
+                                    client.MessageSent += onMessagesSent;
+                                }
+                          
+
 
                                 Dispatcher.Invoke(() =>
                                 {
@@ -234,11 +253,25 @@ namespace TelegramServer
                                     ClientsOnline[userClient] = client;
 
 
+                                    if (userClient.MessagesToSend.Count > 0)
+                                    {
+                                        onMessagesSent = (cl, message) =>
+                                        {
+                                            userClient.MessagesToSend.Clear();
+                                            client.MessageSent -= onMessagesSent;
+                                        };
+
+                                        client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
+                                        client.MessageSent += onMessagesSent;
+                                    }
+
                                     Dispatcher.Invoke(() =>
                                     {
                                         UsersOffline.Remove(sender);
                                         UsersOnline.Add(sender);
                                     });
+
+
 
                                 }
                                 else
@@ -340,11 +373,8 @@ namespace TelegramServer
                             SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
                                                sender.Id,
                                                senderClient.Id,
-                                               new List<User> { sender, toUser }
+                                               newChat.Members
                                                );
-
-
-
 
                         }
 
