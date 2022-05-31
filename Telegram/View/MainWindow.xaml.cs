@@ -35,6 +35,17 @@ namespace Telegram
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public MessageItemWrap RespondingTo
+        {
+            get => respondingTo;
+            set
+            {
+                respondingTo = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -52,7 +63,7 @@ namespace Telegram
                 client.MessageReceived += Client_MessageReceived;
             }
         }
-        public const int LeftMenuWidth = 280;
+        public const int LeftMenuWidth = 290;
         public MenuState RighMenuState { get; set; }
         public MenuState LeftMenuState { get; set; }
         public MenuState AddGroupMenuState { get; set; }
@@ -68,6 +79,7 @@ namespace Telegram
         private ObservableCollection<MessageItemWrap> messages;
         private TcpClientWrap client;
         private GroupItemWrap curGroup;
+        private MessageItemWrap respondingTo;
 
         public PublicUserInfo Me { get; set; }
         public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
@@ -84,15 +96,18 @@ namespace Telegram
 
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
         public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description")) { }
-        
+
         public MainWindow(PublicUserInfo me)
         {
 
             CacheManager.Instance.CachePath = "Cache\\";
             MessageDoubleClick = new UICommand((o) => true, (obj) =>
               {
-                  MessageItemWrap wrap = (MessageItemWrap)obj;
-                  Buffers.RespondingTo = wrap;
+                  Dispatcher.Invoke(() =>
+                  {
+                      MessageItemWrap wrap = (MessageItemWrap)obj;
+                      RespondingTo = wrap;
+                  });
               });
             LoadCache();
 
@@ -184,7 +199,7 @@ namespace Telegram
                         foreach (var group in array)
                         {
                             var cachedGroup = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == group.Id);
-                            if(cachedGroup != null)
+                            if (cachedGroup != null)
                             {
                                 FoundGroups.Add(cachedGroup);
                                 continue;
@@ -276,6 +291,7 @@ namespace Telegram
         private void ShowGroupMessages(GroupItemWrap group)
         {
             Messages.Clear();
+            RespondingTo = null;
             if (CurGroup.GroupChat.Messages != null)
                 foreach (var msg in group.Messages)
                     AddMessage(msg);
@@ -368,14 +384,15 @@ namespace Telegram
                 var fadeAway = MakeDoubleAnim(0, 0.1);
                 fadeAway.Completed += (v1, v2) =>
                 {
-                    Dispatcher.Invoke(() => {
+                    Dispatcher.Invoke(() =>
+                    {
                         MainGrid.BeginAnimation(OpacityProperty, MainGridDarkReverse);
                         AddGroupMenu.Visibility = Visibility.Hidden;
-                        });
+                    });
                 };
                 AddGroupMenuState = MenuState.Hidden;
                 AddGroupMenu.BeginAnimation(OpacityProperty, fadeAway);
-                
+
             }
         }
 
@@ -470,7 +487,8 @@ namespace Telegram
             Client.SendAsync(new GroupJoinMessage(group.GroupChat.Id, Me.Id, App.MyGuid));
         }
 
-        public GroupItemWrap CurGroup { 
+        public GroupItemWrap CurGroup
+        {
 
             get => curGroup;
             set
@@ -490,18 +508,26 @@ namespace Telegram
                     ChatMessage msg = new ChatMessage(textBox.Text)
                     .SetFrom(Me)
                     .SetGroupId(CurGroup.GroupChat.Id);
-                    if (Buffers.RespondingTo != null)
-                        msg.SetRespondingTo(Buffers.RespondingTo.Message);
+                    if (RespondingTo != null)
+                    {
+                        msg.SetRespondingTo(RespondingTo.Message);
+                        RespondingTo = null;
+                    }
                     Client.SendAsync(msg);
 
                     CurGroup.GroupChat.Messages.Add(msg);
                     CurGroup.OnPropertyChanged("Messages");
                     CurGroup.OnPropertyChanged("LastMessage");
-
+                    
                     AddMessage(msg);
                     textBox.Text = "";
                 }
             });
+        }
+
+        private void CloseRespondingToPanel(object sender, RoutedEventArgs e)
+        {
+            RespondingTo = null;
         }
     }
 
