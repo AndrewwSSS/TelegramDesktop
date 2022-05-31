@@ -7,9 +7,10 @@ namespace CommonLibrary.Messages
     public class FirstPersonalResultMessage : Message
     {
         public int GroupId { get; set; }
-
-        public FirstPersonalResultMessage(int groupId) {
+        public int LocalId { get; set; }
+        public FirstPersonalResultMessage(int groupId, int localId) {
             this.GroupId = groupId;
+            LocalId = localId;
         }
 
     }

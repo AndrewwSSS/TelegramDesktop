@@ -196,7 +196,7 @@ namespace Telegram
                 {
                     var result = msg as ChatLookupResultMessage;
                     var groups = result.Groups;
-                    var users = result.Users;
+                    var users = result.UsersId;
                     if (users.Count != 0)
                     {
                         FoundUsers.Clear();
