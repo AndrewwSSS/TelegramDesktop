@@ -22,7 +22,6 @@ namespace CommonLibrary.Messages
 
         public ChatMessage(string text) : this()
         {
-
             Text = text;
         }
 

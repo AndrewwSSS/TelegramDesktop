@@ -202,10 +202,12 @@ namespace TelegramServer
                 case "FastLoginMessage":
                     {
                         FastLoginMessage fastLoginMessage = (FastLoginMessage)msg;
-
+                       
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
 
-                        if(sender != null)
+                        ClientMessageHandler onMessagesSent = null;
+
+                        if (sender != null)
                         {
                             UserClient userClient = sender.Clients.FirstOrDefault(c => c.MachineName == fastLoginMessage.MachineName);
 
@@ -214,6 +216,23 @@ namespace TelegramServer
                                 client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
                                 client.Disconnected += OnClientDisconnected;
                                 ClientsOnline[userClient] = client;
+
+                                
+
+
+                                if(userClient.MessagesToSend.Count > 0)
+                                {
+                                    onMessagesSent = (cl, message) =>
+                                    {
+                                        userClient.MessagesToSend.Clear();
+                                        client.MessageSent -= onMessagesSent;
+                                    };
+
+                                    client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
+                                    client.MessageSent += onMessagesSent;
+                                }
+                          
+
 
                                 Dispatcher.Invoke(() =>
                                 {
@@ -234,11 +253,25 @@ namespace TelegramServer
                                     ClientsOnline[userClient] = client;
 
 
+                                    if (userClient.MessagesToSend.Count > 0)
+                                    {
+                                        onMessagesSent = (cl, message) =>
+                                        {
+                                            userClient.MessagesToSend.Clear();
+                                            client.MessageSent -= onMessagesSent;
+                                        };
+
+                                        client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
+                                        client.MessageSent += onMessagesSent;
+                                    }
+
                                     Dispatcher.Invoke(() =>
                                     {
                                         UsersOffline.Remove(sender);
                                         UsersOnline.Add(sender);
                                     });
+
+
 
                                 }
                                 else
@@ -265,34 +298,87 @@ namespace TelegramServer
                         break;
 
                     }
-                case "GroupLookupMessage":
+                case "ChatLookupMessage":
                     {
-                        ChatLookupMessage groupLookupMessage = (ChatLookupMessage)msg;
-                        List<PublicGroupInfo> SuitableGroups = null;
+                        ChatLookupMessage chatLookupMessage = (ChatLookupMessage)msg;
+                    
 
-                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == groupLookupMessage.UserGuid).Key;
+                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == chatLookupMessage.UserGuid).Key;
                         User sender = senderClient.User;
+
+                        ChatLookupResultMessage resultMessage =
+                            new ChatLookupResultMessage();
 
 
                         foreach (var group in DbTelegram.GroupChats)
                         {
-                            if (group.Name.ToLower().Contains(groupLookupMessage.Name.ToLower())
-                                && !sender.Chats.Any(chat => chat.Id == group.Id))
+                            if (group.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
+                                && !sender.Chats.Any(chat => chat.Id == group.Id)
+                                && group.Type != GroupType.Personal)
                             {
-
-                                if (SuitableGroups == null)
-                                    SuitableGroups = new List<PublicGroupInfo>();
-
-                                SuitableGroups.Add(PublicGroupInfoFromGroup(group));
+                                resultMessage.Groups.Add(PublicGroupInfoFromGroup(group));
 
                             }
                         }
 
+                        foreach(var user in DbTelegram.Users)
+                        {
+                            if(user.Name.Contains(chatLookupMessage.Name)
+                               && user.Login.Contains(chatLookupMessage.Name))
+                            {
+                                resultMessage.UsersId.Add(user.Id); 
+                            }
+                        }
 
-                        ArrayMessage<PublicGroupInfo> result
-                            = new ArrayMessage<PublicGroupInfo>(SuitableGroups);
+                        client.SendAsync(resultMessage);
 
-                        client.SendAsync(result);
+                        break;
+                    }
+                case "FirstPersonalMessage":
+                    {
+                        FirstPersonalMessage firstPersonalMessage
+                                = (FirstPersonalMessage)msg;
+
+                        UserClient senderClient =
+                            ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
+
+                        User sender = senderClient.User;
+
+                        User toUser = DbTelegram.Users.FirstOrDefault(u => u.Id == firstPersonalMessage.ToUserId);
+
+                        if(toUser != null && senderClient != null)
+                        {
+                            GroupChat newChat = new GroupChat()
+                            {
+                                DateCreated = DateTime.UtcNow,
+                                Type = GroupType.Personal
+                            };
+
+
+                            DbTelegram.GroupChats.Add(newChat);
+                            newChat.Members.Add(sender);
+                            newChat.Members.Add(toUser);
+                            DbTelegram.SaveChanges();
+
+
+                            client.SendAsync(new FirstPersonalResultMessage(newChat.Id));
+
+
+                            PublicGroupInfo newChatInfo = new PublicGroupInfo()
+                            {
+                                Id = newChat.Id,
+                            };
+                            newChatInfo.MembersId.AddRange(new List<int>() { sender.Id, toUser.Id });
+
+                            SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
+                                               sender.Id,
+                                               senderClient.Id,
+                                               newChat.Members
+                                               );
+
+                        }
+
+
 
                         break;
                     }
@@ -572,6 +658,7 @@ namespace TelegramServer
                 DbTelegram.SaveChanges();
         }
 
+ 
         public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group, int MaxMessagesCount = 50)
         {
             PublicGroupInfo result = new PublicGroupInfo(group.Name,

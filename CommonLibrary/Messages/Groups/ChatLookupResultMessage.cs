@@ -12,12 +12,19 @@ namespace CommonLibrary.Messages.Groups
     public class ChatLookupResultMessage : Message
     {
         public List<PublicGroupInfo> Groups { get; set; }
-        public List<int> Users { get; set; }
+        public List<int> UsersId { get; set; }
 
-        public ChatLookupResultMessage(IEnumerable<int> userId, IEnumerable<PublicGroupInfo> groups) 
+        public ChatLookupResultMessage(IEnumerable<int> usersId, IEnumerable<PublicGroupInfo> groups) : this() 
         {
-            Users = userId.ToList();
+            UsersId = usersId.ToList();
             Groups = groups.ToList();
         }
+
+        public ChatLookupResultMessage()
+        {
+            UsersId = new List<int>();
+            Groups = new List<PublicGroupInfo>();
+        }
+
     }
 }
