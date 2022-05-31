@@ -477,11 +477,6 @@ namespace TelegramServer
 
                         break;
                     }
-                case "ClientDisconnectMessage":
-                    {
-                        //client.DisconnectAsync();
-                        break;
-                    }
             }
         }
 
@@ -598,10 +593,5 @@ namespace TelegramServer
         }
 
         private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsKey(userClient);
-
-  
-
-
-    
     }
 }
