@@ -305,12 +305,7 @@ namespace TelegramServer
 
                         UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == chatLookupMessage.UserGuid).Key;
                         User sender = senderClient.User;
-
-
-                        
-
-
-
+   
                         ChatLookupResultMessage resultMessage =
                             new ChatLookupResultMessage();
 
@@ -328,9 +323,10 @@ namespace TelegramServer
 
                         foreach(var user in DbTelegram.Users)
                         {
-                            if (user.Name.Contains(chatLookupMessage.Name)
-                               && user.Login.Contains(chatLookupMessage.Name)
-                               && user.Id != sender.Id)
+                            if (user.Id != sender.Id &&
+                                (user.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
+                               || user.Login.ToLower().Contains(chatLookupMessage.Name.ToLower()))
+                               )
                             {
                                 resultMessage.UsersId.Add(user.Id); 
                             }
@@ -360,18 +356,17 @@ namespace TelegramServer
                                 Type = GroupType.Personal
                             };
 
-
-                            DbTelegram.GroupChats.Add(newChat);
                             newChat.Members.Add(sender);
                             newChat.Members.Add(toUser);
 
+                        
                             Dispatcher.Invoke(() =>
                             {
                                 DbTelegram.GroupChats.Add(newChat);
                                 DbTelegram.SaveChanges();
                                 DbTelegram.GroupChats.Load();
                             });
-                            DbTelegram.SaveChanges();
+                            
 
 
                             client.SendAsync(new FirstPersonalResultMessage(newChat.Id, firstPersonalMessage.LocalId));
@@ -423,7 +418,8 @@ namespace TelegramServer
                         {
                             Name = createNewGroupMessage.Name,
                             Members = new List<User>() { sender },
-                            DateCreated = DateTime.UtcNow
+                            DateCreated = DateTime.UtcNow,
+                            Type = GroupType.Public
                         };
 
                         if(createNewGroupMessage.Image != null)
@@ -676,7 +672,8 @@ namespace TelegramServer
         {
             PublicGroupInfo result = new PublicGroupInfo(group.Name,
                                                          group.Description,
-                                                         group.Id);
+                                                         group.Id
+                                                         );
 
             if (group.Messages.Count >= MaxMessagesCount)
                 result.Messages.AddRange(group.Messages.GetRange(0, MaxMessagesCount-1));
@@ -684,10 +681,11 @@ namespace TelegramServer
                 result.Messages.AddRange(group.Messages);
 
             result.ImagesId.AddRange(group.ImagesId);
-
+           
             foreach (var groupMember in group.Members)
                 result.MembersId.Add(groupMember.Id);
 
+            result.GroupType = group.Type;
 
             return result;
         }
