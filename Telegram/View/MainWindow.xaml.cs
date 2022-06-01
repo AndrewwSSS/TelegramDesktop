@@ -186,6 +186,13 @@ namespace Telegram
                         foreach (var group in CachedGroups.Where(g => g.GroupChat.MembersId.Contains(container.User.Id)))
                         {
                             group.Members.Add(user);
+                            if (group.GroupChat.GroupType == GroupType.Personal)
+                            {
+                                var secondUser = group.Members.First(u => u.User.Id != Me.Id);
+                                group.GroupChat.Name = secondUser.User.Name;
+                                group.GroupChat.Description = secondUser.User.Description;
+                                group.Images = user.Images;
+                            }
                         }
                         foreach(var group in TemporaryUserGroups)
                         {
@@ -195,7 +202,7 @@ namespace Telegram
                                 group.GroupChat.Name = user.User.Name;
                                 group.GroupChat.Description = user.User.Description;
                                 group.Images = user.Images;
-                                
+
                                 
                                 Dispatcher.Invoke(()=>
                                 FoundGroups.Add(group));
@@ -307,6 +314,7 @@ namespace Telegram
                 {
                     var personalChatCreated = msg as PersonalChatCreatedMessage;
                     GroupItemWrap newGroup = new GroupItemWrap(personalChatCreated.Group);
+                    
                     foreach(var userId in personalChatCreated.Group.MembersId)
                     {
                         UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == userId);
