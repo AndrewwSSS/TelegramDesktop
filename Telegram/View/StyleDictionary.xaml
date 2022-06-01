@@ -510,6 +510,7 @@
         </Style.Setters>
 
     </Style>
+    
     <Style TargetType="TextBox" x:Key="SearchBoxStyle">
         <Style.Setters>
             <Setter Property="CaretBrush" Value="White"/>
