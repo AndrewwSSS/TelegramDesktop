@@ -203,7 +203,6 @@ namespace Telegram
                                 group.GroupChat.Description = user.User.Description;
                                 group.Images = user.Images;
 
-                                
                                 Dispatcher.Invoke(()=>
                                 FoundGroups.Add(group));
                             }
@@ -315,16 +314,23 @@ namespace Telegram
                     var personalChatCreated = msg as PersonalChatCreatedMessage;
                     GroupItemWrap newGroup = new GroupItemWrap(personalChatCreated.Group);
                     
+                    CachedGroups.Add(newGroup);
+
                     foreach(var userId in personalChatCreated.Group.MembersId)
                     {
                         UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == userId);
-                        CachedGroups.Add(newGroup);
+
                         if (user == null)
                             client.SendAsync(new DataRequestMessage(userId, DataRequestType.User));
                         else
+                        {
                             newGroup.Members.Add(user);
-                        Groups.Add(newGroup);
+                            newGroup.GroupChat.Name = user.User.Name;
+                            newGroup.GroupChat.Description = user.User.Description;
+                            newGroup.Images = user.Images;
+                        }
                     }
+                    Groups.Add(newGroup);
                 }
             });
         }
