@@ -306,6 +306,11 @@ namespace TelegramServer
                         UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == chatLookupMessage.UserGuid).Key;
                         User sender = senderClient.User;
 
+
+                        
+
+
+
                         ChatLookupResultMessage resultMessage =
                             new ChatLookupResultMessage();
 
@@ -323,8 +328,9 @@ namespace TelegramServer
 
                         foreach(var user in DbTelegram.Users)
                         {
-                            if(user.Name.Contains(chatLookupMessage.Name)
-                               && user.Login.Contains(chatLookupMessage.Name))
+                            if (user.Name.Contains(chatLookupMessage.Name)
+                               && user.Login.Contains(chatLookupMessage.Name)
+                               && user.Id != sender.Id)
                             {
                                 resultMessage.UsersId.Add(user.Id); 
                             }
@@ -358,10 +364,17 @@ namespace TelegramServer
                             DbTelegram.GroupChats.Add(newChat);
                             newChat.Members.Add(sender);
                             newChat.Members.Add(toUser);
+
+                            Dispatcher.Invoke(() =>
+                            {
+                                DbTelegram.GroupChats.Add(newChat);
+                                DbTelegram.SaveChanges();
+                                DbTelegram.GroupChats.Load();
+                            });
                             DbTelegram.SaveChanges();
 
 
-                            client.SendAsync(new FirstPersonalResultMessage(newChat.Id));
+                            client.SendAsync(new FirstPersonalResultMessage(newChat.Id, firstPersonalMessage.LocalId));
 
 
                             PublicGroupInfo newChatInfo = new PublicGroupInfo()
