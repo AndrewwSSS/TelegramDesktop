@@ -23,8 +23,7 @@ namespace CommonLibrary.Messages.Users
             Guid = guid;
         }
 
-        public UserClient()
-        {
+        public UserClient() {
             MessagesToSend = new List<BaseMessage>();
         }
 
