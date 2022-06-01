@@ -28,12 +28,24 @@ namespace CommonLibrary.Messages.Groups
         public DateTime DateCreated { get; set; }
         public virtual List<ChatMessage> Messages { get; set; }
         public virtual List<User> Members { get; set; } = new List<User>();
+        public virtual List<User> Administrators { get; set; }
 
         public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public string NameByGroup
+        {
+            get
+            {
+
+                if (Type == GroupType.Personal)
+                    return Members[0].Login + " - " + Members[1].Login;
+                else
+                    return Name;
+            }
+        }
 
         public GroupChat() 
         {

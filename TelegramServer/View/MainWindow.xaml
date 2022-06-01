@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TelegramServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="585" Width="820"
+        Title="TelegramServer" Height="585" Width="820"
         MinHeight="450"
         MinWidth="800">
 
@@ -317,6 +317,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
                                             <RowDefinition/>
+                                            <RowDefinition/>
                                         </Grid.RowDefinitions>
 
                                         <Grid Grid.Row="0">
@@ -331,7 +332,7 @@
                                                        Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
-                                                       Text="{Binding Name}"
+                                                       Text="{Binding NameByGroup}"
                                                        FontSize="17"
                                                        Foreground="#768c9e"/>
                                         </Grid>
@@ -349,6 +350,23 @@
 
                                             <TextBlock Grid.Column="1"
                                                        Text="{Binding Path=Members.Count}"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
+                                        </Grid>
+
+                                        <Grid Grid.Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="100"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Grouo type:"
+                                                       FontSize="17"
+                                                       Foreground="#768c9e"/>
+
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Path=Type}"
                                                        FontSize="17"
                                                        Foreground="#768c9e"/>
                                         </Grid>
