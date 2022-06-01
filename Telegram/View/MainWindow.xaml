@@ -204,6 +204,9 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.Resources>
+                            <BooleanToVisibilityConverter x:Key="boolToVis"/>
+                        </Grid.Resources>
 
                         <Grid Grid.Row="0"
                               Grid.Column="0"
@@ -217,14 +220,8 @@
                                 Grid.Row="0" Grid.Column="1" 
                                 Width="32" Height="32" 
                                 Content="X"
-                                
+                                IsEnabled="{Binding ElementName=LB_FoundGroups, Path=HasItems}"
                                 Style="{StaticResource BLight}">
-                            <Button.Resources>
-                                <entities:VisibilityToBoolConverter x:Key="visToBool"/>
-                            </Button.Resources>
-                            <Button.IsEnabled>
-                                <Binding ElementName="FoundListboxesGrid" Path="Visibility" Converter="{StaticResource visToBool}"/>
-                            </Button.IsEnabled>
                         </Button>
 
                         <ListBox x:Name="LB_Groups" 
@@ -233,52 +230,16 @@
                                  SelectionChanged="GroupSelected"
                                  Style="{StaticResource LBGroup}">
                         </ListBox>
-                        <StackPanel Background="{StaticResource DarkBgBrush}" x:Name="FoundListboxesGrid"
-                              
-                                    Grid.Row="1" Grid.ColumnSpan="2">
-                            <StackPanel.Resources>
-                                <BooleanToVisibilityConverter x:Key="boolToVis"/>
-                            </StackPanel.Resources>
-                            <ListBox x:Name="LB_FoundUsers"
-                                     Grid.Row="0"
-                                     ItemsSource="{Binding FoundUsers}"
-                                     Style="{StaticResource LBUsers}"
-                                     />
-                            <Border  Height="2" Margin="2,5" 
-                                     Background="{StaticResource DarkGreyBrush}" 
-                                     CornerRadius="2"
-                                     Visibility="{Binding ElementName=LB_FoundGroups, Path=HasItems, Converter={StaticResource boolToVis}}">
-                            </Border>
-                            <ListBox x:Name="LB_FoundGroups"
-                                 Grid.Row="1"
-                                 ItemsSource="{Binding FoundGroups}"
-                                 SelectionChanged="FoundGroupSelected"
-                                 Style="{StaticResource LBGroup}"
-                                 >
-                            </ListBox>
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Style.Resources>
-                                        <entities:OrConverter x:Key="or"/>
-                                    </Style.Resources>
-                                    <Style.Setters>
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                    </Style.Setters>
-                                    <Style.Triggers>
-                                        <DataTrigger Value="True">
-                                            <DataTrigger.Binding>
-                                                <MultiBinding Converter="{StaticResource or}">
-                                                    <Binding ElementName="LB_FoundGroups" Path="HasItems"/>
-                                                    <Binding ElementName="LB_FoundUsers" Path="HasItems"/>
-                                                </MultiBinding>
-                                            </DataTrigger.Binding>
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                        </StackPanel>
+
+                        <ListBox x:Name="LB_FoundGroups"
+                                Grid.Row="1"
+                                Background="{StaticResource DarkBgBrush}"
+                                ItemsSource="{Binding FoundGroups}"
+                                SelectionChanged="FoundGroupSelected"
+                                Style="{StaticResource LBGroup}"
+                                >
+                            
+                        </ListBox>
                         <TextBlock  Grid.Row="1" Margin="15"
                                 x:Name="TB_GroupsNotFound"   
                                 Visibility="Hidden"
@@ -296,7 +257,6 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-
                     </Grid>
 
                     <Grid Grid.Column="2"
@@ -555,7 +515,7 @@
                                 </RowDefinition>
                                 <RowDefinition Height="40"/>
                             </Grid.RowDefinitions>
-
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" Foreground="{StaticResource BlueBrush}" FontSize="20">⬅️</TextBlock>
                             <StackPanel Grid.Column="1" Grid.Row="0">
                                 <TextBlock Foreground="{StaticResource BlueBrush}">Ответ на сообщение:</TextBlock>
                                 <TextBlock Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Message.Text}" TextTrimming="CharacterEllipsis"/>
@@ -627,8 +587,8 @@
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" Foreground="White">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}#{1}">
-                                    <Binding Path="Me.User.Name" />
-                                    <Binding Path="Me.User.Id" />
+                                    <Binding Path="Me.Name" />
+                                    <Binding Path="Me.Id" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>

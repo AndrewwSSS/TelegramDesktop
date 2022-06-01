@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonLibrary.Messages
 {
-    public enum RequestType
+    public enum DataRequestType
     {
         User,
         Image,
@@ -17,18 +17,18 @@ namespace CommonLibrary.Messages
     [Serializable]
     public class DataRequestMessage : Message
     {
-        public RequestType Type { get; set; }
+        public DataRequestType Type { get; set; }
         public int[] ItemsId { get; set; }
 
         public DataRequestMessage() { }
 
-        public DataRequestMessage(int id, RequestType type)
+        public DataRequestMessage(int id, DataRequestType type)
         {
             ItemsId = new int[] { id };
             Type = type;
         }
 
-        public DataRequestMessage(IEnumerable<int> array, RequestType type)
+        public DataRequestMessage(IEnumerable<int> array, DataRequestType type)
         {
             if (array != null)
                 ItemsId = array.ToArray();

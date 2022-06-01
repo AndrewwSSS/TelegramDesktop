@@ -525,7 +525,7 @@ namespace TelegramServer
 
                         switch (message.Type)
                         {
-                            case RequestType.File:
+                            case DataRequestType.File:
                             {
                                FileContainer[] results
                                         = DbTelegram.Files.Where(file => message.ItemsId.Contains(file.Id)).ToArray();
@@ -534,7 +534,7 @@ namespace TelegramServer
 
                                 break;
                             }
-                            case RequestType.Image:
+                            case DataRequestType.Image:
                             {
                                 ImageContainer[] results
                                             = DbTelegram.Images.Where(image => message.ItemsId.Contains(image.Id)).ToArray();
@@ -542,7 +542,7 @@ namespace TelegramServer
                                 client.Send(new DataRequestResultMessage<ImageContainer>(results));
                                 break;
                             }
-                            case RequestType.User:
+                            case DataRequestType.User:
                             {
                                 List<UserContainer> results = new List<UserContainer>();
                                 foreach(var user in DbTelegram.Users)
