@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -24,18 +25,25 @@ namespace TelegramServer
         private ObservableCollection<User> UsersOffline;
         private Dictionary<UserClient, TcpClientWrap> ClientsOnline;
         private TelegramDb DbTelegram;
-        private TcpServerWrap Server;     
+        private TcpServerWrap Server;
+        private Mutex mutex;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            bool isUniqueApp;
+            mutex = new Mutex(true, "TelegramServer", out isUniqueApp);
+
+            if (!isUniqueApp)
+                this.Close();
 
             DbTelegram = new TelegramDb();
             ClientsOnline = new Dictionary<UserClient, TcpClientWrap>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-          
+
+   
 
             DbTelegram.GroupChats.Load();
             
@@ -396,12 +404,11 @@ namespace TelegramServer
                 case "CreateGroupMessage":
                     {
                         CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
-                        List<User> newGroupMembers = null;
+                        List<User> newGroupMembers = DbTelegram.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
 
                         UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
                         User sender = senderClient.User;  
 
-                        newGroupMembers = DbTelegram.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
 
                         if (newGroupMembers.Count > 0)
                         {
@@ -420,10 +427,11 @@ namespace TelegramServer
                         GroupChat newGroup = new GroupChat()
                         {
                             Name = createNewGroupMessage.Name,
-                            Members = new List<User>() { sender },
                             DateCreated = DateTime.UtcNow,
                             Type = GroupType.Public
                         };
+                        newGroup.Members.Add(sender);
+                        newGroup.Administrators.Add(sender);
 
                         if(createNewGroupMessage.Image != null)
                         {
@@ -452,23 +460,20 @@ namespace TelegramServer
                         if (newGroupMembers.Count > 0)
                         {
                             newGroup.Members.AddRange(newGroupMembers);
-
-                            List<int> UsersId = new List<int>();
-
+                     
                             foreach (var member in newGroupMembers)
-                            {
                                 member.Chats.Add(newGroup);
-                                UsersId.Add(member.Id);
-                            }
-
+  
                             DbTelegram.SaveChanges();
 
 
                             PublicGroupInfo GroupInfo = new PublicGroupInfo(newGroup.Name,
                                                                             newGroup.Description,
                                                                             newGroup.Id);
+                            
 
-                            GroupInfo.MembersId = UsersId;
+                            GroupInfo.AdministratorsId.Add(sender.Id);
+                            GroupInfo.MembersId = newGroup.Members.Select(m => m.Id).ToList();
 
                             SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
                                                      sender.Id,
@@ -590,7 +595,6 @@ namespace TelegramServer
             {
                 UsersOnline.Remove(DisconnectedClient.User);
                 UsersOffline.Add(DisconnectedClient.User);
-
                 ClientsOnline.Remove(DisconnectedClient);
             });
         }
@@ -671,23 +675,17 @@ namespace TelegramServer
         }
 
  
-        public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group, int MaxMessagesCount = 50)
+        public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group)
         {
             PublicGroupInfo result = new PublicGroupInfo(group.Name,
                                                          group.Description,
                                                          group.Id
                                                          );
 
-            if (group.Messages.Count >= MaxMessagesCount)
-                result.Messages.AddRange(group.Messages.GetRange(0, MaxMessagesCount-1));
-            else
-                result.Messages.AddRange(group.Messages);
-
-            result.ImagesId.AddRange(group.ImagesId);
-           
-            foreach (var groupMember in group.Members)
-                result.MembersId.Add(groupMember.Id);
-
+            result.AdministratorsId.AddRange(group.Administrators.Select(g => g.Id));
+            result.Messages.AddRange(group.Messages);
+            result.ImagesId.AddRange(group.ImagesId);      
+            result.MembersId.AddRange(group.Members.Select(gm => gm.Id));
             result.GroupType = group.Type;
 
             return result;
