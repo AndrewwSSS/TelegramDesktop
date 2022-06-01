@@ -236,7 +236,7 @@ namespace TelegramServer
                                 && !sender.Chats.Any(chat => chat.Id == group.Id)
                                 && group.Type != GroupType.Personal)
                             {
-                                resultMessage.Groups.Add(PublicGroupInfoFromGroup(group));
+                                resultMessage.Groups.Add(new PublicGroupInfo(group));
 
                             }
                         }
@@ -438,15 +438,15 @@ namespace TelegramServer
                     }
                 case "DataRequestMessage":
                     {
-                        DataRequestMessage message = (DataRequestMessage)msg;
+                        DataRequestMessage dataRequestMessage = (DataRequestMessage)msg;
 
 
-                        switch (message.Type)
+                        switch (dataRequestMessage.Type)
                         {
                             case DataRequestType.File:
                                 {
                                     FileContainer[] results
-                                             = DbTelegram.Files.Where(file => message.ItemsId.Contains(file.Id)).ToArray();
+                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).ToArray();
 
                                     client.Send(new DataRequestResultMessage<FileContainer>(results));
 
@@ -455,7 +455,7 @@ namespace TelegramServer
                             case DataRequestType.Image:
                                 {
                                     ImageContainer[] results
-                                                = DbTelegram.Images.Where(image => message.ItemsId.Contains(image.Id)).ToArray();
+                                                = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToArray();
 
                                     client.Send(new DataRequestResultMessage<ImageContainer>(results));
                                     break;
@@ -465,7 +465,7 @@ namespace TelegramServer
                                     List<UserContainer> results = new List<UserContainer>();
                                     foreach (var user in DbTelegram.Users)
                                     {
-                                        if (message.ItemsId.Contains(user.Id))
+                                        if (dataRequestMessage.ItemsId.Contains(user.Id))
                                         {
                                             UserContainer userItem = new UserContainer();
                                             userItem.User = new PublicUserInfo()

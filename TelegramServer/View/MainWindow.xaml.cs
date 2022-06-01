@@ -111,8 +111,6 @@ namespace TelegramServer
             });
         }
 
-        
-
         private void OnClientDisconnected(TcpClientWrap client)
         {
             UserClient DisconnectedClient
@@ -183,41 +181,30 @@ namespace TelegramServer
                 if(user.Id == senderId)
                 {
                     foreach(var userClient in user.Clients)
-                    {
                         if(userClient.Id != senderClientId)
+                        {
                             userClient.MessagesToSend.Add(msg);
-                    }
+                            changesExist = true;
+                        }
                 }
                 else
                 {
                     foreach (var userClient in user.Clients)
                     {
                         if (isUserOnline(userClient))
-                            TcpClientByUserClient(userClient).SendAsync(msg);      
+                            TcpClientByUserClient(userClient).SendAsync(msg);
                         else
+                        {
                             userClient.MessagesToSend.Add(msg);
+                            changesExist = true;
+                        }
+                            
                     }
                 }
             }
 
             if(changesExist)
                 DbTelegram.SaveChanges();
-        }
-
-        public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group)
-        {
-            PublicGroupInfo result = new PublicGroupInfo(group.Name,
-                                                         group.Description,
-                                                         group.Id
-                                                         );
-
-            result.AdministratorsId.AddRange(group.Administrators.Select(g => g.Id));
-            result.Messages.AddRange(group.Messages);
-            result.ImagesId.AddRange(group.ImagesId);      
-            result.MembersId.AddRange(group.Members.Select(gm => gm.Id));
-            result.GroupType = group.Type;
-
-            return result;
         }
 
         private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsValue(userClient);

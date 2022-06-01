@@ -25,6 +25,19 @@ namespace CommonLibrary.Messages.Groups
             Id = id;
         }
 
+        public PublicGroupInfo(GroupChat group) : this()
+        {
+            Name = group.Name;
+            Description = group.Description;
+            Id = group.Id;
+         
+            AdministratorsId.AddRange(group.Administrators.Select(g => g.Id));
+            Messages.AddRange(group.Messages);
+            ImagesId.AddRange(group.ImagesId);
+            MembersId.AddRange(group.Members.Select(gm => gm.Id));
+            GroupType = group.Type;
+        }
+
         public PublicGroupInfo()
         {
             MembersId = new List<int>();

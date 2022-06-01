@@ -85,15 +85,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Entities\TelegramDb.cs" />
-    <Compile Include="Migrations\202206011535554_InitialCreate.cs" />
-    <Compile Include="Migrations\202206011535554_InitialCreate.designer.cs">
-      <DependentUpon>202206011535554_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202206011800487_M1.cs" />
-    <Compile Include="Migrations\202206011800487_M1.designer.cs">
-      <DependentUpon>202206011800487_M1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -121,12 +112,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\202206011535554_InitialCreate.resx">
-      <DependentUpon>202206011535554_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202206011800487_M1.resx">
-      <DependentUpon>202206011800487_M1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
