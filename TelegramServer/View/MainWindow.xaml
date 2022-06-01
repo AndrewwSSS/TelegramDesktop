@@ -331,7 +331,7 @@
                                                        Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
-                                                       Text="{Binding Name}"
+                                                       Text="{Binding NameByGroup}"
                                                        FontSize="17"
                                                        Foreground="#768c9e"/>
                                         </Grid>

@@ -34,6 +34,16 @@ namespace CommonLibrary.Messages.Groups
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public string NameByGroup
+        {
+            get
+            {
+                if (Type == GroupType.Personal)
+                    return Members[0].Login + " - " + Members[1].Login;
+                else
+                    return Name;
+            }
+        }
 
         public GroupChat() 
         {

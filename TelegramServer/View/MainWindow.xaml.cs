@@ -376,6 +376,9 @@ namespace TelegramServer
                             {
                                 Id = newChat.Id,
                             };
+
+                            newChatInfo.Messages.Add(firstPersonalMessage.Message);
+
                             newChatInfo.MembersId.AddRange(new List<int>() { sender.Id, toUser.Id });
 
                             SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
