@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TelegramServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="585" Width="820"
+        Title="TelegramServer" Height="585" Width="820"
         MinHeight="450"
         MinWidth="800">
 

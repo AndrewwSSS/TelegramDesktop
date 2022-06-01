@@ -10,7 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -23,10 +25,13 @@ namespace TelegramServer
     {
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
-        private Dictionary<UserClient, TcpClientWrap> ClientsOnline;
+        private Dictionary<TcpClientWrap, UserClient> ClientsOnline;
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
-        private Mutex mutex;
+        private static Mutex mutex;
+
+        [DllImport("USER32.DLL")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         public MainWindow()
         {
@@ -36,10 +41,15 @@ namespace TelegramServer
             mutex = new Mutex(true, "TelegramServer", out isUniqueApp);
 
             if (!isUniqueApp)
-                this.Close();
+            {
+                SetForegroundWindow(Process.GetProcessesByName("TelegramServer").First(x => x.Id != Process.GetCurrentProcess().Id).MainWindowHandle);
+                Environment.Exit(0);
+                Close();
+            }
+               
 
             DbTelegram = new TelegramDb();
-            ClientsOnline = new Dictionary<UserClient, TcpClientWrap>();
+            ClientsOnline = new Dictionary<TcpClientWrap, UserClient>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
 
@@ -101,492 +111,12 @@ namespace TelegramServer
             });
         }
 
-        private void ClientMessageRecived(TcpClientWrap client, Message msg)
-        {
-            Console.WriteLine($"Message recieved. Type {msg.GetType().Name}");
-            switch (msg.GetType().Name)
-            {
-                case "SignUpStage1Message":
-                    {
-                        SignUpStage1Message signUpMessage = (SignUpStage1Message)msg;
-
-
-                        if (!DbTelegram.Users.Any(u => u.Email == signUpMessage.Email || u.Login == signUpMessage.Login))
-                        {
-                            User newUser = new User()
-                            {
-                                Email = signUpMessage.Email,
-                                Login = signUpMessage.Login,
-                                Name = signUpMessage.Name,
-                                Password = signUpMessage.Password,
-                                RegistrationDate = DateTime.UtcNow,
-                                VisitDate = DateTime.UtcNow
-                            };
-
-                            DbTelegram.Users.Add(newUser);
-                            Dispatcher.Invoke(() => UsersOffline.Add(newUser));
-                            DbTelegram.SaveChanges();
-
-
-                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Success));
-
-                        }
-                        else
-                        {
-                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Denied,
-                                            "Email or login already used to create an account"));
-
-                        }
-                        break;
-
-                    }
-                case "LoginMessage":
-                    {
-                        LoginMessage loginMessage = (LoginMessage)msg;
-                        User sender = DbTelegram.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
-
-
-                        if (sender != null && sender.Password == loginMessage.Password)
-                        {
-                            PublicUserInfo UserInfo = new PublicUserInfo()
-                            {
-                                Id = sender.Id,
-                                Name = sender.Name
-                            };
-
-                            UserClient newUserClient
-                                = new UserClient(loginMessage.MachineName, Guid.NewGuid().ToString());
-
-                            newUserClient.User = sender;
-                            sender.Clients.Add(newUserClient);
-                           
-                            UserInfo.ImagesId.AddRange(sender.ImagesId);
-
-                            if(sender.Email == loginMessage.Login)
-                                UserInfo.Login = sender.Login;
-
-
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, newUserClient.Guid));
-                            
-
-                            client.Disconnected += OnClientDisconnected;
-
-                            ClientsOnline[newUserClient] = client;
-
-                           
-                            Dispatcher.Invoke(() =>
-                            {
-                                UsersOffline.Remove(sender);
-                                UsersOnline.Add(sender);
-                            });
-
-
-                            DbTelegram.SaveChanges();
-
-                            if(sender.Messages.Count != 0)
-                                client.SendAsync(new ArrayMessage<ChatMessage>(sender.Messages));
-
-                           
-
-                            //if (sender.MessagesToSend.Count > 0)
-                            //{
-
-                            //    client.SendAsync(new ArrayMessage<BaseMessage>(sender.MessagesToSend));
-
-                            //    ClientMessageHandler OnMessageSent = null;
-                            //    OnMessageSent = (c, m) =>
-                            //    {
-                            //        sender.MessagesToSend.Clear();
-                            //        client.MessageSent -= OnMessageSent;
-                            //    };
-                            //    client.MessageSent += OnMessageSent;
-                            //}
-                        }
-                        else
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied,
-                                                                    "wrong login/email or password"));
-                        break;
-                    }
-                case "FastLoginMessage":
-                    {
-                        FastLoginMessage fastLoginMessage = (FastLoginMessage)msg;
-                       
-                        User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
-
-                        ClientMessageHandler onMessagesSent = null;
-
-                        if (sender != null)
-                        {
-                            UserClient userClient = sender.Clients.FirstOrDefault(c => c.MachineName == fastLoginMessage.MachineName);
-
-                            if(userClient != null && userClient.Guid == fastLoginMessage.Guid)
-                            {
-                                client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
-                                client.Disconnected += OnClientDisconnected;
-                                ClientsOnline[userClient] = client;
-
-                                
-
-
-                                if(userClient.MessagesToSend.Count > 0)
-                                {
-                                    onMessagesSent = (cl, message) =>
-                                    {
-                                        userClient.MessagesToSend.Clear();
-                                        client.MessageSent -= onMessagesSent;
-                                    };
-
-                                    client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
-                                    client.MessageSent += onMessagesSent;
-                                }
-                          
-
-
-                                Dispatcher.Invoke(() =>
-                                {
-                                    UsersOffline.Remove(sender);
-                                    UsersOnline.Add(sender);
-                                });
-                            }    
-                            else
-                            {
-                                userClient = sender.Clients.FirstOrDefault(c => c.Guid == fastLoginMessage.Guid);
-
-                                if(userClient != null)
-                                {
-                                    //tmp
-                                    userClient.MachineName = fastLoginMessage.MachineName;
-                                    client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
-                                    client.Disconnected += OnClientDisconnected;
-                                    ClientsOnline[userClient] = client;
-
-
-                                    if (userClient.MessagesToSend.Count > 0)
-                                    {
-                                        onMessagesSent = (cl, message) =>
-                                        {
-                                            userClient.MessagesToSend.Clear();
-                                            client.MessageSent -= onMessagesSent;
-                                        };
-
-                                        client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
-                                        client.MessageSent += onMessagesSent;
-                                    }
-
-                                    Dispatcher.Invoke(() =>
-                                    {
-                                        UsersOffline.Remove(sender);
-                                        UsersOnline.Add(sender);
-                                    });
-
-
-
-                                }
-                                else
-                                    client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Denied));
-                            }
-                        }
-                        break;
-                    }
-                case "ChatMessage":
-                    {
-                        ChatMessage newMessage = (ChatMessage)msg;
-                        GroupChat chat = DbTelegram.GroupChats.First(gc => gc.Id == newMessage.GroupId);
-                        
-                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
-                        User sender = senderClient.User;
-
-                        sender.Messages.Add(newMessage);
-                        chat.Messages.Add(newMessage);
-
-                        DbTelegram.SaveChanges();
-
-                        SendMessageToUsers(newMessage, sender.Id, senderClient.Id, chat.Members);
-
-                        break;
-
-                    }
-                case "ChatLookupMessage":
-                    {
-                        ChatLookupMessage chatLookupMessage = (ChatLookupMessage)msg;
-                    
-
-                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Key.Guid == chatLookupMessage.UserGuid).Key;
-                        User sender = senderClient.User;
-   
-                        ChatLookupResultMessage resultMessage =
-                            new ChatLookupResultMessage();
-
-
-                        foreach (var group in DbTelegram.GroupChats)
-                        {
-                            if (group.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
-                                && !sender.Chats.Any(chat => chat.Id == group.Id)
-                                && group.Type != GroupType.Personal)
-                            {
-                                resultMessage.Groups.Add(PublicGroupInfoFromGroup(group));
-
-                            }
-                        }
-
-                        foreach(var user in DbTelegram.Users)
-                        {
-                            if (user.Id != sender.Id &&
-                                (user.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
-                               || user.Login.ToLower().Contains(chatLookupMessage.Name.ToLower()))
-                               )
-                            {
-                                resultMessage.UsersId.Add(user.Id); 
-                            }
-                        }
-
-                        client.SendAsync(resultMessage);
-
-                        break;
-                    }
-                case "FirstPersonalMessage":
-                    {
-                        FirstPersonalMessage firstPersonalMessage
-                                = (FirstPersonalMessage)msg;
-
-                        UserClient senderClient =
-                            ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
-
-                        User sender = senderClient.User;
-
-                        User toUser = DbTelegram.Users.FirstOrDefault(u => u.Id == firstPersonalMessage.ToUserId);
-
-                        if(toUser != null && senderClient != null)
-                        {
-                            GroupChat newChat = new GroupChat()
-                            {
-                                DateCreated = DateTime.UtcNow,
-                                Type = GroupType.Personal
-                            };
-
-                            newChat.Members.Add(sender);
-                            newChat.Members.Add(toUser);
-
-                        
-                            Dispatcher.Invoke(() =>
-                            {
-                                DbTelegram.GroupChats.Add(newChat);
-                                DbTelegram.SaveChanges();
-                                DbTelegram.GroupChats.Load();
-                            });
-                            
-
-
-                            client.SendAsync(new FirstPersonalResultMessage(newChat.Id, firstPersonalMessage.LocalId));
-
-
-                            PublicGroupInfo newChatInfo = new PublicGroupInfo()
-                            {
-                                Id = newChat.Id,
-                            };
-
-                            newChatInfo.Messages.Add(firstPersonalMessage.Message);
-
-                            newChatInfo.MembersId.AddRange(new List<int>() { sender.Id, toUser.Id });
-
-                            SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
-                                               sender.Id,
-                                               senderClient.Id,
-                                               newChat.Members
-                                               );
-
-                        }
-
-
-
-                        break;
-                    }
-                case "CreateGroupMessage":
-                    {
-                        CreateGroupMessage createNewGroupMessage = (CreateGroupMessage)msg;
-                        List<User> newGroupMembers = DbTelegram.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
-
-                        UserClient senderClient = ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
-                        User sender = senderClient.User;  
-
-
-                        if (newGroupMembers.Count > 0)
-                        {
-
-                            if (newGroupMembers.Any(newGroupMember
-                                => newGroupMember.BlockedUsersId.Any(blockedUserId => blockedUserId == sender.Id)))
-                            {
-
-                                client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Denied,
-                                                 "One or more users blocked you"));
-                                break;
-                            }
-
-                        }
-
-                        GroupChat newGroup = new GroupChat()
-                        {
-                            Name = createNewGroupMessage.Name,
-                            DateCreated = DateTime.UtcNow,
-                            Type = GroupType.Public
-                        };
-                        newGroup.Members.Add(sender);
-                        newGroup.Administrators.Add(sender);
-
-                        if(createNewGroupMessage.Image != null)
-                        {
-                            ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
-                            DbTelegram.Images.Add(newImage);
-                            
-                            DbTelegram.SaveChanges();
-                            DbTelegram.Images.Load();
-
-                            newGroup.ImagesId.Add(newImage.Id);
-                            
-                        }
-                        
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            DbTelegram.GroupChats.Add(newGroup);
-                            DbTelegram.SaveChanges();
-                            DbTelegram.GroupChats.Load();
-                        });
-
-
-                        client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Success, newGroup.Id));
-
-
-                        if (newGroupMembers.Count > 0)
-                        {
-                            newGroup.Members.AddRange(newGroupMembers);
-                     
-                            foreach (var member in newGroupMembers)
-                                member.Chats.Add(newGroup);
-  
-                            DbTelegram.SaveChanges();
-
-
-                            PublicGroupInfo GroupInfo = new PublicGroupInfo(newGroup.Name,
-                                                                            newGroup.Description,
-                                                                            newGroup.Id);
-                            
-
-                            GroupInfo.AdministratorsId.Add(sender.Id);
-                            GroupInfo.MembersId = newGroup.Members.Select(m => m.Id).ToList();
-
-                            SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
-                                                     sender.Id,
-                                                     senderClient.Id,
-                                                     newGroupMembers);
-                        }
-
-                        break;
-                    }
-                case "GroupJoinMessage":
-                    {
-                        GroupJoinMessage groupJoinMessage = (GroupJoinMessage)msg;
-                        GroupChat group = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == groupJoinMessage.GroupId);
-
-                        User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == groupJoinMessage.UserId);
-                        UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == groupJoinMessage.Guid);
-
-
-                        if (sender != null && group != null)
-                        {
-
-                            sender.Chats.Add(group);
-                            group.AddMember(sender);
-
-                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
-
-                            PublicUserInfo userInfo = new PublicUserInfo()
-                            {
-                                Id = sender.Id,
-                                Name = sender.Name,
-                                Description = sender.Description,
-                                Login = sender.Login,
-                            };
-
-                            userInfo.ImagesId.AddRange(sender.ImagesId);
-
-
-                            SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUser = userInfo },
-                                                        sender.Id,
-                                                        senderClient.Id,
-                                                        group.Members);
-
-                        }
-                        else
-                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Denied));
-
-                        break;
-                    }
-                case "DataRequestMessage":
-                    {
-                        DataRequestMessage message = (DataRequestMessage)msg;
-                       
-
-                        switch (message.Type)
-                        {
-                            case DataRequestType.File:
-                            {
-                               FileContainer[] results
-                                        = DbTelegram.Files.Where(file => message.ItemsId.Contains(file.Id)).ToArray();
-
-                                client.Send(new DataRequestResultMessage<FileContainer>(results));
-
-                                break;
-                            }
-                            case DataRequestType.Image:
-                            {
-                                ImageContainer[] results
-                                            = DbTelegram.Images.Where(image => message.ItemsId.Contains(image.Id)).ToArray();
-
-                                client.Send(new DataRequestResultMessage<ImageContainer>(results));
-                                break;
-                            }
-                            case DataRequestType.User:
-                            {
-                                List<UserContainer> results = new List<UserContainer>();
-                                foreach(var user in DbTelegram.Users)
-                                {
-                                    if(message.ItemsId.Contains(user.Id))
-                                    {
-                                         UserContainer userItem = new UserContainer();
-                                         userItem.User = new PublicUserInfo()
-                                         {
-                                             Id = user.Id,
-                                             Login = user.Login,
-                                             Description = user.Description,
-                                             Name = user.Name
-                                         };
-
-                                         foreach(var image in DbTelegram.Images.Where(im => user.ImagesId.Contains(im.Id)))
-                                             userItem.Images.Add(image);
-
-                                         results.Add(userItem);
-                                    }
-
-                                }
-                                
-                                client.Send(new DataRequestResultMessage<UserContainer>(results));
-                                break;
-                            }
-
-
-                        }
-
-
-                        break;
-                    }
-            }
-        }
+        
 
         private void OnClientDisconnected(TcpClientWrap client)
         {
             UserClient DisconnectedClient
-                = ClientsOnline.FirstOrDefault((c) => c.Value == client).Key;
+                = ClientsOnline[client];
 
             DisconnectedClient.User.VisitDate = DateTime.UtcNow;
             DbTelegram.SaveChanges();
@@ -595,7 +125,7 @@ namespace TelegramServer
             {
                 UsersOnline.Remove(DisconnectedClient.User);
                 UsersOffline.Add(DisconnectedClient.User);
-                ClientsOnline.Remove(DisconnectedClient);
+                ClientsOnline.Remove(client);
             });
         }
 
@@ -663,7 +193,7 @@ namespace TelegramServer
                     foreach (var userClient in user.Clients)
                     {
                         if (isUserOnline(userClient))
-                            ClientsOnline[userClient].SendAsync(msg);
+                            TcpClientByUserClient(userClient).SendAsync(msg);      
                         else
                             userClient.MessagesToSend.Add(msg);
                     }
@@ -674,7 +204,6 @@ namespace TelegramServer
                 DbTelegram.SaveChanges();
         }
 
- 
         public PublicGroupInfo PublicGroupInfoFromGroup(GroupChat group)
         {
             PublicGroupInfo result = new PublicGroupInfo(group.Name,
@@ -691,6 +220,10 @@ namespace TelegramServer
             return result;
         }
 
-        private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsKey(userClient);
+        private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsValue(userClient);
+
+        private TcpClientWrap TcpClientByUserClient(UserClient client){
+            return ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
+        }
     }
 }
