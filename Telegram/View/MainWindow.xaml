@@ -407,7 +407,7 @@
                                                 <Border.ContextMenu>
                                                     <ContextMenu>
                                                         <MenuItem Header="Ответить" Click="CtxMenu_Message_Respond_OnClick"/>
-                                                        <MenuItem Header="Удалить"/>
+                                                        <MenuItem Header="Удалить" Click="CtxMenu_Message_Delete_OnClick"/>
                                                     </ContextMenu>
                                                 </Border.ContextMenu>
                                                 <Grid Margin="9">

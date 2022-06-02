@@ -336,12 +336,7 @@ namespace Telegram
                         if (user == null)
                             client.SendAsync(new DataRequestMessage(userId, DataRequestType.User));
                         else
-                        {
                             newGroup.Members.Add(user);
-                            newGroup.GroupChat.Name = user.User.Name;
-                            newGroup.GroupChat.Description = user.User.Description;
-                            newGroup.Images = user.Images;
-                        }
                     }
                     Groups.Add(newGroup);
                 }
@@ -663,6 +658,13 @@ namespace Telegram
             var menuItem = (MenuItem)sender;
             var msg = (MessageItemWrap)menuItem.DataContext;
             RespondingTo = msg;
+        }
+
+        private void CtxMenu_Message_Delete_OnClick(object sender, RoutedEventArgs e)
+        {
+            var menuItem = (MenuItem)sender;
+            var msg = (MessageItemWrap)menuItem.DataContext;
+            Client.SendAsync(new DeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
         }
     }
 
