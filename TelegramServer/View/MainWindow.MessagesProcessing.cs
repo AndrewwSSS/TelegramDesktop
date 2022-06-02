@@ -224,9 +224,7 @@ namespace TelegramServer
 
                         client.SendAsync(new ChatMessageSendResult(toGroupMessage.LocalMessageId, newMessage.Id));
 
-
                         SendMessageToUsers(newMessage, sender.Id, senderClient.Id, group.Members);
-
                         break;
 
                     }
@@ -348,6 +346,7 @@ namespace TelegramServer
                             DateCreated = DateTime.UtcNow,
                             Type = GroupType.Public
                         };
+
                         newGroup.Members.Add(sender);
                         newGroup.Administrators.Add(sender);
 

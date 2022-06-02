@@ -51,6 +51,7 @@ namespace CommonLibrary.Messages.Groups
         {
             Messages = new List<ChatMessage>();
             Members = new List<User>();
+            Administrators = new List<User>();
         }
         
 
