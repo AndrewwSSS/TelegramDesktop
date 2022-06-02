@@ -2,6 +2,7 @@
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Auth.Login;
+using CommonLibrary.Messages.Auth.Logout;
 using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
@@ -240,8 +241,7 @@ namespace TelegramServer
                         {
                             if (group.Type != GroupType.Personal
                                 && group.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
-                                && !sender.Chats.Any(chat => chat.Id == group.Id)
-                                )
+                                && !sender.Chats.Any(chat => chat.Id == group.Id))
                             {
                                 resultMessage.Groups.Add(new PublicGroupInfo(group));
 
@@ -507,24 +507,34 @@ namespace TelegramServer
 
                         GroupChat group
                             = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == deleteMessage.GroupId);
-                        
 
-                        if(group != null)
+                        if (group != null)
                         {
                             ChatMessage deletedMessage = group.Messages.FirstOrDefault(gc => gc.Id == deleteMessage.MessageId);
 
-                            if(deletedMessage != null
-                                && (deletedMessage.FromUserId == deletedMessage.FromUserId  || group.Administrators.Any(a => a.Id == sender.Id)  ))
+                            if (deletedMessage != null &&
+                               (deletedMessage.FromUserId == deletedMessage.FromUserId ||
+                               group.Administrators.Any(a => a.Id == sender.Id)))
                             {
-                               
+
                                 group.Messages.Remove(deletedMessage);
                                 DbTelegram.SaveChanges();
 
-                                client.SendAsync(new DeleteChatMessageResultMessage())
+                                client.SendAsync(new DeleteChatMessageResultMessage(group.Id, deletedMessage.Id));
 
                                 SendMessageToUsers(deletedMessage, sender.Id, senderClient.Id, group.Members);
                             }
+                            else
+                                client.SendAsync(new DeleteChatMessageResultMessage(AuthenticationResult.Denied));
                         }
+                        else
+                            client.SendAsync(new DeleteChatMessageResultMessage(AuthenticationResult.Denied));
+
+                        break;
+                    }
+                case "LogoutMessage":
+                    {
+                        LogoutMessage logoutMessage = (LogoutMessage)msg;
 
 
 
