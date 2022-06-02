@@ -3,21 +3,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="BrushDictionary.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-
-    <Style TargetType="{x:Type ListBox}" x:Key="LB_Messages">
-        <Style.Setters>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-
-                        <ScrollViewer CanContentScroll="False" >
-                            <StackPanel IsItemsHost="True" Background="{TemplateBinding Background}"/>
-                        </ScrollViewer>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style.Setters>
-    </Style>
     <Style TargetType="{x:Type ListBoxItem}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
@@ -38,6 +23,21 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ListBox}" x:Key="LB_Messages">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+
+                        <ScrollViewer CanContentScroll="False" >
+                            <StackPanel IsItemsHost="True" Background="{TemplateBinding Background}"/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
     </Style>
 
     <LinearGradientBrush x:Key="ListBoxBackgroundBrush" StartPoint="0,0" EndPoint="1,0.001">
@@ -412,6 +412,7 @@
             <Setter Property="ItemContainerStyle">
                 <Setter.Value>
                     <Style TargetType="ListBoxItem">
+                        <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Margin" Value="0"/>
                     </Style>
