@@ -497,6 +497,39 @@ namespace TelegramServer
 
                         break;
                     }
+                case "ChatMessageDeleteMessage":
+                    {
+                        ChatMessageDeleteMessage deleteMessage
+                            = (ChatMessageDeleteMessage)msg;
+
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+
+                        GroupChat group
+                            = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == deleteMessage.GroupId);
+                        
+
+                        if(group != null)
+                        {
+                            ChatMessage deletedMessage = group.Messages.FirstOrDefault(gc => gc.Id == deleteMessage.MessageId);
+
+                            if(deletedMessage != null
+                                && (deletedMessage.FromUserId == deletedMessage.FromUserId  || group.Administrators.Any(a => a.Id == sender.Id)  ))
+                            {
+                               
+                                group.Messages.Remove(deletedMessage);
+                                DbTelegram.SaveChanges();
+
+                                client.SendAsync(new DeleteChatMessageResultMessage())
+
+                                SendMessageToUsers(deletedMessage, sender.Id, senderClient.Id, group.Members);
+                            }
+                        }
+
+
+
+                        break;
+                    }
             }
         }
     }
