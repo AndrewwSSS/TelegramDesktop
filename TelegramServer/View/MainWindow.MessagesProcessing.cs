@@ -536,8 +536,6 @@ namespace TelegramServer
                     {
                         LogoutMessage logoutMessage = (LogoutMessage)msg;
 
-
-
                         break;
                     }
             }
