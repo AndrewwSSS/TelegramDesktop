@@ -8,12 +8,12 @@ using CommonLibrary.Messages.Auth;
 namespace CommonLibrary.Messages
 {
     [Serializable]
-    public class DeleteMessageResultMessage : BaseMessage
+    public class DeleteChatMessageResultMessage : BaseMessage
     {
         public AuthenticationResult Result { get; set; }
 
-        public DeleteMessageResultMessage(AuthenticationResult result) => Result = result;
+        public DeleteChatMessageResultMessage(AuthenticationResult result) => Result = result;
 
-        public DeleteMessageResultMessage() { }
+        public DeleteChatMessageResultMessage() { }
     }
 }

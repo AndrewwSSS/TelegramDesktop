@@ -497,6 +497,7 @@ namespace TelegramServer
 
                         break;
                     }
+                case ChatMessageDeleteMessage
             }
         }
     }

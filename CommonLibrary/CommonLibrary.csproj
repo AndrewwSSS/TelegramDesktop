@@ -54,7 +54,8 @@
     <Compile Include="Messages\Auth\Login\FastLoginResultMessage.cs" />
     <Compile Include="Messages\Auth\SignUp\SignUpStage2Message.cs" />
     <Compile Include="Messages\Auth\SignUp\SignUpStage2ResultMessage.cs" />
-    <Compile Include="Messages\DeleteMessage.cs" />
+    <Compile Include="Messages\ChatMessageDeleteMessage.cs" />
+    <Compile Include="Messages\DeleteChatMessageResultMessage.cs" />
     <Compile Include="Messages\FirstPersonalMessage.cs" />
     <Compile Include="Messages\FirstPersonalResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatLookupResultMessage.cs" />
