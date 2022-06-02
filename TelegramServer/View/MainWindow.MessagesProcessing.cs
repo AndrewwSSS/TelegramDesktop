@@ -510,7 +510,7 @@ namespace TelegramServer
 
                         if (group != null)
                         {
-                            ChatMessage deletedMessage = group.Messages.FirstOrDefault(gc => gc.Id == deleteMessage.MessageId);
+                            ChatMessage deletedMessage = group.Messages.FirstOrDefault(gc => gc.Id == deleteMessage.DeletedMessageId);
 
                             if (deletedMessage != null &&
                                (deletedMessage.FromUserId == deletedMessage.FromUserId ||
