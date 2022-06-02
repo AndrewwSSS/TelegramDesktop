@@ -95,9 +95,9 @@ namespace Telegram
         }
 
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
-        public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"),null) { }
+        public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"), null) { }
 
-        
+
 
         public MainWindow(PublicUserInfo me, ArrayMessage<BaseMessage> offlineMessages)
         {
@@ -113,11 +113,11 @@ namespace Telegram
               });
             LoadCache();
 
-                                     
-            DataContext = this;      
-            InitializeComponent();   
-            HideRightMenu();         
-            Me = me;                 
+
+            DataContext = this;
+            InitializeComponent();
+            HideRightMenu();
+            Me = me;
             Users.Add(new UserItemWrap(me));
 
             RighMenuState = MenuState.Hidden;
@@ -163,11 +163,11 @@ namespace Telegram
                         var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
                         {
                             MembersId = new List<int>() { Me.Id },
-                            AdministratorsId =  new List<int> { Me.Id }
+                            AdministratorsId = new List<int> { Me.Id }
                         };
                         var newGroup = new GroupItemWrap(info)
                         {
-                            Admins = new ObservableCollection<UserItemWrap> { Users.First(u => u.User.Id== Me.Id) }
+                            Admins = new ObservableCollection<UserItemWrap> { Users.First(u => u.User.Id == Me.Id) }
                         };
                         Groups.Add(newGroup);
                         CachedGroups.Add(newGroup);
@@ -199,7 +199,7 @@ namespace Telegram
                                 group.Images = user.Images;
                             }
                         }
-                        foreach(var pair in TemporaryUserGroups)
+                        foreach (var pair in TemporaryUserGroups)
                         {
                             var group = pair.Value;
                             if (group.GroupChat.MembersId.Contains(user.User.Id))
@@ -209,7 +209,7 @@ namespace Telegram
                                 group.GroupChat.Description = user.User.Description;
                                 group.Images = user.Images;
 
-                                Dispatcher.Invoke(()=>
+                                Dispatcher.Invoke(() =>
                                 FoundGroups.Add(group));
                             }
                         }
@@ -240,14 +240,16 @@ namespace Telegram
                         }
                         else
                         {
-                            TemporaryUserGroups.Add(App.UserGroupLocalIdCounter++, new GroupItemWrap(new PublicGroupInfo() {
+                            TemporaryUserGroups.Add(App.UserGroupLocalIdCounter++, new GroupItemWrap(new PublicGroupInfo()
+                            {
                                 Id = -1,
-                                MembersId = new List<int> { Me.Id, userId } }));
+                                MembersId = new List<int> { Me.Id, userId }
+                            }));
                             Client.SendAsync(new DataRequestMessage(userId, DataRequestType.User));
                         }
                     }
-                    
-                    if (groups.Count!= 0)
+
+                    if (groups.Count != 0)
                     {
                         List<int> requestedId = new List<int>();
                         foreach (var group in groups)
@@ -310,7 +312,7 @@ namespace Telegram
                         else
                             Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
                     }
-                } 
+                }
                 else if (msg is FirstPersonalResultMessage)
                 {
                     var result = msg as FirstPersonalResultMessage;
@@ -318,15 +320,15 @@ namespace Telegram
                     group.GroupChat.Id = result.GroupId;
                     TemporaryUserGroups.Remove(result.LocalId);
                     Groups.Add(group);
-                } 
-                else if(msg is PersonalChatCreatedMessage)
+                }
+                else if (msg is PersonalChatCreatedMessage)
                 {
                     var personalChatCreated = msg as PersonalChatCreatedMessage;
                     GroupItemWrap newGroup = new GroupItemWrap(personalChatCreated.Group);
-                    
+
                     CachedGroups.Add(newGroup);
 
-                    foreach(var userId in personalChatCreated.Group.MembersId)
+                    foreach (var userId in personalChatCreated.Group.MembersId)
                     {
                         UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == userId);
 
@@ -341,7 +343,8 @@ namespace Telegram
                         }
                     }
                     Groups.Add(newGroup);
-                } else if(msg is ChatMessageSendResult)
+                }
+                else if (msg is ChatMessageSendResult)
                 {
                     var result = msg as ChatMessageSendResult;
                     PendingMessages[result.LocalId].Message.Id = result.MessageId;
@@ -361,10 +364,6 @@ namespace Telegram
                     return;
             }
 
-            if (LB_Groups.SelectedItem == group ||
-                LB_FoundGroups.SelectedItem == group ||
-                msg.FromUserId == Me.Id)
-            {
             MessageItemWrap item = new MessageItemWrap(msg);
             item.FromUser = Users.First(u => u.User.Id == msg.FromUserId);
 
@@ -376,16 +375,23 @@ namespace Telegram
             if (msg.RepostUserId != -1)
                 item.RepostUser = Users.FirstOrDefault(u => u.User.Id == msg.RepostUserId);
 
-                if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
-                        Messages.Last().ShowAvatar = false;
-                else
-                    item.ShowUsername = true;
-                if (item.Message.FromUserId == Me.Id)
-                    item.ShowUsername = false;
-                item.ShowAvatar = true;
+            if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
+                Messages.Last().ShowAvatar = false;
+            else
+                item.ShowUsername = true;
+            if (item.Message.FromUserId == Me.Id)
+                item.ShowUsername = false;
+            item.ShowAvatar = true;
+            if(msg.FromUserId == Me.Id)
+                PendingMessages.Add(App.MessageLocalIdCounter++, item);
+            if (LB_Groups.SelectedItem == group ||
+                LB_FoundGroups.SelectedItem == group ||
+                msg.FromUserId == Me.Id)
+            {
                 Messages.Add(item);
                 LB_Messages.SelectedIndex = LB_Messages.Items.Count - 1;
                 LB_Messages.ScrollIntoView(LB_Messages.SelectedItem);
+
             }
         }
         private void ShowGroupMessages(GroupItemWrap group)
@@ -398,8 +404,8 @@ namespace Telegram
         }
         private void BTNFullScreen_Click(object sender, RoutedEventArgs e)
         {
-            WindowState = WindowState == WindowState.Maximized ? 
-                WindowState.Normal : 
+            WindowState = WindowState == WindowState.Maximized ?
+                WindowState.Normal :
                 WindowState.Maximized;
 
         }
@@ -504,7 +510,7 @@ namespace Telegram
             TextBox textBox = sender as TextBox;
             if (textBox.Text.Length != 0)
                 if (e.Key == Key.Enter)
-                        Client.SendAsync(new ChatLookupMessage(textBox.Text, Me.Id, App.MyGuid));
+                    Client.SendAsync(new ChatLookupMessage(textBox.Text, Me.Id, App.MyGuid));
         }
 
         private void B_AddGroupMenu_OnClick(object sender, RoutedEventArgs e)
@@ -607,28 +613,29 @@ namespace Telegram
                     .SetFrom(Me)
                     .SetGroupId(CurGroup.GroupChat.Id);
                     AddMessage(msg);
-                    
+
                     if (RespondingTo != null)
                     {
                         msg.SetRespondingTo(RespondingTo.Message);
                         RespondingTo = null;
                     }
                     MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
-                    if(CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
+                    if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
                         FirstPersonalMessage fpMsg
                         = new FirstPersonalMessage(msg, App.MyGuid,
-                        CurGroup.GroupChat.MembersId.First(m => m != Me.Id), 
-                        TemporaryUserGroups.First(p=>p.Value == CurGroup).Key);
+                        CurGroup.GroupChat.MembersId.First(m => m != Me.Id),
+                        TemporaryUserGroups.First(p => p.Value == CurGroup).Key);
                         Client.SendAsync(fpMsg);
                     }
                     else
                         Client.SendAsync(msgToGroup);
 
+
                     CurGroup.GroupChat.Messages.Add(msg);
                     CurGroup.OnPropertyChanged("Messages");
                     CurGroup.OnPropertyChanged("LastMessage");
-                    
+
                     textBox.Text = "";
                 }
             });
