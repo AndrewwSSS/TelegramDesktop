@@ -379,11 +379,14 @@ namespace Telegram
                 Messages.Last().ShowAvatar = false;
             else
                 item.ShowUsername = true;
+
             if (item.Message.FromUserId == Me.Id)
                 item.ShowUsername = false;
             item.ShowAvatar = true;
+
             if(msg.FromUserId == Me.Id)
-                PendingMessages.Add(App.MessageLocalIdCounter++, item);
+                PendingMessages.Add(App.MessageLocalIdCounter, item);
+
             if (LB_Groups.SelectedItem == group ||
                 LB_FoundGroups.SelectedItem == group ||
                 msg.FromUserId == Me.Id)
@@ -619,7 +622,7 @@ namespace Telegram
                         msg.SetRespondingTo(RespondingTo.Message);
                         RespondingTo = null;
                     }
-                    MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter);
+                    MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                     if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
                         FirstPersonalMessage fpMsg
