@@ -58,7 +58,7 @@
     <Compile Include="Messages\FirstPersonalMessage.cs" />
     <Compile Include="Messages\FirstPersonalResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatLookupResultMessage.cs" />
-    <Compile Include="Messages\Groups\ChatMessageResultMessage.cs" />
+    <Compile Include="Messages\Groups\ChatMessageSendResult.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />

@@ -18,5 +18,6 @@ namespace Telegram
         public static TcpClientWrap Client { get;  set; }= new TcpClientWrap(IPAddress.Parse("26.87.230.148"), 5000);
         public static string MyGuid { get; set; }
         public static int UserGroupLocalIdCounter { get; set; } = 0;
+        public static int MessageLocalIdCounter { get; set; } = 0;
     }
 }

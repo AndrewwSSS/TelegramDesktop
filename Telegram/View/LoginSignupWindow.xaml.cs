@@ -1,10 +1,12 @@
 ﻿using CacheLibrary;
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Auth.Login;
 using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -98,11 +100,16 @@ namespace Telegram.View
                         GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
                     
                 });
+            }  else if(msg is ArrayMessage<BaseMessage>)
+            {
+                OfflineMessages = msg as ArrayMessage<BaseMessage>;
             }
         }
+
+        ArrayMessage<BaseMessage> OfflineMessages;
         private void GoToMainWnd(PublicUserInfo info)
         {
-            wnd = new MainWindow(info);
+            wnd = new MainWindow(info, OfflineMessages);
             wnd.Client = App.Client;
             wnd.Show();
             Close();
