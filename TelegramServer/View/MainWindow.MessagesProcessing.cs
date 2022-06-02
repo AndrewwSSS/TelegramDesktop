@@ -298,21 +298,17 @@ namespace TelegramServer
                             client.SendAsync(new FirstPersonalResultMessage(newChat.Id, firstPersonalMessage.LocalId));
 
 
-                            PublicGroupInfo newChatInfo = new PublicGroupInfo()
-                            {
+                            PublicGroupInfo newChatInfo = new PublicGroupInfo() {
                                 Id = newChat.Id,
                             };
 
                             newChatInfo.Messages.Add(firstPersonalMessage.Message);
-
                             newChatInfo.MembersId.AddRange(new List<int>() { sender.Id, toUser.Id });
 
                             SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
                                                sender.Id,
                                                senderClient.Id,
-                                               newChat.Members
-                                               );
-
+                                               newChat.Members);
                         }
 
 
