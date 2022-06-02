@@ -385,7 +385,8 @@ namespace Telegram
             item.ShowAvatar = true;
 
             if(msg.FromUserId == Me.Id)
-                PendingMessages.Add(App.MessageLocalIdCounter, item);
+                if(!PendingMessages.ContainsKey(App.MessageLocalIdCounter))
+                    PendingMessages.Add(App.MessageLocalIdCounter, item);
 
             if (LB_Groups.SelectedItem == group ||
                 LB_FoundGroups.SelectedItem == group ||
@@ -615,13 +616,11 @@ namespace Telegram
                     ChatMessage msg = new ChatMessage(textBox.Text)
                     .SetFrom(Me)
                     .SetGroupId(CurGroup.GroupChat.Id);
-                    AddMessage(msg);
 
                     if (RespondingTo != null)
-                    {
                         msg.SetRespondingTo(RespondingTo.Message);
-                        RespondingTo = null;
-                    }
+                    
+                    AddMessage(msg);
                     MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                     if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
@@ -640,6 +639,7 @@ namespace Telegram
                     CurGroup.OnPropertyChanged("LastMessage");
 
                     textBox.Text = "";
+                    RespondingTo = null;
                 }
             });
         }
