@@ -204,20 +204,28 @@ namespace TelegramServer
                         }
                         break;
                     }
-                case "ChatMessage":
+                case "MessageToGroupMessage":
                     {
-                        ChatMessage newMessage = (ChatMessage)msg;
-                        GroupChat chat = DbTelegram.GroupChats.First(gc => gc.Id == newMessage.GroupId);
+                        MessageToGroupMessage toGroupMessage =
+                            (MessageToGroupMessage)msg;
+
+                        ChatMessage newMessage = toGroupMessage.Message;
+                        GroupChat group = DbTelegram.GroupChats.First(gc => gc.Id == newMessage.GroupId);
 
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
                         sender.Messages.Add(newMessage);
-                        chat.Messages.Add(newMessage);
+                        group.Messages.Add(newMessage);
+
 
                         DbTelegram.SaveChanges();
+                        DbTelegram.GroupChats.Load();
 
-                        SendMessageToUsers(newMessage, sender.Id, senderClient.Id, chat.Members);
+                        client.SendAsync(new ChatMessageSendResult(toGroupMessage.LocalMessageId, newMessage.Id));
+
+
+                        SendMessageToUsers(newMessage, sender.Id, senderClient.Id, group.Members);
 
                         break;
 
@@ -320,8 +328,6 @@ namespace TelegramServer
                         User sender = senderClient.User;
                         List<User> newGroupMembers = DbTelegram.Users.Where(u => createNewGroupMessage.MembersId.Equals(u.Id)).ToList();
 
-
-
                         if (newGroupMembers.Count > 0)
                         {
 
@@ -390,6 +396,7 @@ namespace TelegramServer
 
                             List<User> DistributionList = new List<User>(newGroupMembers);
                             DistributionList.Add(sender);
+
                             SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
                                                      sender.Id,
                                                      senderClient.Id,
