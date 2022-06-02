@@ -404,7 +404,13 @@
                                             </ContentControl>
                                             <!--Тело сообщения-->
                                             <Border Name="border" Background="{StaticResource MsgBgBrush}" CornerRadius="8" Grid.Column="1">
-                                                <Grid Margin="9" >
+                                                <Border.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Ответить" Click="CtxMenu_Message_Respond_OnClick"/>
+                                                        <MenuItem Header="Удалить"/>
+                                                    </ContextMenu>
+                                                </Border.ContextMenu>
+                                                <Grid Margin="9">
                                                     <Grid.RowDefinitions>
                                                         <!--Имя пользователя, от которого переслано сообщение(может не быть)-->
                                                         <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
@@ -555,13 +561,16 @@
                     </Grid>
 
                     <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280">
-
-                        <ScrollViewer >
+                        <StackPanel>
                             <ListBox 
+                                Style="{StaticResource LBUsers}"
+                                ItemsSource="{Binding CurGroup.Admins}">
+                            </ListBox>
+                            <ListBox
                                 Style="{StaticResource LBUsers}"
                                 ItemsSource="{Binding CurGroup.Members}">
                             </ListBox>
-                        </ScrollViewer>
+                        </StackPanel>
                     </Grid>
                 </Grid >
             </Grid>

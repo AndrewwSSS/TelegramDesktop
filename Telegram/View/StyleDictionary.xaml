@@ -3,6 +3,61 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="BrushDictionary.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="ContextMenu">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+
+                        <Border Background="#17212b"   
+                                CornerRadius="5"
+                                Width="200">
+
+                            <StackPanel IsItemsHost="True"
+                                        KeyboardNavigation.DirectionalNavigation="Cycle"
+                                        Margin="0, 5, 0, 5"                                              />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+
+                        <Border x:Name="Border">
+
+                            <TextBlock Text="{TemplateBinding Header}"
+                                       Foreground="#e9ecf0"
+                                       FontSize="15"
+                                       x:Name="TextBlock"
+                                       Margin="10, 0, 0, 0"
+                                       Padding="5"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+
+                                <Setter TargetName="Border"
+                                        Property="Background"
+                                        Value="#232e3c"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+
+
     <Style TargetType="{x:Type ListBoxItem}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
@@ -25,12 +80,12 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type ListBox}" x:Key="LB_Messages">
+
+    <Style TargetType="{x:Type ListBox}" x:Key="LBScrollable">
         <Style.Setters>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
-
                         <ScrollViewer CanContentScroll="False" >
                             <StackPanel IsItemsHost="True" Background="{TemplateBinding Background}"/>
                         </ScrollViewer>
@@ -38,6 +93,10 @@
                 </Setter.Value>
             </Setter>
         </Style.Setters>
+        
+    </Style>
+    <Style BasedOn="{StaticResource LBScrollable}" TargetType="{x:Type ListBox}" x:Key="LB_Messages">
+        
     </Style>
 
     <LinearGradientBrush x:Key="ListBoxBackgroundBrush" StartPoint="0,0" EndPoint="1,0.001">
@@ -302,7 +361,7 @@
             </Setter>
         </Style.Setters>
     </Style>
-    <Style TargetType="ListBox" x:Key="LBUsers">
+    <Style BasedOn="{StaticResource LBScrollable}" TargetType="ListBox" x:Key="LBUsers">
         <Style.Resources>
             <BooleanToVisibilityConverter x:Key="boolToVis"/>
         </Style.Resources>
