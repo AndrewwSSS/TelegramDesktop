@@ -516,7 +516,7 @@ namespace Telegram
             TextBox textBox = sender as TextBox;
             if (textBox.Text.Length != 0)
                 if (e.Key == Key.Enter)
-                    Client.SendAsync(new ChatLookupMessage(textBox.Text, Me.Id, App.MyGuid));
+                    Client.SendAsync(new ChatLookupMessage(textBox.Text));
         }
 
         private void B_AddGroupMenu_OnClick(object sender, RoutedEventArgs e)
@@ -606,7 +606,7 @@ namespace Telegram
             if (LB_FoundGroups.SelectedIndex == -1)
                 return;
             var group = LB_FoundGroups.SelectedItem as GroupItemWrap;
-            Client.SendAsync(new GroupJoinMessage(group.GroupChat.Id, Me.Id, App.MyGuid));
+            Client.SendAsync(new GroupJoinMessage(group.GroupChat.Id));
         }
 
         public GroupItemWrap CurGroup
@@ -640,7 +640,7 @@ namespace Telegram
                     if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
                         FirstPersonalMessage fpMsg
-                        = new FirstPersonalMessage(msg, App.MyGuid,
+                        = new FirstPersonalMessage(msg, 
                         CurGroup.GroupChat.MembersId.First(m => m != Me.Id),
                         TemporaryUserGroups.First(p => p.Value == CurGroup).Key);
                         Client.SendAsync(fpMsg);
@@ -677,7 +677,7 @@ namespace Telegram
         {
             var menuItem = (MenuItem)sender;
             var msg = (MessageItemWrap)menuItem.DataContext;
-            Client.SendAsync(new DeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
+            Client.SendAsync(new ChatMessageDeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
         }
     }
 
