@@ -238,9 +238,10 @@ namespace TelegramServer
 
                         foreach (var group in DbTelegram.GroupChats)
                         {
-                            if (group.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
+                            if (group.Type != GroupType.Personal
+                                && group.Name.ToLower().Contains(chatLookupMessage.Name.ToLower())
                                 && !sender.Chats.Any(chat => chat.Id == group.Id)
-                                && group.Type != GroupType.Personal)
+                                )
                             {
                                 resultMessage.Groups.Add(new PublicGroupInfo(group));
 
