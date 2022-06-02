@@ -478,7 +478,7 @@
                                         <DataTrigger Binding="{Binding ShowUsername}" Value="false">
                                             <Setter TargetName="author" Property="Height" Value="0"/>
                                         </DataTrigger>
-                                        <DataTrigger
+                                        <!--<DataTrigger
                                                 Binding="{Binding
                                                     RelativeSource={RelativeSource
                                                     Mode=FindAncestor,
@@ -489,7 +489,7 @@
                                                 TargetName="border"
                                                 Property="Background"
                                                 Value="{StaticResource MsgBgBrushLight}"/>
-                                        </DataTrigger>
+                                        </DataTrigger>-->
                                     </DataTemplate.Triggers>
 
                                 </DataTemplate>

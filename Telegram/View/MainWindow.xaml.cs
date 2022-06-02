@@ -148,7 +148,7 @@ namespace Telegram
         }
 
         public Dictionary<int, GroupItemWrap> TemporaryUserGroups { get; set; } = new Dictionary<int, GroupItemWrap>();
-        public Dictionary<int, MessageItemWrap> PendingMessages { get; set; } = new Dictionary<int, MessageItemWrap>();
+        public Dictionary<int, ChatMessage> PendingMessages { get; set; } = new Dictionary<int, ChatMessage>();
 
         public void Client_MessageReceived(TcpClientWrap client, Message msg)
         {
@@ -299,7 +299,7 @@ namespace Telegram
                     group.OnPropertyChanged("Messages");
                     group.OnPropertyChanged("LastMessage");
                     if (group == CurGroup)
-                        AddMessage(chatMsg);
+                        AddMessageToUI(chatMsg);
                 }
                 else if (msg is GroupUpdateMessage)
                 {
@@ -320,6 +320,7 @@ namespace Telegram
                     group.GroupChat.Id = result.GroupId;
                     TemporaryUserGroups.Remove(result.LocalId);
                     Groups.Add(group);
+                    ShowGroupMessages(CurGroup);
                 }
                 else if (msg is PersonalChatCreatedMessage)
                 {
@@ -347,23 +348,13 @@ namespace Telegram
                 else if (msg is ChatMessageSendResult)
                 {
                     var result = msg as ChatMessageSendResult;
-                    PendingMessages[result.LocalId].Message.Id = result.MessageId;
+                    PendingMessages[result.LocalId].Id = result.MessageId;
                     PendingMessages.Remove(result.LocalId);
                 }
             });
         }
-
-        private void AddMessage(ChatMessage msg)
+        private MessageItemWrap MakeMsgWrap(ChatMessage msg)
         {
-            var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msg.GroupId);
-
-            if (group == null)
-            {
-                group = FoundGroups.FirstOrDefault(g => g.GroupChat.Id == msg.GroupId);
-                if (group == null)
-                    return;
-            }
-
             MessageItemWrap item = new MessageItemWrap(msg);
             item.FromUser = Users.First(u => u.User.Id == msg.FromUserId);
 
@@ -384,27 +375,30 @@ namespace Telegram
                 item.ShowUsername = false;
             item.ShowAvatar = true;
 
-            if(msg.FromUserId == Me.Id)
-                if(!PendingMessages.ContainsKey(App.MessageLocalIdCounter))
-                    PendingMessages.Add(App.MessageLocalIdCounter, item);
+            
+            return item;
+        }
+        private void AddMessageToUI(ChatMessage msg)
+        {
+            var item = MakeMsgWrap(msg);
 
-            if (LB_Groups.SelectedItem == group ||
-                LB_FoundGroups.SelectedItem == group ||
-                msg.FromUserId == Me.Id)
-            {
-                Messages.Add(item);
-                LB_Messages.SelectedIndex = LB_Messages.Items.Count - 1;
-                LB_Messages.ScrollIntoView(LB_Messages.SelectedItem);
-
-            }
+            Messages.Add(item);
+            LB_Messages.SelectedIndex = LB_Messages.Items.Count - 1;
+            LB_Messages.ScrollIntoView(LB_Messages.SelectedItem);
         }
         private void ShowGroupMessages(GroupItemWrap group)
         {
-            Messages.Clear();
-            RespondingTo = null;
-            if (CurGroup.GroupChat.Messages != null)
-                foreach (var msg in group.Messages)
-                    AddMessage(msg);
+            Action action = () =>
+            {
+                Messages.Clear();
+                RespondingTo = null;
+                if (CurGroup.GroupChat.Messages != null)
+                    foreach (var msg in group.Messages)
+                        AddMessageToUI(msg);
+            };
+            Dispatcher.Invoke(action);
+            
+            
         }
         private void BTNFullScreen_Click(object sender, RoutedEventArgs e)
         {
@@ -574,7 +568,8 @@ namespace Telegram
             CurGroup = lb.SelectedItem as GroupItemWrap;
             if (CurGroup.GroupChat.GroupType != GroupType.Personal && !Groups.Contains(CurGroup))
                 B_JoinGroup.Visibility = Visibility.Visible;
-            else B_JoinGroup.Visibility = Visibility.Hidden;
+            else 
+                B_JoinGroup.Visibility = Visibility.Hidden;
             ShowGroupMessages(CurGroup);
         }
 
@@ -585,6 +580,17 @@ namespace Telegram
             FoundGroups.Clear();
             TemporaryUserGroups.Clear();
             B_JoinGroup.Visibility = Visibility.Hidden;
+            if (LB_Groups.SelectedItem != null)
+            {
+                CurGroup = LB_Groups.SelectedItem as GroupItemWrap;
+                ShowGroupMessages(CurGroup);
+            }
+            else if (Groups.Contains(CurGroup))
+            {
+                LB_Groups.SelectedItem = CurGroup;
+                ShowGroupMessages(CurGroup);
+            }
+            
         }
 
         private void B_JoinGroup_Click(object sender, RoutedEventArgs e)
@@ -619,8 +625,9 @@ namespace Telegram
 
                     if (RespondingTo != null)
                         msg.SetRespondingTo(RespondingTo.Message);
-                    
-                    AddMessage(msg);
+                    if (msg.FromUserId == Me.Id)
+                        if (!PendingMessages.ContainsKey(App.MessageLocalIdCounter))
+                            PendingMessages.Add(App.MessageLocalIdCounter, msg);
                     MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                     if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
@@ -637,6 +644,8 @@ namespace Telegram
                     CurGroup.GroupChat.Messages.Add(msg);
                     CurGroup.OnPropertyChanged("Messages");
                     CurGroup.OnPropertyChanged("LastMessage");
+
+                    AddMessageToUI(msg);
 
                     textBox.Text = "";
                     RespondingTo = null;
