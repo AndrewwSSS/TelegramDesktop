@@ -619,7 +619,7 @@ namespace Telegram
                         msg.SetRespondingTo(RespondingTo.Message);
                         RespondingTo = null;
                     }
-                    MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
+                    MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter);
                     if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
                         FirstPersonalMessage fpMsg
