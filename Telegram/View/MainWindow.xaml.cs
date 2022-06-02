@@ -346,6 +346,19 @@ namespace Telegram
                     PendingMessages[result.LocalId].Id = result.MessageId;
                     PendingMessages.Remove(result.LocalId);
                 }
+                else if(msg is DeleteChatMessageResultMessage)
+                {
+                    var result = msg as DeleteChatMessageResultMessage;
+                    if(result.Result == AuthenticationResult.Success)
+                        Groups.First(g => g.GroupChat.Id == result.GroupId).Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
+                    Messages.Remove(Messages.First(m => m.Message.Id == result.DeletedMessageId));
+                }
+                else if(msg is ChatMessageDeleteMessage)
+                {
+                    var msgDel = msg as ChatMessageDeleteMessage;
+                    Groups.First(g => g.GroupChat.Id == msgDel.GroupId).Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
+                    Messages.Remove(Messages.First(m => m.Message.Id == msgDel.DeletedMessageId));
+                }
             });
         }
         private MessageItemWrap MakeMsgWrap(ChatMessage msg)
