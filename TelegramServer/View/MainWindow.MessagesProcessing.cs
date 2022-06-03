@@ -394,13 +394,13 @@ namespace TelegramServer
 
                         if (createNewGroupMessage.Image != null)
                         {
-                            ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
-                            DbTelegram.Images.Add(newImage);
+                            //ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
+                            //DbTelegram.Images.Add(newImage);
 
-                            DbTelegram.SaveChanges();
-                            DbTelegram.Images.Load();
+                            //DbTelegram.SaveChanges();
+                            //DbTelegram.Images.Load();
 
-                            newGroup.ImagesId.Add(newImage.Id);
+                            //newGroup.ImagesId.Add(newImage.Id);
 
                         }
 
@@ -483,21 +483,36 @@ namespace TelegramServer
 
                         switch (dataRequestMessage.Type)
                         {
-                            case DataRequestType.File:
+                            case DataRequestType.FileData:
                                 {
-                                    FileContainer[] results
-                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).ToArray();
+                                    FileData[] results
+                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.Data).ToArray();
 
-                                    client.Send(new DataRequestResultMessage<FileContainer>(results));
+                                    client.Send(new DataRequestResultMessage<FileData>(results));
 
                                     break;
                                 }
-                            case DataRequestType.Image:
+                            case DataRequestType.ImageData:
                                 {
-                                    ImageContainer[] results
-                                                = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToArray();
+                                    List<ImageContainer> Images = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToList();
+                                    ImageData[] results = Images.Select(r => r.ImageData).ToArray();
 
-                                    client.Send(new DataRequestResultMessage<ImageContainer>(results));
+
+                                    client.Send(new DataRequestResultMessage<ImageData>(results));
+                                    break;
+                                }
+                            case DataRequestType.ImageMetaData:
+                                {
+                                    ImageMetadata[] results = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).Select(r => r.Metadata).ToArray();
+
+                                    client.Send(new DataRequestResultMessage<ImageMetadata>(results));
+                                    break;
+                                }
+                            case DataRequestType.FileMetaData:
+                                {
+                                    FileMetadata[] results = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(r => r.Metadata).ToArray();
+
+                                    client.Send(new DataRequestResultMessage<FileMetadata>(results));
                                     break;
                                 }
                             case DataRequestType.User:

@@ -16,7 +16,6 @@ namespace CommonLibrary.Containers
 
         public FileMetadata(string name, int size)
         {
-            FileId = fileId;
             Name = name;
             Size = size;
         }

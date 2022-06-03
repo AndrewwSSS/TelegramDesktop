@@ -49,6 +49,8 @@
     <Compile Include="Containers\FileData.cs" />
     <Compile Include="Containers\FileMetadata.cs" />
     <Compile Include="Containers\GroupItemWrap.cs" />
+    <Compile Include="Containers\ImageData.cs" />
+    <Compile Include="Containers\ImageMetadata.cs" />
     <Compile Include="Containers\UserItemWrap.cs" />
     <Compile Include="Messages\Auth\Logout\LogoutMessage.cs" />
     <Compile Include="Messages\DataRequestResultMessage.cs" />

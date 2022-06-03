@@ -1,9 +1,4 @@
-﻿using CommonLibrary.Containers;
-using CommonLibrary.Messages;
-using CommonLibrary.Messages.Auth;
-using CommonLibrary.Messages.Auth.Login;
-using CommonLibrary.Messages.Auth.SignUp;
-using CommonLibrary.Messages.Groups;
+﻿using CommonLibrary.Messages;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
@@ -19,8 +14,6 @@ using System.Windows.Threading;
 
 namespace TelegramServer
 {
-   
-
     public partial class MainWindow : Window
     {
         private ObservableCollection<User> UsersOnline;

@@ -1,14 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace CommonLibrary.Containers
 {
@@ -19,36 +11,15 @@ namespace CommonLibrary.Containers
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        public FileMetadata Metadata { get; set; }
-        public FileData FileData { get; set; }
+        public ImageMetadata Metadata { get; set; }
+        public ImageData ImageData { get; set; }
 
-
-        public static readonly string[] AllowedExtensions
-            = new string[] {
-                ".png",
-                ".jpg",
-                ".jpeg"
-            };
-
-        [NotMapped]
-        public ImageSource ImageSource
-        {
-            get
-            {
-                MemoryStream stream = new MemoryStream(FileData.Data);
-                BitmapImage image = new BitmapImage();
-                image.BeginInit();
-                image.StreamSource = stream;
-                image.EndInit();
-                return image;
-            }
-        }
-
+       
 
         public ImageContainer(string name, byte[] data)
         {
-            Metadata = new FileMetadata(name, data.Length);
-            FileData = new FileData(data);
+            Metadata = new ImageMetadata(name, data.Length);
+            ImageData = new ImageData(data);
         }
 
         public ImageContainer() { }
