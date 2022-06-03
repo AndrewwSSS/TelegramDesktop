@@ -216,6 +216,17 @@ namespace TelegramServer
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
+
+                        if(newMessage.Files.Count > 0)
+                        {
+                            foreach (var file in newMessage.Files)
+                            {
+
+                            }
+
+                        }
+
+
                         sender.Messages.Add(newMessage);
                         group.Messages.Add(newMessage);
 
