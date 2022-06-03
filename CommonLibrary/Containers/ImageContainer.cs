@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.IO;
+using System.Linq;
 
 namespace CommonLibrary.Containers
 {
@@ -9,7 +11,7 @@ namespace CommonLibrary.Containers
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; private set; }
+        public int Id { get; set; }
 
         public ImageMetadata Metadata { get; set; }
         public ImageData ImageData { get; set; }
@@ -25,7 +27,7 @@ namespace CommonLibrary.Containers
         public ImageContainer() { }
 
 
-        
+
 
 
         //public static ImageContainer FromImage(Image img)
@@ -41,19 +43,20 @@ namespace CommonLibrary.Containers
         //    return result;
         //}
 
-        //public static ImageContainer FromFile(string path)
-        //{
-        //    if (!File.Exists(path))
-        //        throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
-        //    if (!AllowedExtensions.Contains(new FileInfo(path).Extension))
-        //        throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
-        //    ImageContainer result = new ImageContainer()
-        //    {
-        //        Name = Path.GetFileName(path),
-        //        Data = File.ReadAllBytes(path)
-        //    };
-        //    return result;
-        //}
+        public static ImageContainer FromFile(string path)
+        {
+            if (!File.Exists(path))
+                throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
+            if (!ImageMetadata.AllowedExtensions.Contains(new FileInfo(path).Extension))
+                throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
+            byte[] bytes = File.ReadAllBytes(path);
+            ImageContainer result = new ImageContainer()
+            {
+                ImageData = new ImageData(bytes),
+                Metadata = new ImageMetadata(Path.GetFileName(path), bytes.Length)
+            };
+            return result;
+        }
 
         //public static string GetImageFormat(Image img)
         //{
@@ -79,12 +82,12 @@ namespace CommonLibrary.Containers
         //        return ".wmf";
         //}
 
-        ///// <summary>
-        ///// Сохраняет этот файл на устройстве
-        ///// </summary>
-        ///// <param name="path">Путь к папке для сохранения файла</param>
-        //public void ToFile(string path) => File.WriteAllBytes(path, Data);
+        /// <summary>
+        /// Сохраняет этот файл на устройстве
+        /// </summary>
+        /// <param name="path">Путь к папке для сохранения файла</param>
+        public void ToFile(string path) => File.WriteAllBytes(path, ImageData.Bytes);
 
- 
+
     }
 }

@@ -8,20 +8,20 @@ using System.Threading;
 using System.Threading.Tasks;
 namespace MessageLibrary
 {
-    public class TcpClientWrap
+    public sealed class TcpClientWrap
     {
 
 
-        private IPEndPoint endPoint;
-        private TcpClient client;
+        protected IPEndPoint endPoint;
+        protected TcpClient client;
         public TcpClient Tcp => client;
         public bool IsConnected => client == null ? false : client.Connected;
 
-        public event ClientHandler Connected;
-        public event ClientHandler Disconnected;
+        public event ClientEventHandler Connected;
+        public event ClientEventHandler Disconnected;
 
-        public event ClientMessageHandler MessageReceived;
-        public event ClientMessageHandler MessageSent;
+        public event ClientMessageEventHandler MessageReceived;
+        public event ClientMessageEventHandler MessageSent;
 
         public TcpClientWrap(IPAddress ip, int port)
         {
@@ -149,7 +149,7 @@ namespace MessageLibrary
             }
             return null;
         }
-        const int DEFAULT_BUFFER_SIZE = 4096;
+        protected const int DEFAULT_BUFFER_SIZE = 4096;
         public void ReceiveAsync()
         {
             try

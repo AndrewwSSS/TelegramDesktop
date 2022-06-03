@@ -4,6 +4,7 @@ using MessageLibrary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace TESTS
 {
@@ -22,9 +23,9 @@ namespace TESTS
         }
 
         [TestMethod]
-        public void TestUserCaching()
+        public void TestFileClient()
         {
-
+            TcpFileClientWrap client = new TcpFileClientWrap(IPAddress.Parse("127.0.0.1"), 5001);
         }
     }
 }

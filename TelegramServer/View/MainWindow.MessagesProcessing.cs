@@ -132,7 +132,7 @@ namespace TelegramServer
 
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
 
-                        ClientMessageHandler onMessagesSent = null;
+                        ClientMessageEventHandler onMessagesSent = null;
 
                         if (sender != null)
                         {
@@ -486,7 +486,7 @@ namespace TelegramServer
                             case DataRequestType.FileData:
                                 {
                                     FileData[] results
-                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.Data).ToArray();
+                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.FileData).ToArray();
 
                                     client.Send(new DataRequestResultMessage<FileData>(results));
 

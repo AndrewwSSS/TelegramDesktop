@@ -14,14 +14,14 @@ namespace CommonLibrary.Containers
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        public byte[] Data;
+        public byte[] Bytes { get; set; }
 
         [NotMapped]
         public ImageSource ImageSource
         {
             get
             {
-                MemoryStream stream = new MemoryStream(Data);
+                MemoryStream stream = new MemoryStream(Bytes);
                 BitmapImage image = new BitmapImage();
                 image.BeginInit();
                 image.StreamSource = stream;
@@ -30,7 +30,7 @@ namespace CommonLibrary.Containers
             }
         }
 
-        public ImageData(byte[] data) => Data = data;
+        public ImageData(byte[] data) => Bytes = data;
 
         public ImageData() { }
 

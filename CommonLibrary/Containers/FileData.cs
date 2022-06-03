@@ -16,10 +16,10 @@ namespace CommonLibrary.Containers
         public int Id { get; set; }
 
     
-        public byte[] Data { get; set; }
+        public byte[] Bytes { get; set; }
 
 
-        public FileData(byte[] data) => Data = data;
+        public FileData(byte[] data) => Bytes = data;
 
         public FileData() { }
 
