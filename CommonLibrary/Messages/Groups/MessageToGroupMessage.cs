@@ -11,8 +11,8 @@ namespace CommonLibrary.Messages.Groups
         public int LocalMessageId { get; set; }
         public ChatMessage Message { get; set; }
 
-        public List<KeyValuePair<int, FileContainer>> Files { get; set; }
-        public List<KeyValuePair<int, ImageContainer>> Images { get; set; }
+        public List<KeyValuePair<FileContainer, int>> Files { get; set; }
+        public List<KeyValuePair<ImageContainer, int>> Images { get; set; }
 
 
         public MessageToGroupMessage(ChatMessage message, int localId) : this()
