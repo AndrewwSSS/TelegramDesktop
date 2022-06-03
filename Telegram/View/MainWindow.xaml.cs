@@ -308,11 +308,11 @@ namespace Telegram
                 else if (msg is GroupUpdateMessage)
                 {
                     var info = msg as GroupUpdateMessage;
-                    if (info.NewUser != null)
+                    if (info.NewUserId != -1)
                     {
-                        var user = Users.FirstOrDefault(u => u.User.Id == info.NewUser.Id);
+                        var user = Users.FirstOrDefault(u => u.User.Id == info.NewUserId);
                         if (user == null)
-                            Client.SendAsync(new DataRequestMessage(info.NewUser.Id, DataRequestType.User));
+                            Client.SendAsync(new DataRequestMessage(info.NewUserId, DataRequestType.User));
                         else
                             Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
                     }
@@ -706,7 +706,7 @@ namespace Telegram
             {
                 foreach(var fileName in dialog.FileNames)
                 { 
-                    if (ImageContainer.AllowedExtensions.Contains(Path.GetExtension(fileName)))
+                    if (CommonLibrary.Containers.ImageMetadata.AllowedExtensions.Contains(Path.GetExtension(fileName)))
                     {
                         ImageContainer img = ImageContainer.FromFile(fileName);
                         MsgImages.Add(img);                        

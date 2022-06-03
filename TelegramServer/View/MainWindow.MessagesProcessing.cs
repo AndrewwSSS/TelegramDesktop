@@ -486,7 +486,7 @@ namespace TelegramServer
                             case DataRequestType.FileData:
                                 {
                                     FileData[] results
-                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.Data).ToArray();
+                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.FileData).ToArray();
 
                                     client.Send(new DataRequestResultMessage<FileData>(results));
 
