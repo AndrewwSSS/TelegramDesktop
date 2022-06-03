@@ -462,18 +462,10 @@ namespace TelegramServer
 
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
-                            PublicUserInfo userInfo = new PublicUserInfo()
-                            {
-                                Id = sender.Id,
-                                Name = sender.Name,
-                                Description = sender.Description,
-                                Login = sender.Login,
-                            };
-
-                            userInfo.ImagesId.AddRange(sender.ImagesId);
+                     
 
 
-                            SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUser = userInfo },
+                            SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUserId = sender.Id },
                                                         sender.Id,
                                                         senderClient.Id,
                                                         group.Members);
@@ -601,14 +593,15 @@ namespace TelegramServer
                             DbTelegram.SaveChanges();
 
 
-                            GroupUpdateMessage groupUpdate
-                                = new GroupUpdateMessage()
+                            GroupUpdateMessage groupUpdate = new GroupUpdateMessage()
                                 {
                                     GroupId = group.Id,
-                                    RemovedUser = sender
+                                    RemovedUserId = sender.Id
                                 };
 
-                            SendMessageToUsers()
+                            SendMessageToUsers(groupUpdate, sender.Id,
+                                               senderClient.Id,
+                                               new List<User>(group.Members) { sender });
 
                         }
                         break;

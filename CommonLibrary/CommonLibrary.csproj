@@ -46,6 +46,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Containers\FileData.cs" />
+    <Compile Include="Containers\FileMetadata.cs" />
     <Compile Include="Containers\GroupItemWrap.cs" />
     <Compile Include="Containers\UserItemWrap.cs" />
     <Compile Include="Messages\Auth\Logout\LogoutMessage.cs" />
