@@ -15,16 +15,10 @@ namespace CommonLibrary.Messages.Groups
         public List<KeyValuePair<ImageContainer, int>> Images { get; set; }
 
 
-        public MessageToGroupMessage(ChatMessage message, int localId) : this()
+        public MessageToGroupMessage(ChatMessage message, int localId)
         {
             LocalMessageId = localId;
             Message = message;
-        }
-
-        public MessageToGroupMessage()
-        {
-            Files = new List<KeyValuePair<int, FileContainer>>();
-            Images = new List<KeyValuePair<int, ImageContainer>>();
         }
     }
 }

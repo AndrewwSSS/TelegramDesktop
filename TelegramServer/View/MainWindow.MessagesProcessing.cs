@@ -583,6 +583,36 @@ namespace TelegramServer
 
                         break;
                     }
+                case "LeaveFromGroupMessage":
+                    {
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+
+                        LeaveFromGroupMessage 
+                            leaveFromGroup = (LeaveFromGroupMessage)msg;
+
+                        GroupChat group = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.Id);
+                        
+
+                        if(group != null)
+                        {
+                            
+                            group.Members.Remove(sender);
+                            DbTelegram.SaveChanges();
+
+
+                            GroupUpdateMessage groupUpdate
+                                = new GroupUpdateMessage()
+                                {
+                                    GroupId = group.Id,
+                                    RemovedUser = sender
+                                };
+
+                            SendMessageToUsers()
+
+                        }
+                        break;
+                    }
             }
         }
     }
