@@ -10,8 +10,10 @@ namespace CommonLibrary.Messages
     public enum DataRequestType
     {
         User,
-        Image,
-        File
+        ImageMetaData,
+        FileMetaData,
+        FileData, 
+        ImageData
     }
 
     [Serializable]

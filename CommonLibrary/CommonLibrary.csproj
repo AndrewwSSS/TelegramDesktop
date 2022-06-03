@@ -46,7 +46,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Containers\FileData.cs" />
+    <Compile Include="Containers\FileMetadata.cs" />
     <Compile Include="Containers\GroupItemWrap.cs" />
+    <Compile Include="Containers\ImageData.cs" />
+    <Compile Include="Containers\ImageMetadata.cs" />
     <Compile Include="Containers\UserItemWrap.cs" />
     <Compile Include="Messages\Auth\Logout\LogoutMessage.cs" />
     <Compile Include="Messages\DataRequestResultMessage.cs" />
@@ -70,6 +74,7 @@
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\DataRequestMessage.cs" />
     <Compile Include="Messages\Groups\GroupUpdateMessage.cs" />
+    <Compile Include="Messages\Groups\LeaveFromGroupMessage.cs" />
     <Compile Include="Messages\Groups\MessageToGroupMessage.cs" />
     <Compile Include="Messages\PersonalChatCreatedMessage.cs" />
     <Compile Include="Messages\Users\PreparatoryUser.cs" />

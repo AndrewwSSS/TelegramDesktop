@@ -216,15 +216,47 @@ namespace TelegramServer
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
+                        ChatMessageSendResult resultMessage
+                            = new ChatMessageSendResult();
 
-                        if(toGroupMessage.Files.Count > 0)
+
+                        if (toGroupMessage.Files.Count > 0)
                         {
                             List<FileContainer> newFiles 
-                                = toGroupMessage.Files.Select(f => f.Value).ToList();
+                                = toGroupMessage.Files.Select(f => f.Key).ToList();
+
+               
+                             DbTelegram.Files.AddRange(newFiles);
+                             DbTelegram.SaveChanges();
+                            //DbTelegram.Files.Load();
+
+                            foreach (var file in newFiles)
+                            {
+                                int key = toGroupMessage.Files.First(f => f.Key == file).Value;
+                                resultMessage.FilesId.Add(new KeyValuePair<int, int>(key, file.Id));
+                            }
+
+                            newMessage.FilesId.AddRange(newFiles.Select(f => f.Id));
 
 
+                        }
+
+                        if (toGroupMessage.Images.Count > 0)
+                        {
+                            List<ImageContainer> newImages
+                                = toGroupMessage.Images.Select(f => f.Key).ToList();
 
 
+                            DbTelegram.Images.AddRange(newImages);
+                            DbTelegram.SaveChanges();
+                            //DbTelegram.Images.Load();
+
+                            foreach (var image in newImages)
+                            {
+                                int key = toGroupMessage.Images.First(i => i.Key == image).Value;
+                                resultMessage.ImagesId.Add(new KeyValuePair<int, int>(key, image.Id));
+                            }
+                            newMessage.ImagesId.AddRange(newImages.Select(i => i.Id));
 
                         }
 
@@ -362,13 +394,13 @@ namespace TelegramServer
 
                         if (createNewGroupMessage.Image != null)
                         {
-                            ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
-                            DbTelegram.Images.Add(newImage);
+                            //ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
+                            //DbTelegram.Images.Add(newImage);
 
-                            DbTelegram.SaveChanges();
-                            DbTelegram.Images.Load();
+                            //DbTelegram.SaveChanges();
+                            //DbTelegram.Images.Load();
 
-                            newGroup.ImagesId.Add(newImage.Id);
+                            //newGroup.ImagesId.Add(newImage.Id);
 
                         }
 
@@ -430,18 +462,10 @@ namespace TelegramServer
 
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
-                            PublicUserInfo userInfo = new PublicUserInfo()
-                            {
-                                Id = sender.Id,
-                                Name = sender.Name,
-                                Description = sender.Description,
-                                Login = sender.Login,
-                            };
-
-                            userInfo.ImagesId.AddRange(sender.ImagesId);
+                     
 
 
-                            SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUser = userInfo },
+                            SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUserId = sender.Id },
                                                         sender.Id,
                                                         senderClient.Id,
                                                         group.Members);
@@ -459,21 +483,36 @@ namespace TelegramServer
 
                         switch (dataRequestMessage.Type)
                         {
-                            case DataRequestType.File:
+                            case DataRequestType.FileData:
                                 {
-                                    FileContainer[] results
-                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).ToArray();
+                                    FileData[] results
+                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.Data).ToArray();
 
-                                    client.Send(new DataRequestResultMessage<FileContainer>(results));
+                                    client.Send(new DataRequestResultMessage<FileData>(results));
 
                                     break;
                                 }
-                            case DataRequestType.Image:
+                            case DataRequestType.ImageData:
                                 {
-                                    ImageContainer[] results
-                                                = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToArray();
+                                    List<ImageContainer> Images = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToList();
+                                    ImageData[] results = Images.Select(r => r.ImageData).ToArray();
 
-                                    client.Send(new DataRequestResultMessage<ImageContainer>(results));
+
+                                    client.Send(new DataRequestResultMessage<ImageData>(results));
+                                    break;
+                                }
+                            case DataRequestType.ImageMetaData:
+                                {
+                                    ImageMetadata[] results = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).Select(r => r.Metadata).ToArray();
+
+                                    client.Send(new DataRequestResultMessage<ImageMetadata>(results));
+                                    break;
+                                }
+                            case DataRequestType.FileMetaData:
+                                {
+                                    FileMetadata[] results = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(r => r.Metadata).ToArray();
+
+                                    client.Send(new DataRequestResultMessage<FileMetadata>(results));
                                     break;
                                 }
                             case DataRequestType.User:
@@ -549,6 +588,37 @@ namespace TelegramServer
                     {
                         LogoutMessage logoutMessage = (LogoutMessage)msg;
 
+                        break;
+                    }
+                case "LeaveFromGroupMessage":
+                    {
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+
+                        LeaveFromGroupMessage 
+                            leaveFromGroup = (LeaveFromGroupMessage)msg;
+
+                        GroupChat group = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.Id);
+                        
+
+                        if(group != null)
+                        {
+                            
+                            group.Members.Remove(sender);
+                            DbTelegram.SaveChanges();
+
+
+                            GroupUpdateMessage groupUpdate = new GroupUpdateMessage()
+                                {
+                                    GroupId = group.Id,
+                                    RemovedUserId = sender.Id
+                                };
+
+                            SendMessageToUsers(groupUpdate, sender.Id,
+                                               senderClient.Id,
+                                               new List<User>(group.Members) { sender });
+
+                        }
                         break;
                     }
             }
