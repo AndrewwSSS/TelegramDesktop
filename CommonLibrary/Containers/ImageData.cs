@@ -14,7 +14,7 @@ namespace CommonLibrary.Containers
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        public byte[] Bytes { get; set}
+        public byte[] Bytes { get; set; }
 
         [NotMapped]
         public ImageSource ImageSource
