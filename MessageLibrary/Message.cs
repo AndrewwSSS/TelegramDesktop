@@ -9,13 +9,13 @@ namespace MessageLibrary
     public abstract class Message
     {
         public DateTime Time { get; protected set; } = DateTime.UtcNow;
-        private static BinaryFormatter bf = new BinaryFormatter();
+        protected static BinaryFormatter bf = new BinaryFormatter();
 
         /// <summary>
         /// Возвращает байт-массив с сериализованным объектом. Первые четыре байте отведены под размер(для чтения на клиенте)
         /// </summary>
         /// <returns></returns>
-        public byte[] ToByteArray()
+        public virtual byte[] ToByteArray()
         {
             MemoryStream ms = new MemoryStream();
 
@@ -23,14 +23,14 @@ namespace MessageLibrary
 
             byte[] msBuf = ms.ToArray();
 
-            // Len message in bytes
-            int len = msBuf.Length;
+            // Message size in bytes
+            int size = msBuf.Length;
 
             MemoryStream ms2 = new MemoryStream();
 
-            byte[] lenBuffer = BitConverter.GetBytes(len);
+            byte[] sizeBytes = BitConverter.GetBytes(size);
             
-            ms2.Write(lenBuffer, 0, lenBuffer.Length);
+            ms2.Write(sizeBytes, 0, sizeBytes.Length);
             ms2.Write(msBuf, 0, msBuf.Length);
             
             ms2.Position = 0;

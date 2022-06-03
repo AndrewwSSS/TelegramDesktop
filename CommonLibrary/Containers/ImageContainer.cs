@@ -19,7 +19,7 @@ namespace CommonLibrary.Containers
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; private set; }
+        public int Id { get; set; }
 
        
 

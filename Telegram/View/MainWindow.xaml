@@ -526,7 +526,8 @@
                                 <TextBlock Foreground="{StaticResource BlueBrush}">Ответ на сообщение:</TextBlock>
                                 <TextBlock Foreground="{StaticResource GreyBrush}" Text="{Binding RespondingTo.Message.Text}" TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
-                            <Button Grid.Column="3" Grid.Row="0" Click="CloseRespondingToPanel">X</Button>
+                            <Button Grid.Column="3" Grid.Row="0" Click="CloseRespondingToPanel">❌</Button>
+                            <Button Grid.Column="0" Grid.Row="1" Click="B_AddFilesToMsg_OnClick">📎</Button>
                             <TextBox Grid.Column="1"
                                      Grid.Row="1"
                                  Background="#282E33"

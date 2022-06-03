@@ -132,7 +132,7 @@ namespace TelegramServer
 
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Id == fastLoginMessage.UserId);
 
-                        ClientMessageHandler onMessagesSent = null;
+                        ClientMessageEventHandler onMessagesSent = null;
 
                         if (sender != null)
                         {

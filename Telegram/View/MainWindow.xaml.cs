@@ -215,6 +215,10 @@ namespace Telegram
                         }
                     }
                 }
+                else if (msg is DataRequestResultMessage<FileContainer>)
+                {
+
+                }
                 else if (msg is ChatLookupResultMessage)
                 {
                     var result = msg as ChatLookupResultMessage;
@@ -343,6 +347,11 @@ namespace Telegram
                 else if (msg is ChatMessageSendResult)
                 {
                     var result = msg as ChatMessageSendResult;
+                    foreach(var fileId in result.FilesId)
+                    {
+                        PendingFiles[fileId.Key].Id = fileId.Value;
+                        PendingFiles.Remove(fileId.Key);
+                    }
                     PendingMessages[result.LocalId].Id = result.MessageId;
                     PendingMessages.Remove(result.LocalId);
                 }
@@ -636,18 +645,25 @@ namespace Telegram
                     if (msg.FromUserId == Me.Id)
                         if (!PendingMessages.ContainsKey(App.MessageLocalIdCounter))
                             PendingMessages.Add(App.MessageLocalIdCounter, msg);
-                    MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
+
                     if (CurGroup.GroupChat.Id == -1 && CurGroup.GroupChat.GroupType == GroupType.Personal)
                     {
                         FirstPersonalMessage fpMsg
-                        = new FirstPersonalMessage(msg, 
+                        = new FirstPersonalMessage(msg,
                         CurGroup.GroupChat.MembersId.First(m => m != Me.Id),
                         TemporaryUserGroups.First(p => p.Value == CurGroup).Key);
                         Client.SendAsync(fpMsg);
                     }
                     else
+                    {
+                        MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
+                        foreach(var file in MsgFiles)
+                        {
+                            msgToGroup.Files.Add(new KeyValuePair<FileContainer, int>(file, App.ContainerLocalIdCounter));
+                            PendingFiles.Add(App.ContainerLocalIdCounter++, file);
+                        }
                         Client.SendAsync(msgToGroup);
-
+                    }
 
                     CurGroup.GroupChat.Messages.Add(msg);
                     CurGroup.OnPropertyChanged("Messages");
@@ -678,6 +694,30 @@ namespace Telegram
             var menuItem = (MenuItem)sender;
             var msg = (MessageItemWrap)menuItem.DataContext;
             Client.SendAsync(new ChatMessageDeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
+        }
+        ObservableCollection<FileContainer> MsgFiles = new ObservableCollection<FileContainer>();
+        ObservableCollection<ImageContainer> MsgImages = new ObservableCollection<ImageContainer>();
+        Dictionary<int, FileContainer> PendingFiles = new Dictionary<int, FileContainer>();
+        Dictionary<int, ImageContainer> PendingImages = new Dictionary<int, ImageContainer>();
+        private void B_AddFilesToMsg_OnClick(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                foreach(var fileName in dialog.FileNames)
+                { 
+                    if (ImageContainer.AllowedExtensions.Contains(Path.GetExtension(fileName)))
+                    {
+                        ImageContainer img = ImageContainer.FromFile(fileName);
+                        MsgImages.Add(img);                        
+                    }
+                    else
+                    {
+                        FileContainer file = FileContainer.FromFile(fileName);
+                        MsgFiles.Add(file);
+                    }
+                }
+            }
         }
     }
 

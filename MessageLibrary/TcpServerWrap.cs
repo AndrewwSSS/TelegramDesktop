@@ -5,20 +5,20 @@ using System.Threading;
 
 namespace MessageLibrary
 {
-    public delegate void ClientMessageHandler(TcpClientWrap client, Message msg);
-    public delegate void ServerHandler(TcpServerWrap server);
-    public delegate void ClientHandler(TcpClientWrap client);
+    public delegate void ClientMessageEventHandler(TcpClientWrap client, Message msg);
+    public delegate void ServerEventHandler(TcpServerWrap server);
+    public delegate void ClientEventHandler(TcpClientWrap client);
 
     public class TcpServerWrap
     {
-        public event ServerHandler Started;
-        public event ClientHandler ClientConnected;
-        public event ClientHandler ClientDisconnected;
-        public event ServerHandler Stopped;
+        public event ServerEventHandler Started;
+        public event ClientEventHandler ClientConnected;
+        public event ClientEventHandler ClientDisconnected;
+        public event ServerEventHandler Stopped;
         private TcpListener listener;
         private Thread ListenerThread;
-        public event ClientMessageHandler MessageReceived;
-        public event ClientMessageHandler MessageSent;
+        public event ClientMessageEventHandler MessageReceived;
+        public event ClientMessageEventHandler MessageSent;
 
 
         public void Start(int port, int backlog)

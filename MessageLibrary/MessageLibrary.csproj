@@ -48,7 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayMessage.cs" />
+    <Compile Include="FileMessage.cs" />
     <Compile Include="StateObject.cs" />
+    <Compile Include="TcpFileClientWrap.cs" />
+    <Compile Include="TcpFileServerWrap.cs" />
     <Compile Include="TcpServerWrap.cs" />
     <Compile Include="TextMessage.cs" />
     <Compile Include="Message.cs" />
