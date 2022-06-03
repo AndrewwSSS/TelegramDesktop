@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Messages.Users;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages.Users;
 using System;
 using System.Collections.Generic;
 
@@ -15,6 +16,9 @@ namespace CommonLibrary.Messages
         public List<int> ImagesId { get; set; }
         public List<int> FilesId { get; set; }
 
+        public List<FileContainer> Files { get; set; }
+        public List<ImageContainer> Images { get; set; }
+
         public string Text { get; set; }
         public int GroupId { get; set; }
 
@@ -29,6 +33,8 @@ namespace CommonLibrary.Messages
         {
             ImagesId = new List<int>();
             FilesId = new List<int>();
+            Images = new List<ImageContainer>();
+            Files = new List<FileContainer>();
         }
 
 

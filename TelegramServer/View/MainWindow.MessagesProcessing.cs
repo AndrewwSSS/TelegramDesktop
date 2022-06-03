@@ -499,18 +499,18 @@ namespace TelegramServer
                     }
                 case "ChatMessageDeleteMessage":
                     {
-                        ChatMessageDeleteMessage deleteMessage
+                        ChatMessageDeleteMessage MsgDeleteMessage
                             = (ChatMessageDeleteMessage)msg;
 
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
                         GroupChat group
-                            = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == deleteMessage.GroupId);
+                            = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == MsgDeleteMessage.GroupId);
 
                         if (group != null)
                         {
-                            ChatMessage deletedMessage = group.Messages.FirstOrDefault(gc => gc.Id == deleteMessage.DeletedMessageId);
+                            ChatMessage deletedMessage = group.Messages.FirstOrDefault(gc => gc.Id == MsgDeleteMessage.DeletedMessageId);
 
                             if (deletedMessage != null &&
                                (deletedMessage.FromUserId == deletedMessage.FromUserId ||
@@ -522,7 +522,7 @@ namespace TelegramServer
 
                                 client.SendAsync(new DeleteChatMessageResultMessage(group.Id, deletedMessage.Id));
 
-                                SendMessageToUsers(deletedMessage, sender.Id, senderClient.Id, group.Members);
+                                SendMessageToUsers(MsgDeleteMessage, sender.Id, senderClient.Id, group.Members);
                             }
                             else
                                 client.SendAsync(new DeleteChatMessageResultMessage(AuthenticationResult.Denied));
