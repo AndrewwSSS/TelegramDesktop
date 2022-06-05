@@ -44,6 +44,7 @@ namespace MessageLibrary
                     try { client = new TcpClientWrap(listener.AcceptTcpClient()); }
                     catch (Exception) { return; }
 
+
                     ClientConnected?.Invoke(client);
                     ReceiveAsync(client);
                 } while (true);

@@ -27,6 +27,7 @@ namespace CommonLibrary.Messages.Files
         public event FileClientMessageEventHandler ImageChunkReceived;
         public event Action<TcpFileClientWrap, FileMessage> MessageSent;
         public event FileClientEventHandler UserSynchronized;
+        public bool RequiresSync { get; set; } = false;
         public TcpFileClientWrap(IPAddress ip, int port, int userId = -1, string guid = null)
         {
             UserId = userId;
@@ -196,7 +197,7 @@ namespace CommonLibrary.Messages.Files
                         DisconnectAsync();
                         return;
                     }
-                    if (!Synchronized)
+                    if (RequiresSync && !Synchronized)
                     {
                         UserId = BitConverter.ToInt32(idBytes, 0);
                         Synchronized = true;
