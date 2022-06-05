@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 
-namespace MessageLibrary.Containers
+namespace CommonLibrary.Containers
 {
     [Serializable]
     public class FileContainer

@@ -95,6 +95,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonLibrary\CommonLibrary.csproj">
+      <Project>{9A350A63-4C66-42FE-A318-FB4FAEB330C9}</Project>
+      <Name>CommonLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MessageLibrary\MessageLibrary.csproj">
       <Project>{1FB16189-8D14-4C0C-AF9D-AF26B57E19A0}</Project>
       <Name>MessageLibrary</Name>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessageLibrary;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageLibrary
+namespace CommonLibrary.Messages.Files
 {
 
     public delegate void FileClientMessageEventHandler(TcpFileClientWrap client, int id, byte[] chunk, bool isLast);
@@ -26,7 +27,7 @@ namespace MessageLibrary
         public event FileClientMessageEventHandler ImageChunkReceived;
         public event Action<TcpFileClientWrap, FileMessage> MessageSent;
         public event FileClientEventHandler UserSynchronized;
-        public TcpFileClientWrap(IPAddress ip, int port, int userId = -1, string guid=null)
+        public TcpFileClientWrap(IPAddress ip, int port, int userId = -1, string guid = null)
         {
             UserId = userId;
             Guid = guid;
@@ -183,7 +184,7 @@ namespace MessageLibrary
                 MemoryStream stream = new MemoryStream();
 
                 // ID файла в системе Telegram
-                int fileId=-1;
+                int fileId = -1;
                 // Является ли файл изображением
                 bool isImage = false;
                 {
@@ -243,7 +244,6 @@ namespace MessageLibrary
                 int remaining = fileSize - bufSize;
                 while (client.Available > 0 && remaining != 0)
                 {
-                    
                     int received = Tcp.Client.Receive(buffer, remaining < DEFAULT_BUFFER_SIZE ? remaining : DEFAULT_BUFFER_SIZE, SocketFlags.None);
                     remaining -= received;
 
