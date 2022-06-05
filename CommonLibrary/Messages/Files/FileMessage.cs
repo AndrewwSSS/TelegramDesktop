@@ -1,4 +1,5 @@
-﻿using MessageLibrary.Containers;
+﻿using CommonLibrary.Containers;
+using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageLibrary
+namespace CommonLibrary.Messages.Files
 {
     /// <summary>
     /// Специальный вид сообщения для TcpFileClientWrap.

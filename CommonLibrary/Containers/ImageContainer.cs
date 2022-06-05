@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 
-namespace MessageLibrary.Containers
+namespace CommonLibrary.Containers
 {
     [Serializable]
     public class ImageContainer

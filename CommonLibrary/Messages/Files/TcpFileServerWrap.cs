@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MessageLibrary
+namespace CommonLibrary.Messages.Files
 {
     public delegate void FileServerEventHandler(TcpFileServerWrap server);
     public class TcpFileServerWrap
@@ -20,7 +20,8 @@ namespace MessageLibrary
         private TcpListener listener;
         private Thread ListenerThread;
         public event FileClientMessageEventHandler FileChunkReceived;
-        
+        public event FileClientMessageEventHandler ImageChunkReceived;
+
 
         public void Start(int port, int backlog)
         {
@@ -38,7 +39,8 @@ namespace MessageLibrary
             Started?.Invoke(this);
 
 
-            ListenerThread = new Thread(() => {
+            ListenerThread = new Thread(() =>
+            {
                 do
                 {
                     TcpFileClientWrap client;
@@ -56,6 +58,7 @@ namespace MessageLibrary
         {
             client.Disconnected += ClientDisconnected;
             client.FileChunkReceived += FileChunkReceived;
+            client.ImageChunkReceived += ImageChunkReceived;
             client.UserSynchronized += UserSynchronized;
 
             client.ReceiveAsync();
