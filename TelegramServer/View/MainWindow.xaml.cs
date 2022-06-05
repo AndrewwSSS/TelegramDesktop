@@ -1,6 +1,7 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
+using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
@@ -13,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using TelegramServer.View;
 
 namespace TelegramServer
 {
@@ -129,15 +131,10 @@ namespace TelegramServer
 
         private void UserSynchronized(TcpFileClientWrap client)
         {
-            //User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
-            //UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
+            User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
+            UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
 
-            //FileClientsOnline[senderClient] = client;
-
-            //for Tests
-            ImageContainer image = ImageContainer.FromFile("cat.jpg");
-
-            client.SendAsync(new FileMessage(image.ImageData, image.Id));
+            FileClientsOnline[senderClient] = client;
         }
 
         #endregion ServerEvents
@@ -186,6 +183,15 @@ namespace TelegramServer
 
         }
 
+        private void BTN_GroupInfo_Click(object sender, RoutedEventArgs e)
+        {
+            if(LB_Groups.SelectedItem != null)
+            {
+                GroupViewer groupViewer = new GroupViewer(DbTelegram, ((GroupChat)LB_Groups.SelectedItem).Id);
+                groupViewer.Show();
+            }
+        }
+
         #endregion WpfEvents
 
 
@@ -230,6 +236,8 @@ namespace TelegramServer
             return ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
         }
 
-   
+
+
+      
     }
 }

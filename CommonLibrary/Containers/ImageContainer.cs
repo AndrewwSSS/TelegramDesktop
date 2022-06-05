@@ -16,8 +16,6 @@ namespace CommonLibrary.Containers
         public ImageMetadata Metadata { get; set; }
         public ImageData ImageData { get; set; }
 
-       
-
         public ImageContainer(string name, byte[] data)
         {
             Metadata = new ImageMetadata(name, data.Length);

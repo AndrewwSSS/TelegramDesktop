@@ -100,7 +100,9 @@
 
                                     <Border.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Info"/>
+                                            <MenuItem Header="Info"
+                                                      x:Name="BTN_GroupInfo"
+                                                      Click="BTN_GroupInfo_Click"/>
                                         </ContextMenu>
                                     </Border.ContextMenu>
                                     
