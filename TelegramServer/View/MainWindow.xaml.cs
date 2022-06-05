@@ -19,9 +19,10 @@ namespace TelegramServer
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
         private Dictionary<TcpClientWrap, UserClient> ClientsOnline;
-       // private Dictionary<>
+        private Dictionary<UserClient , TcpFileClientWrap> FileClientsOnline;
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
+        private TcpFileServerWrap FileServer;
         private static Mutex mutex;
 
         [DllImport("USER32.DLL")]
@@ -46,16 +47,18 @@ namespace TelegramServer
             ClientsOnline = new Dictionary<TcpClientWrap, UserClient>();
             UsersOnline = new ObservableCollection<User>();
             UsersOffline = new ObservableCollection<User>();
-
-   
+            FileClientsOnline = new Dictionary<UserClient, TcpFileClientWrap>();
+            Server = new TcpServerWrap();
+            FileServer = new TcpFileServerWrap();
 
             DbTelegram.GroupChats.Load();
             
 
-            Server = new TcpServerWrap();
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
             Server.MessageReceived += ClientMessageRecived;
+
+            FileServer.UserSynchronized += UserSynchronized;
 
 
             LB_UsersOffline.ItemsSource = UsersOffline;
@@ -118,7 +121,16 @@ namespace TelegramServer
                 UsersOnline.Remove(DisconnectedClient.User);
                 UsersOffline.Add(DisconnectedClient.User);
                 ClientsOnline.Remove(client);
+                FileClientsOnline.Remove(DisconnectedClient);
             });
+        }
+
+        private void UserSynchronized(TcpFileClientWrap client)
+        {
+            User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
+            UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
+
+            FileClientsOnline[senderClient] = client;
         }
 
         #endregion ServerEvents
@@ -165,6 +177,7 @@ namespace TelegramServer
 
         #endregion WpfEvents
 
+
         private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, List<User> usersToSend)
         {
             bool changesExist = false;
@@ -205,5 +218,7 @@ namespace TelegramServer
         private TcpClientWrap TcpClientByUserClient(UserClient client){
             return ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
         }
+
+   
     }
 }
