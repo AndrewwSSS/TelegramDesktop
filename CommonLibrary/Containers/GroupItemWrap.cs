@@ -1,6 +1,7 @@
 ﻿using CommonLibrary.Messages;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
+using MessageLibrary.Containers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
