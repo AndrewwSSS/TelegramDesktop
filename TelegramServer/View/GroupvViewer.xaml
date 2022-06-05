@@ -230,7 +230,7 @@
                                                        Margin="0,0,0,2"/>
                                             
                                             <!--Сообщение, на которое отвечаем-->
-                                            <Grid PreviewMouseDown="Responce_OnClick" Grid.Row="2" Grid.Column="1" Margin="0,2,0,5">
+                                            <Grid Grid.Row="2" Grid.Column="1" Margin="0,2,0,5">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="*"/>
