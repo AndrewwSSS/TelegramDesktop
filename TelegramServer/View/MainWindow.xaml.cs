@@ -19,6 +19,7 @@ namespace TelegramServer
         private ObservableCollection<User> UsersOnline;
         private ObservableCollection<User> UsersOffline;
         private Dictionary<TcpClientWrap, UserClient> ClientsOnline;
+       // private Dictionary<>
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
         private static Mutex mutex;
