@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MessageLibrary
 {
@@ -12,11 +9,13 @@ namespace MessageLibrary
     {
         public string FileName { get; set; }
         public byte[] Data { get; set; }
+
         public FileMessage(string fileName, byte[] data)
         {
             FileName = fileName;
             Data = data;
         }
+
         public override byte[] ToByteArray()
         {
             MemoryStream ms = new MemoryStream();

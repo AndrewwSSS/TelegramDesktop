@@ -84,6 +84,7 @@ namespace MessageLibrary
             }
             return true;
         }
+
         private void ConnectCB(IAsyncResult ar)
         {
             TcpClient client = ar.AsyncState as TcpClient;
@@ -142,7 +143,7 @@ namespace MessageLibrary
             state.Socket.EndSend(ar);
 
             byte[] obj = state.Buffer.ToList().GetRange(4, state.Buffer.Length - 4).ToArray();
-            MessageSent?.Invoke(this, Message.FromByteArray(obj));
+            //MessageSent?.Invoke(this, Message.FromByteArray(obj));
         }
 
         private const int DEFAULT_BUFFER_SIZE = 4096;
