@@ -25,9 +25,9 @@ namespace WpfTest
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TcpFileClientWrap FileClient { get; set; } = new TcpFileClientWrap(IPAddress.Parse("192.168.0.107"), 5001, 228, "guid!");
-        private TcpFileServerWrap FileServer { get; set; } = new TcpFileServerWrap();
-        private FileStream writer = new FileStream("receivedimage.png", FileMode.OpenOrCreate);
+        private TcpFileClientWrap FileClient { get; set; } = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, 228, "guid!");
+        
+        private FileStream writer = new FileStream("receivedimage.jpg", FileMode.OpenOrCreate);
         public MainWindow()
         {
             InitializeComponent();
@@ -80,9 +80,7 @@ namespace WpfTest
         private void FileClient_Connected(TcpFileClientWrap client)
         {
             Console.WriteLine("connected");
-            ImageContainer container = ImageContainer.FromFile("testimage.png");
-            FileClient.SendAsync(new FileMessage(container.ImageData, 451));
-
+            FileClient.ReceiveAsync();
         }
     }
 }

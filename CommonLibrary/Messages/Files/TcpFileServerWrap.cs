@@ -60,6 +60,7 @@ namespace CommonLibrary.Messages.Files
             client.FileChunkReceived += FileChunkReceived;
             client.ImageChunkReceived += ImageChunkReceived;
             client.UserSynchronized += UserSynchronized;
+            client.RequiresSync = true;
 
             client.ReceiveAsync();
         }
