@@ -49,6 +49,7 @@ namespace CommonLibrary.Containers
                 throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
             if (!ImageMetadata.AllowedExtensions.Contains(new FileInfo(path).Extension))
                 throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
+
             byte[] bytes = File.ReadAllBytes(path);
             ImageContainer result = new ImageContainer()
             {

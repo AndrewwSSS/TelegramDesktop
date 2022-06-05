@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Messages;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -128,10 +129,15 @@ namespace TelegramServer
 
         private void UserSynchronized(TcpFileClientWrap client)
         {
-            User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
-            UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
+            //User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
+            //UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
 
-            FileClientsOnline[senderClient] = client;
+            //FileClientsOnline[senderClient] = client;
+
+            //for Tests
+            ImageContainer image = ImageContainer.FromFile("cat.jpg");
+
+            client.SendAsync(new FileMessage(image.ImageData, image.Id));
         }
 
         #endregion ServerEvents
@@ -147,6 +153,9 @@ namespace TelegramServer
                 BtnStartServer.IsEnabled = false;
                 TB_ListenerPort.IsEnabled = false;
                 Server.Start(port, 1000);
+
+                FileServer.Start(port+1, 1000);
+
             }
             else
                 MessageBox.Show("Invalid port", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -156,6 +165,7 @@ namespace TelegramServer
         private void BtnStopServer_Click(object sender, RoutedEventArgs e)
         {
             Server.Shutdown();
+            FileServer.Shutdown();
 
             UsersOnline.Clear();
             UsersOffline.Clear();
