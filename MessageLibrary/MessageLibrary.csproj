@@ -35,7 +35,9 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -45,9 +47,16 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayMessage.cs" />
+    <Compile Include="Containers\FileContainer.cs" />
+    <Compile Include="Containers\FileData.cs" />
+    <Compile Include="Containers\FileMetadata.cs" />
+    <Compile Include="Containers\ImageContainer.cs" />
+    <Compile Include="Containers\ImageData.cs" />
+    <Compile Include="Containers\ImageMetadata.cs" />
     <Compile Include="FileMessage.cs" />
     <Compile Include="StateObject.cs" />
     <Compile Include="TcpFileClientWrap.cs" />

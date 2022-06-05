@@ -5,7 +5,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace CommonLibrary.Containers
+namespace MessageLibrary.Containers
 {
     [Serializable]
     public class ImageData

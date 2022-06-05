@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CommonLibrary.Containers
+namespace MessageLibrary.Containers
 {
     [Serializable]
     public class FileMetadata

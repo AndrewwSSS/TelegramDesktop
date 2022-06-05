@@ -46,11 +46,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Containers\FileData.cs" />
-    <Compile Include="Containers\FileMetadata.cs" />
     <Compile Include="Containers\GroupItemWrap.cs" />
-    <Compile Include="Containers\ImageData.cs" />
-    <Compile Include="Containers\ImageMetadata.cs" />
     <Compile Include="Containers\UserItemWrap.cs" />
     <Compile Include="Messages\Auth\Logout\LogoutMessage.cs" />
     <Compile Include="Messages\DataRequestResultMessage.cs" />
@@ -82,10 +78,8 @@
     <Compile Include="Messages\Users\UserClient.cs" />
     <Compile Include="Messages\Users\UserContainer.cs" />
     <Compile Include="UserEntity.cs" />
-    <Compile Include="Containers\FileContainer.cs" />
     <Compile Include="Messages\ChatMessage.cs" />
     <Compile Include="Messages\Groups\GroupChat.cs" />
-    <Compile Include="Containers\ImageContainer.cs" />
     <Compile Include="Messages\Auth\Login\LoginMessage.cs" />
     <Compile Include="Messages\Auth\Login\LoginResultMessage.cs" />
     <Compile Include="Containers\MessageItemWrap.cs" />

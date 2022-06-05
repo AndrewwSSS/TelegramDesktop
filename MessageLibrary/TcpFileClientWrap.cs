@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 namespace MessageLibrary
 {
 
-    public delegate void FileClientMessageEventHandler(TcpFileClientWrap client, string fileName, byte[] chunk, bool isLast);
+    public delegate void FileClientMessageEventHandler(TcpFileClientWrap client, int id, byte[] chunk, bool isLast);
     public delegate void FileClientEventHandler(TcpFileClientWrap client);
-
     public sealed class TcpFileClientWrap
     {
         private IPEndPoint endPoint;
@@ -24,12 +23,13 @@ namespace MessageLibrary
         public event FileClientEventHandler Disconnected;
         public event FileClientEventHandler ConnectFailed;
         public event FileClientMessageEventHandler FileChunkReceived;
+        public event FileClientMessageEventHandler ImageChunkReceived;
         public event Action<TcpFileClientWrap, FileMessage> MessageSent;
-
-
-
-        public TcpFileClientWrap(IPAddress ip, int port)
+        public event FileClientEventHandler UserSynchronized;
+        public TcpFileClientWrap(IPAddress ip, int port, int userId = -1, string guid=null)
         {
+            UserId = userId;
+            Guid = guid;
             if (ip == null)
                 throw new ArgumentException("IP не может быть пустым");
 
@@ -38,11 +38,14 @@ namespace MessageLibrary
         }
 
 
-        public TcpFileClientWrap(TcpClient tcpClient)
+        public TcpFileClientWrap(TcpClient tcpClient, int userId = -1, string guid = null)
         {
+            UserId = userId;
+            Guid = guid;
             if (tcpClient == null)
                 throw new ArgumentException("Подключение не может быть пустым");
 
+            endPoint = tcpClient.Client.RemoteEndPoint as IPEndPoint;
             client = tcpClient;
         }
 
@@ -84,7 +87,6 @@ namespace MessageLibrary
             }
             return true;
         }
-
         private void ConnectCB(IAsyncResult ar)
         {
             TcpClient client = ar.AsyncState as TcpClient;
@@ -99,7 +101,7 @@ namespace MessageLibrary
             if (client.Connected)
             {
                 Connected?.Invoke(this);
-                ReceiveAsync();
+                SendUserInfoAsync();
             }
         }
 
@@ -112,6 +114,33 @@ namespace MessageLibrary
         public void DisconnectAsync()
         {
             Task.Run(Disconnect);
+        }
+        /// <summary>
+        /// Для синхронизации
+        /// </summary>
+        /// <param name="id">ID пользователя</param>
+        private bool SendUserInfoAsync()
+        {
+            if (client != null && client.Connected)
+            {
+                StateObject state = new StateObject()
+                {
+                    Socket = Tcp.Client
+                };
+                MemoryStream ms = new MemoryStream();
+                byte[] idBytes = BitConverter.GetBytes(UserId);
+                byte[] guidBytes = Encoding.UTF8.GetBytes(Guid);
+                byte[] guidLengthBytes = BitConverter.GetBytes(guidBytes.Length);
+                ms.Write(idBytes, 0, idBytes.Length);
+                ms.Write(guidLengthBytes, 0, guidLengthBytes.Length);
+                ms.Write(guidBytes, 0, guidBytes.Length);
+
+                byte[] buffer = ms.ToArray();
+                state.SetBuffer(buffer, buffer.Length);
+                Tcp.Client.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCB, state);
+                return true;
+            }
+            return false;
         }
         public bool Send(FileMessage message)
         {
@@ -128,7 +157,7 @@ namespace MessageLibrary
         /// </summary>
         /// <param name="message">Сообщение</param>
         /// <returns>Была ли начата операция отправки</returns>
-        public bool SendAsync(Message message)
+        public bool SendAsync(FileMessage message)
         {
             if (client != null && client.Connected)
             {
@@ -142,72 +171,103 @@ namespace MessageLibrary
             StateObject state = (StateObject)ar.AsyncState;
             state.Socket.EndSend(ar);
 
-            byte[] obj = state.Buffer.ToList().GetRange(4, state.Buffer.Length - 4).ToArray();
-            //MessageSent?.Invoke(this, Message.FromByteArray(obj));
         }
-
+        public int UserId { get; private set; } = -1;
+        public string Guid { get; private set; }
+        public bool Synchronized { get; private set; } = false;
         private const int DEFAULT_BUFFER_SIZE = 4096;
+        public void Receive()
+        {
+            try
+            {
+                MemoryStream stream = new MemoryStream();
+
+                // ID файла в системе Telegram
+                int fileId=-1;
+                // Является ли файл изображением
+                bool isImage = false;
+                {
+                    byte[] idBytes = new byte[4];
+
+                    int sizeReceived = Tcp.Client.Receive(idBytes, 4, SocketFlags.None);
+                    if (sizeReceived == 0)
+                    {
+                        DisconnectAsync();
+                        return;
+                    }
+                    if (!Synchronized)
+                    {
+                        UserId = BitConverter.ToInt32(idBytes, 0);
+                        Synchronized = true;
+                        // Получаем длинну ГУИДа
+                        int guidLength = 0;
+                        {
+                            byte[] guidLengthBytes = new byte[4];
+                            Tcp.Client.Receive(guidLengthBytes, 4, SocketFlags.None);
+                            guidLength = BitConverter.ToInt32(guidLengthBytes, 0);
+                        }
+                        byte[] guidBytes = new byte[guidLength];
+                        Tcp.Client.Receive(guidBytes, guidLength, SocketFlags.None);
+                        Guid = Encoding.UTF8.GetString(guidBytes);
+                        UserSynchronized?.Invoke(this);
+                        ReceiveAsync();
+                        return;
+                    }
+                    else
+                    {
+                        fileId = BitConverter.ToInt32(idBytes, 0);
+                        byte[] isImageBytes = new byte[1];
+                        Tcp.Client.Receive(isImageBytes, 1, SocketFlags.None);
+                        isImage = BitConverter.ToBoolean(isImageBytes, 0);
+                    }
+                }
+
+                int bufSize = DEFAULT_BUFFER_SIZE;
+                int fileSize = 0;
+                {
+                    byte[] bufSizeBytes = new byte[4];
+                    Tcp.Client.Receive(bufSizeBytes, 4, SocketFlags.None);
+                    fileSize = BitConverter.ToInt32(bufSizeBytes, 0);
+                    if (fileSize < DEFAULT_BUFFER_SIZE)
+                        bufSize = fileSize;
+                }
+
+                byte[] buffer = new byte[bufSize];
+                Tcp.Client.Receive(buffer, bufSize, SocketFlags.None);
+
+                if (isImage)
+                    ImageChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
+                else
+                    FileChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
+
+                int remaining = fileSize - bufSize;
+                while (client.Available > 0 && remaining != 0)
+                {
+                    
+                    int received = Tcp.Client.Receive(buffer, remaining < DEFAULT_BUFFER_SIZE ? remaining : DEFAULT_BUFFER_SIZE, SocketFlags.None);
+                    remaining -= received;
+
+                    if (isImage)
+                        ImageChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
+                    else
+                        FileChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
+                }
+
+                ReceiveAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Inner TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
+                DisconnectAsync();
+                return;
+            }
+        }
         public void ReceiveAsync()
         {
             try
             {
                 if (client != null && client.Client != null && client.Connected)
-                {
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            MemoryStream stream = new MemoryStream();
-
-                            string fileName;
-                            {
-                                int fileNameLength;
-                                byte[] lenBytes = new byte[4];
-
-                                int sizeReceived = Tcp.Client.Receive(lenBytes, 4, SocketFlags.None);
-                                if (sizeReceived == 0)
-                                {
-                                    Disconnect();
-                                    return;
-                                }
-                                fileNameLength = BitConverter.ToInt32(lenBytes, 0);
-                                byte[] stringBytes = new byte[fileNameLength];
-                                Tcp.Client.Receive(stringBytes, fileNameLength, SocketFlags.None);
-                                fileName = BitConverter.ToString(stringBytes);
-                            }
-                            
-
-                            int bufSize = DEFAULT_BUFFER_SIZE;
-                            int fileSize = 0;
-                            {
-                                byte[] bufSizeBytes = new byte[4];
-                                Tcp.Client.Receive(bufSizeBytes, 4, SocketFlags.None);
-                                fileSize = BitConverter.ToInt32(bufSizeBytes, 0);
-                                if (fileSize < DEFAULT_BUFFER_SIZE)
-                                    bufSize = fileSize;
-                            }
-
-                            byte[] buffer = new byte[bufSize];
-                            Tcp.Client.Receive(buffer, bufSize, SocketFlags.None);
-                            FileChunkReceived?.Invoke(this, fileName, buffer, client.Available == 0);
-                            int remaining = fileSize - bufSize;
-                            while (client.Available > 0 && remaining != 0)
-                            {
-                                int received = Tcp.Client.Receive(buffer, remaining < DEFAULT_BUFFER_SIZE ? remaining : DEFAULT_BUFFER_SIZE, SocketFlags.None);
-                                remaining -= received;
-                                FileChunkReceived?.Invoke(this, fileName, buffer, client.Available == 0);
-                            }
-
-                            ReceiveAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Inner TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
-                            DisconnectAsync();
-                            return;
-                        }
-                    });
-                }
+                    Task.Run(Receive);
             }
             catch (Exception ex)
             {

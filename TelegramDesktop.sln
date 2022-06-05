@@ -13,7 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLibrary", "CommonLibr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheLibrary", "CacheLibrary\CacheLibrary.csproj", "{20577957-5B77-4122-AADF-3A42F531106D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TESTS", "TESTS\TESTS.csproj", "{74D5357B-6916-4C0E-9F00-8A8C02F17877}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TESTS", "TESTS\TESTS.csproj", "{74D5357B-6916-4C0E-9F00-8A8C02F17877}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfTest", "WpfTest\WpfTest.csproj", "{1FF3F113-FF73-4A21-8F89-7709A130C8B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{74D5357B-6916-4C0E-9F00-8A8C02F17877}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74D5357B-6916-4C0E-9F00-8A8C02F17877}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74D5357B-6916-4C0E-9F00-8A8C02F17877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FF3F113-FF73-4A21-8F89-7709A130C8B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FF3F113-FF73-4A21-8F89-7709A130C8B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FF3F113-FF73-4A21-8F89-7709A130C8B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FF3F113-FF73-4A21-8F89-7709A130C8B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

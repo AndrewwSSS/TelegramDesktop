@@ -16,11 +16,11 @@ namespace MessageLibrary
         public event FileClientEventHandler ClientConnected;
         public event FileClientEventHandler ClientDisconnected;
         public event FileServerEventHandler Stopped;
+        public event FileClientEventHandler UserSynchronized;
         private TcpListener listener;
         private Thread ListenerThread;
         public event FileClientMessageEventHandler FileChunkReceived;
-        public event Action<TcpFileClientWrap, FileMessage> MessageSent;
-
+        
 
         public void Start(int port, int backlog)
         {
@@ -44,7 +44,6 @@ namespace MessageLibrary
                     TcpFileClientWrap client;
                     try { client = new TcpFileClientWrap(listener.AcceptTcpClient()); }
                     catch (Exception) { return; }
-
                     ClientConnected?.Invoke(client);
                     ReceiveAsync(client);
                 } while (true);
@@ -57,6 +56,7 @@ namespace MessageLibrary
         {
             client.Disconnected += ClientDisconnected;
             client.FileChunkReceived += FileChunkReceived;
+            client.UserSynchronized += UserSynchronized;
 
             client.ReceiveAsync();
         }
