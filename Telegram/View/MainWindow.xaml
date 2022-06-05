@@ -413,11 +413,12 @@
                                                 <Grid Margin="9">
                                                     <Grid.RowDefinitions>
                                                         <!--Имя пользователя, от которого переслано сообщение(может не быть)-->
-                                                        <RowDefinition x:Name="resend" Height="Auto"></RowDefinition>
+                                                        <RowDefinition Name="resend" Height="Auto"></RowDefinition>
                                                         <!--Имя пользователя, пославшего сообщение(может не быть)-->
-                                                        <RowDefinition x:Name="author" Height="0"></RowDefinition>
-                                                        <RowDefinition x:Name="response" Height="Auto"></RowDefinition>
-                                                        <RowDefinition Height="Auto"></RowDefinition>
+                                                        <RowDefinition Name="author" Height="0"></RowDefinition>
+                                                        <RowDefinition Name="response" Height="Auto"></RowDefinition>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Name="files" Height="Auto"/>
                                                     </Grid.RowDefinitions>
                                                     <Grid.ColumnDefinitions>
                                                         <!--Для иконки-->
@@ -461,13 +462,44 @@
                                                                Foreground="{StaticResource DarkGreyBrush}" 
                                                                Text="{Binding FormattedTime}"></TextBlock>
                                                     </StackPanel>
+                                                    <ListBox
+                                                             Margin="0, 5"
+                                                             Grid.Column="1" Grid.Row="4"
+                                                             ItemsSource="{Binding FilesMetadata}"
+                                                             Background="Transparent"
+                                                             BorderThickness="0">
+
+                                                        <ListBox.ItemContainerStyle>
+                                                            <Style TargetType="ListBoxItem">
+                                                                <Setter Property="Padding" Value="0"/>
+                                                                <Setter Property="Margin" Value="0"/>
+                                                            </Style>
+                                                        </ListBox.ItemContainerStyle>
+                                                        <ListBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Foreground="{StaticResource GreyBrush}" Text="📁" FontSize="20" Grid.Column="0"></TextBlock>
+                                                                    <StackPanel Grid.Column="1">
+                                                                        <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource GreyBrush}"></TextBlock>
+                                                                        <TextBlock Text="{Binding Size,StringFormat={}{0} байт}" FontSize="12" Foreground="{StaticResource DarkGreyBrush}"></TextBlock>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ListBox.ItemTemplate>
+                                                    </ListBox>
                                                 </Grid>
                                             </Border>
                                         </Grid>
                                         <Border Grid.Column="1" Background="Transparent"></Border>
                                     </Grid>
                                     <DataTemplate.Triggers>
-
+                                        <DataTrigger Binding="{Binding FilesMetadata.Count}" Value="0">
+                                            <Setter TargetName="files" Property="Height" Value="0"/>
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding RespondingTo}" Value="{x:Null}">
                                             <Setter TargetName="response" Property="Height" Value="0"/>
                                         </DataTrigger>

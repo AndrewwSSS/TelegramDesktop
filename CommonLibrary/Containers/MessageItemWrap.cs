@@ -2,6 +2,7 @@
 using CommonLibrary.Messages.Users;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -17,7 +18,8 @@ namespace CommonLibrary.Containers
 
         private bool showAvatar = false;
         private bool showUsername = false;
-
+        public ObservableCollection<FileMetadata> FilesMetadata { get; set; } = new ObservableCollection<FileMetadata>();
+        public ObservableCollection<ImageMetadata> ImageMetadatas { get; set; } = new ObservableCollection<ImageMetadata>();
         public ChatMessage Message { get; set; }
         public UserItemWrap FromUser { get; set; }
         public MessageItemWrap RespondingTo { get; set; }

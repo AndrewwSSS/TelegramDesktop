@@ -221,6 +221,7 @@ namespace CommonLibrary.Messages.Files
                         byte[] isImageBytes = new byte[1];
                         Tcp.Client.Receive(isImageBytes, 1, SocketFlags.None);
                         isImage = BitConverter.ToBoolean(isImageBytes, 0);
+                        Console.WriteLine(fileId + ": " + isImage);
                     }
                 }
 

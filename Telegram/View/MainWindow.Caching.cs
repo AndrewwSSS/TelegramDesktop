@@ -17,7 +17,8 @@ namespace Telegram
     {
         public ObservableCollection<GroupItemWrap> Groups { get; set; } = new ObservableCollection<GroupItemWrap>();
         public ObservableCollection<GroupItemWrap> FoundGroups { get; set; } = new ObservableCollection<GroupItemWrap>();
-        
+
+        public List<FileContainer> CachedFiles { get; set; } = new List<FileContainer>();
         private void LoadUsers() => Users.AddRange(CacheManager.Instance.LoadAllUsers());
         private void LoadGroups() {
             List<PublicGroupInfo> list = CacheManager.Instance.LoadAllGroups();
