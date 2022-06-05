@@ -1,8 +1,8 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using CommonLibrary.Containers;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
-using MessageLibrary.Containers;
 
 namespace TelegramServer
 {

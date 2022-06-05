@@ -7,7 +7,6 @@ using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
-using MessageLibrary.Containers;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -226,13 +225,10 @@ namespace TelegramServer
                             List<FileContainer> newFiles 
                                 = toGroupMessage.Files.Select(f => f.Key).ToList();
 
-                            foreach (var item in newFiles)
-                            {
-                                DbTelegram.Files.Add(item);
-                            }  
+                            DbTelegram.Files.AddRange(newFiles);
 
                             
-                             DbTelegram.SaveChanges();
+                            DbTelegram.SaveChanges();
                             //DbTelegram.Files.Load();
 
                             foreach (var file in newFiles)
