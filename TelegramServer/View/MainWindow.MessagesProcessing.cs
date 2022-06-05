@@ -225,9 +225,10 @@ namespace TelegramServer
                             List<FileContainer> newFiles 
                                 = toGroupMessage.Files.Select(f => f.Key).ToList();
 
-               
-                             DbTelegram.Files.AddRange(newFiles);
-                             DbTelegram.SaveChanges();
+                            DbTelegram.Files.AddRange(newFiles);
+
+                            
+                            DbTelegram.SaveChanges();
                             //DbTelegram.Files.Load();
 
                             foreach (var file in newFiles)
