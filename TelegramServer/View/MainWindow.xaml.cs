@@ -1,5 +1,7 @@
-﻿using CommonLibrary.Messages;
+﻿using CommonLibrary.Containers;
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
+using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
@@ -12,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using TelegramServer.View;
 
 namespace TelegramServer
 {
@@ -147,6 +150,9 @@ namespace TelegramServer
                 BtnStartServer.IsEnabled = false;
                 TB_ListenerPort.IsEnabled = false;
                 Server.Start(port, 1000);
+
+                FileServer.Start(port+1, 1000);
+
             }
             else
                 MessageBox.Show("Invalid port", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -156,6 +162,7 @@ namespace TelegramServer
         private void BtnStopServer_Click(object sender, RoutedEventArgs e)
         {
             Server.Shutdown();
+            FileServer.Shutdown();
 
             UsersOnline.Clear();
             UsersOffline.Clear();
@@ -174,6 +181,15 @@ namespace TelegramServer
         private void BlockOnlineUser_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void BTN_GroupInfo_Click(object sender, RoutedEventArgs e)
+        {
+            if(LB_Groups.SelectedItem != null)
+            {
+                GroupViewer groupViewer = new GroupViewer(DbTelegram, ((GroupChat)LB_Groups.SelectedItem).Id);
+                groupViewer.Show();
+            }
         }
 
         #endregion WpfEvents
@@ -220,6 +236,8 @@ namespace TelegramServer
             return ClientsOnline.FirstOrDefault(c => c.Value == client).Key;
         }
 
-   
+
+
+      
     }
 }

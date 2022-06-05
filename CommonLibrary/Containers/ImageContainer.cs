@@ -16,8 +16,6 @@ namespace CommonLibrary.Containers
         public ImageMetadata Metadata { get; set; }
         public ImageData ImageData { get; set; }
 
-       
-
         public ImageContainer(string name, byte[] data)
         {
             Metadata = new ImageMetadata(name, data.Length);
@@ -49,6 +47,7 @@ namespace CommonLibrary.Containers
                 throw new ArgumentException($"Не удалось создать ImageContainer: изображение {path} не существует");
             if (!ImageMetadata.AllowedExtensions.Contains(new FileInfo(path).Extension))
                 throw new ArgumentException($"Не удалось создать ImageContainer: формат изображения {path} не поддерживается");
+
             byte[] bytes = File.ReadAllBytes(path);
             ImageContainer result = new ImageContainer()
             {

@@ -76,7 +76,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="View\GroupvViewer.xaml">
+    <Page Include="View\GroupViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -89,8 +89,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Entities\TelegramDb.cs" />
-    <Compile Include="View\GroupvViewer.xaml.cs">
-      <DependentUpon>GroupvViewer.xaml</DependentUpon>
+    <Compile Include="View\GroupViewer.xaml.cs">
+      <DependentUpon>GroupViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

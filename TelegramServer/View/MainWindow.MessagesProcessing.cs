@@ -4,6 +4,7 @@ using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Auth.Login;
 using CommonLibrary.Messages.Auth.Logout;
 using CommonLibrary.Messages.Auth.SignUp;
+using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -486,20 +487,23 @@ namespace TelegramServer
                         {
                             case DataRequestType.FileData:
                                 {
-                                    FileData[] results
-                                             = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(f => f.FileData).ToArray();
+                                    List<FileContainer> Files = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).ToList();
+                                    TcpFileClientWrap fileClient = FileClientsOnline[ClientsOnline[client]];
 
-                                    client.Send(new DataRequestResultMessage<FileData>(results));
+                                    foreach (FileContainer file in Files)
+                                        fileClient.SendAsync(new FileMessage(file.FileData, file.Id));
 
                                     break;
                                 }
                             case DataRequestType.ImageData:
                                 {
                                     List<ImageContainer> Images = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToList();
-                                    ImageData[] results = Images.Select(r => r.ImageData).ToArray();
 
+                                    TcpFileClientWrap fileClient = FileClientsOnline[ClientsOnline[client]];
 
-                                    client.Send(new DataRequestResultMessage<ImageData>(results));
+                                    foreach (var image in Images)
+                                        fileClient.SendAsync(new FileMessage(image.ImageData, image.Id));
+                                    
                                     break;
                                 }
                             case DataRequestType.ImageMetaData:
