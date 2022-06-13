@@ -157,7 +157,8 @@
                         <TextBlock Text="{TemplateBinding Header}"
                                    Foreground="#768c9e"
                                    x:Name="TextBlock"
-                                   HorizontalAlignment="Center"/>
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
                     </Border>
 
                     <ControlTemplate.Triggers>

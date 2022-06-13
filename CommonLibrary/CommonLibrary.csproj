@@ -69,6 +69,7 @@
     <Compile Include="Messages\FirstPersonalResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatLookupResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatMessageSendResult.cs" />
+    <Compile Include="Messages\Groups\DisconnectFromGroupMessage.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Messages\Groups\LeaveFromGroupMessage.cs" />
     <Compile Include="Messages\Groups\MessageToGroupMessage.cs" />
     <Compile Include="Messages\PersonalChatCreatedMessage.cs" />
+    <Compile Include="Messages\SystemMessage.cs" />
     <Compile Include="Messages\Users\PreparatoryUser.cs" />
     <Compile Include="Messages\Users\PublicUserInfo.cs" />
     <Compile Include="Messages\Users\UserClient.cs" />

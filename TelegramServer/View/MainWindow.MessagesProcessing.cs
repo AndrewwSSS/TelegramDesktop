@@ -24,6 +24,7 @@ namespace TelegramServer
         private void ClientMessageRecived(TcpClientWrap client, Message msg)
         {
             Console.WriteLine($"Message recieved. Type {msg.GetType().Name}");
+
             switch (msg.GetType().Name)
             {
                 case "SignUpStage1Message":
@@ -403,7 +404,6 @@ namespace TelegramServer
                             //DbTelegram.Images.Load();
 
                             //newGroup.ImagesId.Add(newImage.Id);
-
                         }
 
 
@@ -427,11 +427,9 @@ namespace TelegramServer
 
                             DbTelegram.SaveChanges();
 
-
                             PublicGroupInfo GroupInfo = new PublicGroupInfo(newGroup.Name,
                                                                             newGroup.Description,
                                                                             newGroup.Id);
-
 
                             GroupInfo.AdministratorsId.Add(sender.Id);
                             GroupInfo.MembersId = newGroup.Members.Select(m => m.Id).ToList();
@@ -441,11 +439,10 @@ namespace TelegramServer
                             DistributionList.Add(sender);
 
                             SendMessageToUsers(new GroupInviteMessage(GroupInfo, sender.Id),
-                                                     sender.Id,
-                                                     senderClient.Id,
-                                                     DistributionList);
+                                               sender.Id,
+                                               senderClient.Id,
+                                               DistributionList);
                         }
-
                         break;
                     }
                 case "GroupJoinMessage":
@@ -458,19 +455,16 @@ namespace TelegramServer
 
                         if (sender != null && group != null)
                         {
-
                             sender.Chats.Add(group);
                             group.AddMember(sender);
 
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
-                     
-
-
+                   
                             SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUserId = sender.Id },
-                                                        sender.Id,
-                                                        senderClient.Id,
-                                                        group.Members);
+                                               sender.Id,
+                                               senderClient.Id,
+                                               group.Members);
 
                         }
                         else
@@ -481,7 +475,6 @@ namespace TelegramServer
                 case "DataRequestMessage":
                     {
                         DataRequestMessage dataRequestMessage = (DataRequestMessage)msg;
-
 
                         switch (dataRequestMessage.Type)
                         {
@@ -547,8 +540,6 @@ namespace TelegramServer
                                     client.Send(new DataRequestResultMessage<UserContainer>(results));
                                     break;
                                 }
-
-
                         }
 
 
@@ -589,9 +580,22 @@ namespace TelegramServer
 
                         break;
                     }
-                case "LogoutMessage":
+                case "SystemMessage":
                     {
-                        LogoutMessage logoutMessage = (LogoutMessage)msg;
+                        SystemMessage messageType = (SystemMessage)msg;
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+
+                        switch (messageType.Type)
+                        {
+                            case SystemMessageType.Logout:
+                                {
+                                    sender.Clients.Remove(senderClient);
+                                    DbTelegram.SaveChanges();
+                                    break;
+                                }
+                        }
+
 
                         break;
                     }
@@ -603,7 +607,8 @@ namespace TelegramServer
                         LeaveFromGroupMessage 
                             leaveFromGroup = (LeaveFromGroupMessage)msg;
 
-                        GroupChat group = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.Id);
+                        GroupChat group
+                            = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.Id);
                         
 
                         if(group != null)
@@ -614,16 +619,48 @@ namespace TelegramServer
 
 
                             GroupUpdateMessage groupUpdate = new GroupUpdateMessage()
-                                {
-                                    GroupId = group.Id,
-                                    RemovedUserId = sender.Id
-                                };
+                            {
+                                GroupId = group.Id,
+                                RemovedUserId = sender.Id
+                            };
 
                             SendMessageToUsers(groupUpdate, sender.Id,
                                                senderClient.Id,
                                                new List<User>(group.Members) { sender });
-
                         }
+                        break;
+                    }
+                case "GroupUpdateMessage":
+                    {
+                        GroupUpdateMessage groupUpdateMessage = (GroupUpdateMessage)msg;
+
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+                        GroupChat updatedGroup = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == groupUpdateMessage.Id);
+
+
+                        GroupUpdateMessage messageToMembers
+                            = new GroupUpdateMessage(sender.Id, groupUpdateMessage);
+                        
+                        if(updatedGroup != null)
+                        {
+                            bool ChangesExists = false;
+                            if(groupUpdateMessage.NewDescription != null)
+                            {
+                                updatedGroup.Description = groupUpdateMessage.NewDescription;
+                                ChangesExists = true;
+                            }
+
+                            if(groupUpdateMessage.NewName != null)
+                            {
+                                updatedGroup.Name = groupUpdateMessage.NewName;
+                                ChangesExists = true;
+                            }
+
+                            if (ChangesExists)
+                                DbTelegram.SaveChanges();
+                        }
+
                         break;
                     }
             }
