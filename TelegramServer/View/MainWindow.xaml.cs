@@ -27,6 +27,7 @@ namespace TelegramServer
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
+        
         private static Mutex mutex;
 
         [DllImport("USER32.DLL")]
