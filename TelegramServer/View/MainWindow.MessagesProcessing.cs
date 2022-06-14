@@ -222,6 +222,11 @@ namespace TelegramServer
                             = new ChatMessageSendResult();
 
 
+                        //if(toGroupMessage.LocalFilesId.Count != 0)
+                        //{
+                        //    foreach (var LocalFileId in toGroupMessage.LocalFilesId)
+                        //}
+
                         //if (toGroupMessage.Files.Count > 0)
                         //{
                         //    List<FileContainer> newFiles 
@@ -260,7 +265,6 @@ namespace TelegramServer
                         //        resultMessage.ImagesId.Add(new KeyValuePair<int, int>(key, image.Id));
                         //    }
                         //    newMessage.ImagesId.AddRange(newImages.Select(i => i.Id));
-
                         //}
 
 
@@ -275,7 +279,6 @@ namespace TelegramServer
 
                         SendMessageToUsers(newMessage, sender.Id, senderClient.Id, group.Members);
                         break;
-
                     }
                 case "ChatLookupMessage":
                     {

@@ -14,10 +14,16 @@ namespace CommonLibrary.Messages.Groups
         public List<int> LocalImagesId { get; set; }
 
 
-        public MessageToGroupMessage(ChatMessage message, int localId)
+        public MessageToGroupMessage(ChatMessage message, int localId) : this()
         {
             LocalMessageId = localId;
             Message = message;
+        }
+
+        public MessageToGroupMessage()
+        {
+            LocalFilesId = new List<int>();
+            LocalImagesId = new List<int>();
         }
     }
 }

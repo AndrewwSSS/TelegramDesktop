@@ -33,7 +33,7 @@ namespace TelegramServer
 
         // localMessageId - ...
         private Dictionary<int, MemoryStream> PreparingFilesData { get; set; }
-        private Dictionary<int, InfoFile> PreparingFiles { get; set; }
+        private Dictionary<int, PreparingFileData> PreparingFiles { get; set; }
         
         private static Mutex mutex;
 
@@ -62,6 +62,7 @@ namespace TelegramServer
             FileClientsOnline = new Dictionary<UserClient, TcpFileClientWrap>();
             Server = new TcpServerWrap();
             FileServer = new TcpFileServerWrap();
+            PreparingFilesData = new Dictionary<int, MemoryStream>();
 
             DbTelegram.GroupChats.Load();
             
