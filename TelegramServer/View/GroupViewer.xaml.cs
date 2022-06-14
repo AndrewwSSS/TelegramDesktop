@@ -45,7 +45,6 @@ namespace TelegramServer.View
         private ObservableCollection<UserItemWrap> Users;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         public GroupViewer(TelegramDb telegramDb, int groupId)
         {
             InitializeComponent();

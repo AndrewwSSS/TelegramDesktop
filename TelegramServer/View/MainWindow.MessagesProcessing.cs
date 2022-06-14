@@ -483,9 +483,7 @@ namespace TelegramServer
                                     List<FileContainer> Files = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).ToList();
                                     TcpFileClientWrap fileClient = FileClientsOnline[ClientsOnline[client]];
 
-                                    foreach (FileContainer file in Files)
-                                        fileClient.SendAsync(new FileMessage(file.FileData, file.Id));
-
+                                    //TODO: send file
                                     break;
                                 }
                             case DataRequestType.ImageData:
@@ -494,9 +492,8 @@ namespace TelegramServer
 
                                     TcpFileClientWrap fileClient = FileClientsOnline[ClientsOnline[client]];
 
-                                    foreach (var image in Images)
-                                        fileClient.SendAsync(new FileMessage(image.ImageData, image.Id));
-                                    
+                                    //TODO: send file
+
                                     break;
                                 }
                             case DataRequestType.ImageMetaData:

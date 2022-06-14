@@ -2,6 +2,7 @@
 using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
+using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
 using MessageLibrary;
@@ -23,6 +24,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using Telegram.Utility;
 using Telegram.WPF_Entities;
+using ImageMetadata = CommonLibrary.Containers.ImageMetadata;
 
 namespace Telegram
 {
@@ -97,11 +99,10 @@ namespace Telegram
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
         public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"), null) { }
 
-
-
+        TcpFileClientWrap FileClient { get; set; }
+        
         public MainWindow(PublicUserInfo me, ArrayMessage<BaseMessage> offlineMessages)
         {
-
             CacheManager.Instance.CachePath = "Cache\\";
             MessageDoubleClick = new UICommand((o) => true, (obj) =>
               {
@@ -113,7 +114,9 @@ namespace Telegram
               });
             LoadCache();
 
-
+            OpenLeftMenuAnim.EasingFunction = new CubicEase();
+            CloseLeftMenuAnim.EasingFunction = new CubicEase();
+            
             DataContext = this;
             InitializeComponent();
             HideRightMenu();
@@ -135,21 +138,36 @@ namespace Telegram
 
             OpenLeftMenuAnim.From = new Thickness(-LeftMenuWidth, 0, 0, 0);
             OpenLeftMenuAnim.To = new Thickness(0, 0, 0, 0);
-            OpenLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(200);
+            OpenLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(300);
 
             CloseLeftMenuAnim.From = LeftMenu.BorderThickness;
             CloseLeftMenuAnim.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
-            CloseLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(200);
-
+            CloseLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(300);
+            
 
 
             Messages = new ObservableCollection<MessageItemWrap>();
-
+            FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, Me.Id, App.MyGuid);
+            FileClient.Connected += FileClient_Connected;
+            FileClient.FileChunkReceived += FileClient_FileChunkReceived;
+            FileClient.ImageChunkReceived += FileClient_ImageChunkReceived;
+            FileClient.ConnectAsync();
+            
             if (offlineMessages != null)
                 Client_MessageReceived(Client, offlineMessages);
+            
 
             Closing += OnClosed;
         }
+
+        
+
+        private void FileClient_Connected(TcpFileClientWrap client)
+        {
+            
+            client.ReceiveAsync();
+        }
+
         private List<GroupItemWrap> CachedGroups { get; set; } = new List<GroupItemWrap>();
         private void OnClosed(object sender, EventArgs e)
         {
@@ -225,9 +243,22 @@ namespace Telegram
                         }
                     }
                 }
-                else if (msg is DataRequestResultMessage<FileContainer>)
+                else if (msg is DataRequestResultMessage<FileMetadata>)
                 {
-
+                    var result = msg as DataRequestResultMessage<FileMetadata>;
+                    foreach (var md in result.Result)
+                    {
+                        AddMetadataToMessages(md);
+                        CachedFilesMetadata.Add(md);
+                    }
+                }
+                else if (msg is DataRequestResultMessage<ImageMetadata>)
+                {
+                    var result = msg as DataRequestResultMessage<ImageMetadata>;
+                    foreach (var md in result.Result) {
+                        AddMetadataToMessages(md);
+                        CachedImagesMetadata.Add(md);
+                    }
                 }
                 else if (msg is ChatLookupResultMessage)
                 {
@@ -235,7 +266,6 @@ namespace Telegram
                     var groups = result.Groups;
                     var users = result.UsersId;
                     FoundGroups.Clear();
-
 
                     foreach (var userId in users)
                     {
@@ -312,6 +342,7 @@ namespace Telegram
                     group.GroupChat.Messages.Add(chatMsg);
                     group.OnPropertyChanged("Messages");
                     group.OnPropertyChanged("LastMessage");
+                    
                     if (group == CurGroup)
                         AddMessageToUI(chatMsg);
                 }
@@ -402,15 +433,24 @@ namespace Telegram
                 item.ShowUsername = false;
             item.ShowAvatar = true;
 
-            foreach(var fileId in msg.FilesId)
-            {
-                var file = CachedFiles.FirstOrDefault(f => f.Id == fileId);
-                if (file != null)
-                    item.FilesMetadata.Add(file.Metadata);
-                //else
-                    //Client.SendAsync(new DataRequestMessage(fileId, DataRequestType.FileData));
-            }
-            
+            //foreach(var fileId in msg.FilesId)
+            //{
+            //    var file = CachedFiles.FirstOrDefault(f => f.Id == fileId);
+            //    if (file != null)
+            //        item.FilesMetadata.Add(file.Metadata);
+            //    else
+            //        Client.SendAsync(new DataRequestMessage(fileId, DataRequestType.FileData));
+            //}
+            //foreach(var imgId in msg.ImagesId)
+            //{
+            //    var file = cache.FirstOrDefault(f => f.Id == fileId);
+            //    if (file != null)
+            //        item.FilesMetadata.Add(file.Metadata);
+            //    else
+            //        Client.SendAsync(new DataRequestMessage(fileId, DataRequestType.FileData));
+
+            //}
+
             return item;
         }
         private void AddMessageToUI(ChatMessage msg)
@@ -691,6 +731,8 @@ namespace Telegram
 
                     textBox.Text = "";
                     RespondingTo = null;
+                    MsgFiles.Clear();
+                    MsgImages.Clear();
                 }
             });
         }
@@ -713,10 +755,10 @@ namespace Telegram
             var msg = (MessageItemWrap)menuItem.DataContext;
             Client.SendAsync(new ChatMessageDeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
         }
-        ObservableCollection<FileContainer> MsgFiles = new ObservableCollection<FileContainer>();
-        ObservableCollection<ImageContainer> MsgImages = new ObservableCollection<ImageContainer>();
-        Dictionary<int, FileContainer> PendingFiles = new Dictionary<int, FileContainer>();
-        Dictionary<int, ImageContainer> PendingImages = new Dictionary<int, ImageContainer>();
+        public ObservableCollection<FileContainer> MsgFiles { get; set; } = new ObservableCollection<FileContainer>();
+        public ObservableCollection<ImageContainer> MsgImages { get; set; } = new ObservableCollection<ImageContainer>();
+        public Dictionary<int, FileContainer> PendingFiles { get; set; } = new Dictionary<int, FileContainer>();
+        public Dictionary<int, ImageContainer> PendingImages { get; set; } = new Dictionary<int, ImageContainer>();
         private void B_AddFilesToMsg_OnClick(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();

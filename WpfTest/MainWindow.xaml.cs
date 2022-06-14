@@ -25,62 +25,45 @@ namespace WpfTest
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TcpFileClientWrap FileClient { get; set; } = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, 228, "guid!");
-        
-        private FileStream writer = new FileStream("receivedimage.jpg", FileMode.OpenOrCreate);
+        private TcpFileClientWrap FileClient { get; set; } = new TcpFileClientWrap(IPAddress.Parse("127.0.0.1"), 5001, 228, "guid!");
+        private TcpFileServerWrap FileServer { get; set; } = new TcpFileServerWrap();
+        private FileStream writer = new FileStream("receivedimage.png", FileMode.OpenOrCreate);
         public MainWindow()
         {
             InitializeComponent();
 
-            //FileServer.Started += FileServer_Started;
-            //FileServer.UserSynchronized += UserSynchronized;
-            //FileServer.FileChunkReceived += FileChunkReceived;
+            FileServer.Started += FileServer_Started;
+            FileServer.ImageChunkReceived += FileServer_ImageChunkReceived;
             FileClient.ImageChunkReceived += FileServer_ImageChunkReceived;
-            FileClient.FileChunkReceived += FileChunkReceived;
-
+            FileServer.UserSynchronized += UserSync;
             FileClient.Connected += FileClient_Connected;
-            FileClient.ConnectFailed += FileClient_ConnectFailed;
-            FileClient.ConnectAsync();
+            
+            FileServer.Start(5001, 1);
+            
         }
 
-        private void FileClient_ConnectFailed(TcpFileClientWrap client)
+        private void UserSync(TcpFileClientWrap client)
         {
-            Console.WriteLine("connect failed!");
+            //ImageContainer file = ImageContainer.FromFile("testimage.png");
+            //file.Id = 451;
+            FileClient.SendFileAsync("testimage.png", -1, true);
+            //FileClient.SendImageAsync(file);
         }
 
-        private void FileServer_ImageChunkReceived(TcpFileClientWrap client, int id, byte[] chunk, bool isLast)
+        private void FileServer_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
-            Console.WriteLine("Image chunk: " + chunk.Length);
-            writer.Write(chunk, 0, chunk.Length);
-            if (isLast)
-                writer.Close();
-        }
-
-        private void FileChunkReceived(TcpFileClientWrap client, int fileId, byte[] chunk, bool isLast)
-        {
-            Console.WriteLine("File chunk: " + chunk.Length);
-            writer.Write(chunk, 0, chunk.Length);
-            if (isLast)
+            writer.Write(chunk.Data, 0, chunk.Data.Length);
+            if (chunk.IsLast)
                 writer.Close();
         }
 
         private void FileServer_Started(TcpFileServerWrap server)
         {
-            FileClient.Connected += FileClient_Connected;
             FileClient.ConnectAsync();
-        }
-
-        private void UserSynchronized(TcpFileClientWrap client)
-        {
-            Console.WriteLine(client.UserId);
-            ImageContainer container = ImageContainer.FromFile("testimage.png");
-            FileClient.SendAsync(new FileMessage(container.ImageData, 451));
         }
 
         private void FileClient_Connected(TcpFileClientWrap client)
         {
-            Console.WriteLine("connected");
-            FileClient.ReceiveAsync();
         }
     }
 }

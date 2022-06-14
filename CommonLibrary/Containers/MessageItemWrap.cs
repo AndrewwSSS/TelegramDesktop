@@ -19,7 +19,7 @@ namespace CommonLibrary.Containers
         private bool showAvatar = false;
         private bool showUsername = false;
         public ObservableCollection<FileMetadata> FilesMetadata { get; set; } = new ObservableCollection<FileMetadata>();
-        public ObservableCollection<ImageMetadata> ImageMetadatas { get; set; } = new ObservableCollection<ImageMetadata>();
+        public ObservableCollection<ImageMetadata> ImagesMetadata { get; set; } = new ObservableCollection<ImageMetadata>();
         public ChatMessage Message { get; set; }
         public UserItemWrap FromUser { get; set; }
         public MessageItemWrap RespondingTo { get; set; }
