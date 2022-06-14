@@ -11,6 +11,8 @@ namespace CommonLibrary.Messages.Groups
     public class GroupUpdateMessage : BaseMessage
     {
         public int GroupId { get; set; }
+        public int SenderId { get; set; }
+
         public int NewUserId { get; set; } = -1;
         public int RemovedUserId { get; set; } = -1;
         public string NewDescription { get; set; }
@@ -19,6 +21,13 @@ namespace CommonLibrary.Messages.Groups
 
         public GroupUpdateMessage() { }
         public GroupUpdateMessage(int id) => GroupId = id;
+        public GroupUpdateMessage(int senderId, GroupUpdateMessage updateMessage)
+        {
+            SenderId = senderId;
+            NewUserId = updateMessage.NewUserId;
+            NewDescription = updateMessage.NewDescription;
+            NewName = updateMessage.NewName;   
+        }
 
     }
 }

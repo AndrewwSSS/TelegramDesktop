@@ -1,17 +1,18 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages.Groups;
+using CommonLibrary.Messages.Users;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace TelegramServer.View
 {
-    /// <summary>
-    /// Interaction logic for GroupViewer.xaml
-    /// </summary>
     public partial class GroupViewer : Window, INotifyPropertyChanged
     {
         private ImageSource groupAvatar;
@@ -28,6 +29,7 @@ namespace TelegramServer.View
                 OnPropertyChanged();
             }
         }
+
         public ImageSource GroupAvatar
         {
             get => groupAvatar;
@@ -37,6 +39,9 @@ namespace TelegramServer.View
                 OnPropertyChanged();
             }
         }
+
+
+
         private ObservableCollection<UserItemWrap> Users;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -46,7 +51,9 @@ namespace TelegramServer.View
             TelegramDb = telegramDb;
             GroupId = groupId;
             Users = new ObservableCollection<UserItemWrap>();
-            //GroupAvatar = ImageContainer.FromFile("cat.jpg").ImageData.ImageSource;
+
+            DataContext = this;
+            LB_Members.ItemsSource = Users;
 
             UpdateInterface();
         }
@@ -55,25 +62,61 @@ namespace TelegramServer.View
         {
             GroupChat group = TelegramDb.GroupChats.FirstOrDefault(g => g.Id == GroupId);
 
+            Users.Clear();
 
             if (group != null)
             {
                 Group = group;
 
-                TB_GroupName.Text = group.Name;
-                TB_Description.Text = group.Description;
-                TB_MembersCount.Text = group.Members.Count.ToString();
-                TB_GroupType.Text = group.Type.ToString();
+                foreach (var member in group.Members) { 
+                    UserItemWrap userItemWrap = new UserItemWrap(new PublicUserInfo()
+                    {
+                        Name = member.Name
+                    });
 
-                LB_Members.ItemsSource = group.Members;
-                LB_Messages.ItemsSource = group.Messages;
+                    foreach (var imageId in member.ImagesId)  {
 
-                if(group.ImagesId.Count > 0)
-                    GroupAvatar = TelegramDb.Images.FirstOrDefault(i => i.Id == group.ImagesId[0]).ImageData.ImageSource;
+                        ImageContainer Image = TelegramDb.Images.FirstOrDefault(i => i.Id == imageId);
+
+                        if (Image != null)
+                            userItemWrap.Images.Add(Image);
+  
+                    }
+
+                    Users.Add(userItemWrap);
+                }
 
                
+                LB_Messages.ItemsSource = group.Messages;
 
-                
+
+
+
+                if (group.ImagesId.Count > 0)
+                {
+                    ImageContainer img
+                        = TelegramDb.Images.FirstOrDefault(i => i.Id == group.ImagesId[0]);
+                    MemoryStream ms1 = new MemoryStream(img.ImageData.Bytes);
+
+                    Bitmap bitmap = new Bitmap(Image.FromStream(ms1));
+
+                    Bitmap bitmap1 = new Bitmap(bitmap, 70, 70);
+
+                    MemoryStream ms2 = new MemoryStream();
+                    bitmap1.Save(ms2, System.Drawing.Imaging.ImageFormat.Png);
+
+                    var imageSource = new BitmapImage();
+                    imageSource.BeginInit();
+                    imageSource.StreamSource = ms2;
+                    imageSource.EndInit();
+
+                    GroupAvatar = imageSource;
+                }
+                    
+
+
+
+
             }
 
 
