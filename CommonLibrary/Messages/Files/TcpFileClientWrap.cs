@@ -1,4 +1,5 @@
-﻿using MessageLibrary;
+﻿using CommonLibrary.Containers;
+using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace CommonLibrary.Messages.Files
 {
 
-    public delegate void FileClientMessageEventHandler(TcpFileClientWrap client, int id, byte[] chunk, bool isLast);
+    public delegate void FileClientMessageEventHandler(TcpFileClientWrap client, FileChunk chunk);
     public delegate void FileClientEventHandler(TcpFileClientWrap client);
     public sealed class TcpFileClientWrap
     {
@@ -25,7 +26,8 @@ namespace CommonLibrary.Messages.Files
         public event FileClientEventHandler ConnectFailed;
         public event FileClientMessageEventHandler FileChunkReceived;
         public event FileClientMessageEventHandler ImageChunkReceived;
-        public event Action<TcpFileClientWrap, FileMessage> MessageSent;
+        public event FileClientMessageEventHandler FileChunkSent;
+        public event FileClientMessageEventHandler ImageChunkSent;
         public event FileClientEventHandler UserSynchronized;
         public bool RequiresSync { get; set; } = false;
         public TcpFileClientWrap(IPAddress ip, int port, int userId = -1, string guid = null)
@@ -113,10 +115,7 @@ namespace CommonLibrary.Messages.Files
             client?.Client?.Close();
             client?.Close();
         }
-        public void DisconnectAsync()
-        {
-            Task.Run(Disconnect);
-        }
+        public void DisconnectAsync() => Task.Run(Disconnect);
         /// <summary>
         /// Для синхронизации
         /// </summary>
@@ -144,26 +143,173 @@ namespace CommonLibrary.Messages.Files
             }
             return false;
         }
-        public bool Send(FileMessage message)
+
+        private static List<string> FilesInProcessing { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Асинхронно отправляет файл(метод для клиента)
+        /// </summary>
+        /// <param name="path">Сообщение</param>
+        /// <returns>Была ли начата операция отправки</returns>
+        public bool SendFileAsync(string path, int localId, bool isImage = false)
         {
-            if (client != null && client.Connected)
+            if (client != null && client.Connected && !FilesInProcessing.Contains(path))
             {
-                Tcp.Client.Send(message.ToByteArray());
-                MessageSent?.Invoke(this, message);
+                Task.Run(() =>
+                {
+                    long remaining = new FileInfo(path).Length;
+                    using (FileStream reader = new FileStream(path, FileMode.Open))
+                    {
+                        FilesInProcessing.Add(path);
+                        byte[] data = new byte[DEFAULT_BUFFER_SIZE];
+                        int bytesRead = 0;
+
+                        for (int chunkOrder = 0; remaining != 0; chunkOrder++)
+                        {
+                            byte[] toSend;
+                            bytesRead = reader.Read(data, 0, DEFAULT_BUFFER_SIZE);
+                            remaining -= bytesRead;
+                            if (bytesRead == 0)
+                                continue;
+                            {
+                                MemoryStream ms = new MemoryStream();
+                                // Посылаемые байты оформлены следующим образом:
+                                // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
+                                ms.Write(BitConverter.GetBytes(localId), 0, 4);
+                                ms.Write(BitConverter.GetBytes(chunkOrder), 0, 4);
+                                ms.Write(BitConverter.GetBytes(isImage), 0, 1);
+                                ms.Write(BitConverter.GetBytes(remaining == 0), 0, 1);
+                                ms.Write(data, 0, DEFAULT_BUFFER_SIZE);
+                                toSend = ms.ToArray();
+                            }
+                            StateObject state = new StateObject()
+                            {
+                                Socket = Tcp.Client
+                            };
+                            state.SetBuffer(toSend, toSend.Length);
+                            Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
+                            FileChunk chunk = new FileChunk()
+                            {
+                                FileId = localId,
+                                IsLast = remaining == 0,
+                                Data = toSend,
+                                IsImage = isImage,
+                                Order = chunkOrder
+                            };
+                            if (chunk.IsImage)
+                                ImageChunkSent?.Invoke(this, chunk);
+                            else
+                                FileChunkSent?.Invoke(this, chunk);
+                        };
+                        FilesInProcessing.Remove(path);
+                    }
+                });
                 return true;
             }
             return false;
         }
         /// <summary>
-        /// Асинхронно отправляет сообщение клиента
+        /// Асинхронно отправляет файл(метод для сервера)
         /// </summary>
-        /// <param name="message">Сообщение</param>
-        /// <returns>Была ли начата операция отправки</returns>
-        public bool SendAsync(FileMessage message)
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public bool SendFileAsync(FileContainer file)
         {
             if (client != null && client.Connected)
             {
-                message.SendToAsync(Tcp.Client, SendCB);
+                Task.Run(() =>
+                {
+                    var data = file.FileData.Bytes;
+                    int remaining = data.Length;
+                    for (int chunkNumber = 0; remaining > 0; chunkNumber++)
+                    {
+                        byte[] toSend;
+                        {
+                            int bufSize = remaining > DEFAULT_BUFFER_SIZE ? DEFAULT_BUFFER_SIZE : remaining;
+                            MemoryStream ms = new MemoryStream();
+                            // Посылаемые байты оформлены следующим образом:
+                            // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
+                            ms.Write(BitConverter.GetBytes(file.Id), 0, 4);
+                            ms.Write(BitConverter.GetBytes(chunkNumber), 0, 4);
+                            ms.Write(BitConverter.GetBytes(false), 0, 1);
+                            ms.Write(BitConverter.GetBytes(remaining <= 4096), 0, 1);
+                            byte[] section = new byte[bufSize];
+                            Array.Copy(data, data.Length - remaining, section, 0, bufSize);
+                            ms.Write(section, 0, bufSize);
+                            toSend = ms.ToArray();
+                            remaining -= bufSize;
+                        }
+                        StateObject state = new StateObject()
+                        {
+                            Socket = Tcp.Client
+                        };
+                        state.SetBuffer(toSend, toSend.Length);
+                        Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
+                        FileChunk chunk = new FileChunk()
+                        {
+                            FileId = file.Id,
+                            IsLast = remaining == 0,
+                            Data = toSend,
+                            IsImage = false,
+                            Order = 0
+                        };
+                        if (chunk.IsImage)
+                            ImageChunkSent?.Invoke(this, chunk);
+                        else
+                            FileChunkSent?.Invoke(this, chunk);
+                    }
+                });
+                return true;
+            }
+            return false;
+
+        }
+        public bool SendImageAsync(ImageContainer img)
+        {
+            if (client != null && client.Connected)
+            {
+                Task.Run(() =>
+                {
+                    var data = img.ImageData.Bytes;
+                    int remaining = data.Length;
+                    for (int chunkNumber = 0; remaining > 0; chunkNumber++)
+                    {
+                        byte[] toSend;
+                        {
+                            int bufSize = remaining > DEFAULT_BUFFER_SIZE ? DEFAULT_BUFFER_SIZE : remaining;
+                            MemoryStream ms = new MemoryStream();
+                            // Посылаемые байты оформлены следующим образом:
+                            // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
+                            ms.Write(BitConverter.GetBytes(img.Id), 0, 4);
+                            ms.Write(BitConverter.GetBytes(chunkNumber), 0, 4);
+                            ms.Write(BitConverter.GetBytes(true), 0, 1);
+                            ms.Write(BitConverter.GetBytes(remaining <= 4096), 0, 1);
+                            byte[] section = new byte[bufSize];
+                            Array.Copy(data, data.Length - remaining, section, 0, bufSize);
+                            ms.Write(section, 0, bufSize);
+                            toSend = ms.ToArray();
+                            remaining -= bufSize;
+                        }
+                        StateObject state = new StateObject()
+                        {
+                            Socket = Tcp.Client
+                        };
+                        state.SetBuffer(toSend, toSend.Length);
+                        Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
+                        FileChunk chunk = new FileChunk()
+                        {
+                            FileId = img.Id,
+                            IsLast = remaining == 0,
+                            Data = toSend,
+                            IsImage = true,
+                            Order = 0
+                        };
+                        if (chunk.IsImage)
+                            ImageChunkSent?.Invoke(this, chunk);
+                        else
+                            FileChunkSent?.Invoke(this, chunk);
+                    }
+                });
                 return true;
             }
             return false;
@@ -172,7 +318,6 @@ namespace CommonLibrary.Messages.Files
         {
             StateObject state = (StateObject)ar.AsyncState;
             state.Socket.EndSend(ar);
-
         }
         public int UserId { get; private set; } = -1;
         public string Guid { get; private set; }
@@ -184,14 +329,12 @@ namespace CommonLibrary.Messages.Files
             {
                 MemoryStream stream = new MemoryStream();
 
-                // ID файла в системе Telegram
-                int fileId = -1;
-                // Является ли файл изображением
-                bool isImage = false;
-                {
-                    byte[] idBytes = new byte[4];
+                FileChunk chunk = new FileChunk();
 
-                    int sizeReceived = Tcp.Client.Receive(idBytes, 4, SocketFlags.None);
+                {
+                    byte[] intBytes = new byte[4];
+
+                    int sizeReceived = Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
                     if (sizeReceived == 0)
                     {
                         DisconnectAsync();
@@ -199,7 +342,7 @@ namespace CommonLibrary.Messages.Files
                     }
                     if (RequiresSync && !Synchronized)
                     {
-                        UserId = BitConverter.ToInt32(idBytes, 0);
+                        UserId = BitConverter.ToInt32(intBytes, 0);
                         Synchronized = true;
                         // Получаем длинну ГУИДа
                         int guidLength = 0;
@@ -217,43 +360,26 @@ namespace CommonLibrary.Messages.Files
                     }
                     else
                     {
-                        fileId = BitConverter.ToInt32(idBytes, 0);
-                        byte[] isImageBytes = new byte[1];
-                        Tcp.Client.Receive(isImageBytes, 1, SocketFlags.None);
-                        isImage = BitConverter.ToBoolean(isImageBytes, 0);
-                        Console.WriteLine(fileId + ": " + isImage);
+                        chunk.FileId = BitConverter.ToInt32(intBytes, 0);
+                        Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
+                        chunk.Order = BitConverter.ToInt32(intBytes, 0);
+                        byte[] boolBytes = new byte[1];
+                        Tcp.Client.Receive(boolBytes, 1, SocketFlags.None);
+                        chunk.IsImage = BitConverter.ToBoolean(boolBytes, 0);
+                        Tcp.Client.Receive(boolBytes, 1, SocketFlags.None);
+                        chunk.IsLast = BitConverter.ToBoolean(boolBytes, 0);
+                        Console.WriteLine($"File #{chunk.FileId} Chunk #{chunk.Order} (isImage: {chunk.IsImage}, isLastChunk: {chunk.IsLast})");
                     }
                 }
 
-                int bufSize = DEFAULT_BUFFER_SIZE;
-                int fileSize = 0;
-                {
-                    byte[] bufSizeBytes = new byte[4];
-                    Tcp.Client.Receive(bufSizeBytes, 4, SocketFlags.None);
-                    fileSize = BitConverter.ToInt32(bufSizeBytes, 0);
-                    if (fileSize < DEFAULT_BUFFER_SIZE)
-                        bufSize = fileSize;
-                }
+                chunk.Data = new byte[DEFAULT_BUFFER_SIZE];
 
-                byte[] buffer = new byte[bufSize];
-                Tcp.Client.Receive(buffer, bufSize, SocketFlags.None);
+                int received = Tcp.Client.Receive(chunk.Data, DEFAULT_BUFFER_SIZE, SocketFlags.None);
 
-                if (isImage)
-                    ImageChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
+                if (chunk.IsImage)
+                    ImageChunkReceived?.Invoke(this, chunk);
                 else
-                    FileChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
-
-                int remaining = fileSize - bufSize;
-                while (client.Available > 0 && remaining != 0)
-                {
-                    int received = Tcp.Client.Receive(buffer, remaining < DEFAULT_BUFFER_SIZE ? remaining : DEFAULT_BUFFER_SIZE, SocketFlags.None);
-                    remaining -= received;
-
-                    if (isImage)
-                        ImageChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
-                    else
-                        FileChunkReceived?.Invoke(this, fileId, buffer, client.Available == 0);
-                }
+                    FileChunkReceived?.Invoke(this, chunk);
 
                 ReceiveAsync();
             }
@@ -273,7 +399,7 @@ namespace CommonLibrary.Messages.Files
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Out TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
+                Console.WriteLine($"Outer TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
                 Disconnected?.Invoke(this);
             }
         }

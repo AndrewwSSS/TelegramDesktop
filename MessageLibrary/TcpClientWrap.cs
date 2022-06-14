@@ -177,9 +177,7 @@ namespace MessageLibrary
 
                             int bufSize = objectSize < DEFAULT_BUFFER_SIZE ? objectSize : DEFAULT_BUFFER_SIZE;
                             byte[] buffer = new byte[bufSize];
-                            Tcp.Client.Receive(buffer, bufSize, SocketFlags.None);
-                            stream.Write(buffer, 0, bufSize);
-                            int remaining = objectSize - bufSize;
+                            int remaining = objectSize;
                             while (client.Available > 0 && remaining != 0)
                             {
                                 int received = Tcp.Client.Receive(buffer, remaining < DEFAULT_BUFFER_SIZE ? remaining : DEFAULT_BUFFER_SIZE, SocketFlags.None);
