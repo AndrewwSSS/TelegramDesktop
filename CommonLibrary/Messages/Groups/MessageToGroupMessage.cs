@@ -1,5 +1,4 @@
-﻿using CommonLibrary.Containers;
-using MessageLibrary;
+﻿using MessageLibrary;
 using System;
 using System.Collections.Generic;
 
@@ -11,14 +10,20 @@ namespace CommonLibrary.Messages.Groups
         public int LocalMessageId { get; set; }
         public ChatMessage Message { get; set; }
 
-        public List<KeyValuePair<FileContainer, int>> Files { get; set; }
-        public List<KeyValuePair<ImageContainer, int>> Images { get; set; }
+        public List<int> LocalFilesId { get; set; }
+        public List<int> LocalImagesId { get; set; }
 
 
-        public MessageToGroupMessage(ChatMessage message, int localId)
+        public MessageToGroupMessage(ChatMessage message, int localId) : this()
         {
             LocalMessageId = localId;
             Message = message;
+        }
+
+        public MessageToGroupMessage()
+        {
+            LocalFilesId = new List<int>();
+            LocalImagesId = new List<int>();
         }
     }
 }
