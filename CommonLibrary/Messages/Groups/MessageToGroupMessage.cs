@@ -10,9 +10,8 @@ namespace CommonLibrary.Messages.Groups
         public int LocalMessageId { get; set; }
         public ChatMessage Message { get; set; }
 
-        // Local 
-        public List<KeyValuePair<int, int>> Files { get; set; }
-        public List<KeyValuePair<int, int>> Images { get; set; }
+        public List<int> LocalFilesId { get; set; }
+        public List<int> LocalImagesId { get; set; }
 
 
         public MessageToGroupMessage(ChatMessage message, int localId)

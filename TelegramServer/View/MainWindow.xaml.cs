@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Containers;
+﻿using CommonLibrary;
+using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Groups;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -18,6 +20,7 @@ using TelegramServer.View;
 
 namespace TelegramServer
 {
+
     public partial class MainWindow : Window
     {
         private ObservableCollection<User> UsersOnline;
@@ -27,6 +30,10 @@ namespace TelegramServer
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
+
+        // localMessageId - ...
+        private Dictionary<int, MemoryStream> PreparingFilesData { get; set; }
+        private Dictionary<int, InfoFile> PreparingFiles { get; set; }
         
         private static Mutex mutex;
 
@@ -64,7 +71,7 @@ namespace TelegramServer
             Server.MessageReceived += ClientMessageRecived;
 
             FileServer.UserSynchronized += UserSynchronized;
-
+            FileServer.FileChunkReceived += FileServer_FileChunkReceived;
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
@@ -91,6 +98,11 @@ namespace TelegramServer
 
             //smtp.Send(message);
 
+        }
+
+        private void FileServer_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
+        {
+            throw new NotImplementedException();
         }
 
         #region ServerEvents
