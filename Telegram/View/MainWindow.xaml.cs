@@ -149,8 +149,8 @@ namespace Telegram
             Messages = new ObservableCollection<MessageItemWrap>();
             FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, Me.Id, App.MyGuid);
             FileClient.Connected += FileClient_Connected;
-            FileClient.FileChunkReceived += FileClient_FileChunkReceived;
-            FileClient.ImageChunkReceived += FileClient_ImageChunkReceived;
+            FileClient.FileChunkReceived += FileClient_FileChunkReceived; ;
+            FileClient.ImageChunkReceived += FileClient_ImageChunkReceived; ;
             FileClient.ConnectAsync();
             
             if (offlineMessages != null)
@@ -160,7 +160,7 @@ namespace Telegram
             Closing += OnClosed;
         }
 
-        
+
 
         private void FileClient_Connected(TcpFileClientWrap client)
         {

@@ -19,22 +19,23 @@ namespace Telegram
 
         public Dictionary<int, FileStream> FileDownloadStreams = new Dictionary<int, FileStream>();
         public Dictionary<int, FileStream> ImageDownloadStreams = new Dictionary<int, FileStream>();
-        private void FileClient_ImageChunkReceived(TcpFileClientWrap client, int id, byte[] chunk, bool isLast)
+
+        private void FileClient_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
-            
+            throw new NotImplementedException();
         }
 
-        private void FileClient_FileChunkReceived(TcpFileClientWrap client, int id, byte[] chunk, bool isLast)
+        private void FileClient_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
-            if (!FileDownloadStreams.ContainsKey(id))
+            if (!FileDownloadStreams.ContainsKey(chunk.FileId))
             {
-                FileMetadata metadata = CachedFilesMetadata.First(md => md.Id == id);
-                var stream = new FileStream($"Downloads/{id}_{metadata.Name}", FileMode.OpenOrCreate);
-                FileDownloadStreams.Add(id, stream);
-                stream.Write(chunk, 0, chunk.Length);
+                FileMetadata metadata = CachedFilesMetadata.First(md => md.Id == chunk.FileId);
+                var stream = new FileStream($"Downloads/{chunk.FileId}_{metadata.Name}", FileMode.OpenOrCreate);
+                FileDownloadStreams.Add(chunk.FileId, stream);
+                stream.Write(chunk.Data, 0, chunk.Data.Length);
             }
             else
-                FileDownloadStreams[id].Write(chunk, 0, chunk.Length);
+                FileDownloadStreams[chunk.FileId].Write(chunk.Data, 0, chunk.Data.Length);
         }
         public void AddMetadataToMessages(FileMetadata metadata)
         {
