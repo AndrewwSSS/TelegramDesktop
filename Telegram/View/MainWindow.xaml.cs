@@ -216,9 +216,8 @@ namespace Telegram
                             group.Members.Add(user);
                             if (group.GroupChat.GroupType == GroupType.Personal)
                             {
-                                var secondUser = group.Members.First(u => u.User.Id != Me.Id);
-                                group.GroupChat.Name = secondUser.User.Name;
-                                group.GroupChat.Description = secondUser.User.Description;
+                                group.GroupChat.Name = user.User.Name;
+                                group.GroupChat.Description = user.User.Description;
                                 group.Images = user.Images;
                             }
                         }
@@ -391,9 +390,13 @@ namespace Telegram
                 else if(msg is DeleteChatMessageResultMessage)
                 {
                     var result = msg as DeleteChatMessageResultMessage;
-                    if(result.Result == AuthenticationResult.Success)
-                        Groups.First(g => g.GroupChat.Id == result.GroupId).Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
+                    if (result.Result == AuthenticationResult.Success) {
+                        var group = Groups.First(g => g.GroupChat.Id == result.GroupId);
+                        group.Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
+                        group.OnPropertyChanged("LastMessage");
+                    }
                     Messages.Remove(Messages.First(m => m.Message.Id == result.DeletedMessageId));
+                
                 }
                 else if(msg is ChatMessageDeleteMessage)
                 {
