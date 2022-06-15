@@ -134,7 +134,7 @@ namespace TelegramServer
                     downloads.FinishedImages.Add(new KeyValuePair<int, int>(newImage.Id, chunk.FileId));
 
                 }
-              
+               
             }
             else
             {
@@ -169,6 +169,8 @@ namespace TelegramServer
 
                 }
             }
+
+
 
             if (downloads.IsCompleted)
             {
