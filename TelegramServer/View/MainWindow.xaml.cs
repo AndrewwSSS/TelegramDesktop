@@ -31,8 +31,6 @@ namespace TelegramServer
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
         private Dictionary<UserClient, UserDownloads> UsersDownloads;
-
-
         private static Mutex mutex;
 
         [DllImport("USER32.DLL")]
@@ -122,7 +120,6 @@ namespace TelegramServer
 
                 if (chunk.IsLast)
                 {
-
                     KeyValuePair<int, ImageMetadata> info = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
                     ImageMetadata metaData = info.Value;
                     ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
@@ -173,9 +170,15 @@ namespace TelegramServer
                 }
             }
 
+            if (downloads.IsCompleted)
+            {
+                MetadataResultMessage resultMessage 
+                    = new MetadataResultMessage(downloads.FinishedImages, downloads.FinishedFiles);
 
-            
+                TcpClientWrap TcpClient = ClientsOnline.FirstOrDefault(co => co.Value == senderClient).Key;
 
+                TcpClient.SendAsync(resultMessage);
+            }
         }
 
         #region ServerEvents
