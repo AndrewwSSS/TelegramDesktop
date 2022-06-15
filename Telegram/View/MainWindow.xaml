@@ -571,11 +571,11 @@
                                      KeyDown="TB_SendMsg_OnEnter"/>
 
                             <Border Margin="-8" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" CornerRadius="360" Background="IndianRed">
-                                <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding MsgFiles.Count}"/>
+                                <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding MsgFilesUI.Count}"/>
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding MsgFiles.Count}" Value="0">
+                                            <DataTrigger Binding="{Binding MsgFilesUI.Count}" Value="0">
                                                 <Setter Property="Visibility" Value="Hidden" />
                                             </DataTrigger>
                                         </Style.Triggers>

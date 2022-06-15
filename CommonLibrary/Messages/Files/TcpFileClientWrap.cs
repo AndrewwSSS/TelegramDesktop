@@ -161,13 +161,14 @@ namespace CommonLibrary.Messages.Files
                     using (FileStream reader = new FileStream(path, FileMode.Open))
                     {
                         FilesInProcessing.Add(path);
-                        byte[] data = new byte[DEFAULT_BUFFER_SIZE];
+                        int bufSize = remaining < DEFAULT_BUFFER_SIZE ? (int)remaining : DEFAULT_BUFFER_SIZE;
+                        byte[] data = new byte[bufSize];
                         int bytesRead = 0;
 
                         for (int chunkOrder = 0; remaining != 0; chunkOrder++)
                         {
                             byte[] toSend;
-                            bytesRead = reader.Read(data, 0, DEFAULT_BUFFER_SIZE);
+                            bytesRead = reader.Read(data, 0, bufSize);
                             remaining -= bytesRead;
                             if (bytesRead == 0)
                                 continue;
@@ -179,7 +180,7 @@ namespace CommonLibrary.Messages.Files
                                 ms.Write(BitConverter.GetBytes(chunkOrder), 0, 4);
                                 ms.Write(BitConverter.GetBytes(isImage), 0, 1);
                                 ms.Write(BitConverter.GetBytes(remaining == 0), 0, 1);
-                                ms.Write(data, 0, DEFAULT_BUFFER_SIZE);
+                                ms.Write(data, 0, bufSize);
                                 toSend = ms.ToArray();
                             }
                             StateObject state = new StateObject()
