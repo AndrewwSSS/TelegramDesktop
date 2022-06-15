@@ -24,7 +24,7 @@ namespace CommonLibrary.Containers
         public UserItemWrap FromUser { get; set; }
         public MessageItemWrap RespondingTo { get; set; }
         public UserItemWrap RepostUser { get; set; }
-        public string FormattedTime => Message.Time.ToString("HH:mm");
+        public string FormattedTime => Message.LocalTime.ToString("HH:mm");
         public bool ShowAvatar
         {
             get => showAvatar;
