@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using MessageLibrary;
+using System;
+using System.Collections.Generic;
 
 namespace CommonLibrary.Messages.Files
 {
-    public class MetadataResultMessage
+    [Serializable]
+    public class MetadataResultMessage : Message
     {
         //LocalId - DbId
         public List<KeyValuePair<int, int>> Images { get; set; }

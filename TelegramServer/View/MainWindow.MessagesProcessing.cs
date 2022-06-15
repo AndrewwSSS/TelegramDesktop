@@ -463,7 +463,7 @@ namespace TelegramServer
                                     client.Send(new DataRequestResultMessage<ImageMetadata>(results));
                                     break;
                                 }
-                            case DataRequestType.FileMetaData:
+                            case DataRequestType.FileMetadata:
                                 {
                                     FileMetadata[] results = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).Select(r => r.Metadata).ToArray();
 
@@ -626,7 +626,7 @@ namespace TelegramServer
 
                         UserClient senderClient = ClientsOnline[client];
 
-                        UsersDownloads[senderClient] = new UserDownload(metadataMessage.Images,metadataMessage.Files)
+                        UsersDownloads[senderClient] = new UserDownload(metadataMessage.Images, metadataMessage.Files);
 
 
 

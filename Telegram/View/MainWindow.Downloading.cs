@@ -19,6 +19,8 @@ namespace Telegram
 
         public Dictionary<int, FileStream> FileDownloadStreams = new Dictionary<int, FileStream>();
         public Dictionary<int, FileStream> ImageDownloadStreams = new Dictionary<int, FileStream>();
+        public Dictionary<int, FileMetadata> PendingFiles { get; set; } = new Dictionary<int, FileMetadata>();
+        public Dictionary<int, ImageMetadata> PendingImages { get; set; } = new Dictionary<int, ImageMetadata>();
 
         private void FileClient_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
