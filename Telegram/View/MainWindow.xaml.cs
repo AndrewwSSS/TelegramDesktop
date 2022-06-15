@@ -420,10 +420,10 @@ namespace Telegram
                     msgToGroup.FilesId = result.Files.Select(p=>p.Value).ToList();
                     msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
                     Client.SendAsync(msgToGroup);
+                    
                     var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msgToGroup.Message.GroupId);
                     if (group != null)
                     {
-
                         group.GroupChat.Messages.Add(msgToGroup.Message);
                         group.OnPropertyChanged("Messages");
                         group.OnPropertyChanged("LastMessage");
