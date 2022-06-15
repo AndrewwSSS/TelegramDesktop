@@ -780,9 +780,9 @@ namespace Telegram
                     textBox.Text = "";
                     RespondingTo = null;
                     MsgFilesUI.Clear();
+                    MsgImagesUI.Clear();
                     MsgImages.Clear();
                     MsgFiles.Clear();
-                    MsgImagesUI.Clear();
                 }
             });
         }
