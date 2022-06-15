@@ -12,11 +12,13 @@ namespace CommonLibrary.Messages.Files
         public List<KeyValuePair<int, int>> Files { get; set; }
 
 
-        public MetadataResultMessage()
+        public MetadataResultMessage(List<KeyValuePair<int, int>> images, List<KeyValuePair<int, int>> files)
         {
-            Images = new List<KeyValuePair<int, int>>();
-            Files = new List<KeyValuePair<int, int>>();
+            Images = images;
+            Files = files;
         }
+
+
 
     }
 }
