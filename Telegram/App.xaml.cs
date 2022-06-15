@@ -19,6 +19,6 @@ namespace Telegram
         public static string MyGuid { get; set; }
         public static int UserGroupLocalIdCounter { get; set; } = 0;
         public static int MessageLocalIdCounter { get; set; } = 0;
-        public static int ContainerLocalIdCounter { get; set; } = 0;
+        public static int MetadataLocalIdCounter { get; set; } = 0;
     }
 }

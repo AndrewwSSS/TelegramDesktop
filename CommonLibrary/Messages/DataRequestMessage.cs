@@ -11,7 +11,7 @@ namespace CommonLibrary.Messages
     {
         User,
         ImageMetaData,
-        FileMetaData,
+        FileMetadata,
         FileData, 
         ImageData
     }

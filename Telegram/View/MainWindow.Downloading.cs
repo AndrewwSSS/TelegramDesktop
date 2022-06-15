@@ -19,6 +19,8 @@ namespace Telegram
 
         public Dictionary<int, FileStream> FileDownloadStreams = new Dictionary<int, FileStream>();
         public Dictionary<int, FileStream> ImageDownloadStreams = new Dictionary<int, FileStream>();
+        public Dictionary<int, FileMetadata> PendingFiles { get; set; } = new Dictionary<int, FileMetadata>();
+        public Dictionary<int, ImageMetadata> PendingImages { get; set; } = new Dictionary<int, ImageMetadata>();
 
         private void FileClient_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
@@ -35,7 +37,12 @@ namespace Telegram
                 stream.Write(chunk.Data, 0, chunk.Data.Length);
             }
             else
+            {
                 FileDownloadStreams[chunk.FileId].Write(chunk.Data, 0, chunk.Data.Length);
+                if (chunk.IsLast)
+                    FileDownloadStreams[chunk.FileId].Close();
+                FileDownloadStreams.Remove(chunk.FileId);
+            }
         }
         public void AddMetadataToMessages(FileMetadata metadata)
         {

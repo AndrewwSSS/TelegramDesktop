@@ -10,8 +10,8 @@ namespace CommonLibrary.Messages.Groups
         public int LocalMessageId { get; set; }
         public ChatMessage Message { get; set; }
 
-        public List<int> LocalFilesId { get; set; }
-        public List<int> LocalImagesId { get; set; }
+        public List<int> FilesId { get; set; }
+        public List<int> ImagesId { get; set; }
 
 
         public MessageToGroupMessage(ChatMessage message, int localId) : this()
@@ -22,8 +22,8 @@ namespace CommonLibrary.Messages.Groups
 
         public MessageToGroupMessage()
         {
-            LocalFilesId = new List<int>();
-            LocalImagesId = new List<int>();
+            FilesId = new List<int>();
+            ImagesId = new List<int>();
         }
     }
 }

@@ -8,6 +8,7 @@ namespace CommonLibrary.Containers
 {
     public class FileChunk
     {
+        public int FileId { get; set; }
         /// <summary>
         /// Порядковый номер куска(на какой итерации чтения его послали)
         /// </summary>

@@ -9,10 +9,11 @@ namespace CommonLibrary.Messages.Files
     [Serializable]
     public class MetadataMessage : Message
     {
-        public List<ImageMetadata> Images { get; set; }
-        public List<FileMetadata> Files { get; set; }
+        // Списки пар LocalID - Image/File metadata
+        public List<KeyValuePair<int, ImageMetadata>> Images { get; set; }
+        public List<KeyValuePair<int, FileMetadata>> Files { get; set; }
 
-        public MetadataMessage(IEnumerable<ImageMetadata> images = null, IEnumerable<FileMetadata> files = null)
+        public MetadataMessage(IEnumerable<KeyValuePair<int, ImageMetadata>> images = null, IEnumerable<KeyValuePair<int, FileMetadata>> files = null)
         {
             Images = images?.ToList();
             Files = files?.ToList();
