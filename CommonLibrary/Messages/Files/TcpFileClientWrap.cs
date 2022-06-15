@@ -165,7 +165,7 @@ namespace CommonLibrary.Messages.Files
                         byte[] data = new byte[bufSize];
                         int bytesRead = 0;
 
-                        for (int chunkOrder = 0; remaining != 0; chunkOrder++)
+                        while(remaining != 0)
                         {
                             byte[] toSend;
                             bytesRead = reader.Read(data, 0, bufSize);
@@ -177,9 +177,9 @@ namespace CommonLibrary.Messages.Files
                                 // Посылаемые байты оформлены следующим образом:
                                 // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
                                 ms.Write(BitConverter.GetBytes(localId), 0, 4);
-                                ms.Write(BitConverter.GetBytes(chunkOrder), 0, 4);
                                 ms.Write(BitConverter.GetBytes(isImage), 0, 1);
                                 ms.Write(BitConverter.GetBytes(remaining == 0), 0, 1);
+                                ms.Write(BitConverter.GetBytes(bufSize), 0, 4);
                                 ms.Write(data, 0, bufSize);
                                 toSend = ms.ToArray();
                             }
@@ -194,8 +194,7 @@ namespace CommonLibrary.Messages.Files
                                 FileId = localId,
                                 IsLast = remaining == 0,
                                 Data = toSend,
-                                IsImage = isImage,
-                                Order = chunkOrder
+                                IsImage = isImage
                             };
                             if (chunk.IsImage)
                                 ImageChunkSent?.Invoke(this, chunk);
@@ -231,9 +230,9 @@ namespace CommonLibrary.Messages.Files
                             // Посылаемые байты оформлены следующим образом:
                             // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
                             ms.Write(BitConverter.GetBytes(file.Id), 0, 4);
-                            ms.Write(BitConverter.GetBytes(chunkNumber), 0, 4);
                             ms.Write(BitConverter.GetBytes(false), 0, 1);
                             ms.Write(BitConverter.GetBytes(remaining <= 4096), 0, 1);
+                            ms.Write(BitConverter.GetBytes(bufSize), 0, 4);
                             byte[] section = new byte[bufSize];
                             Array.Copy(data, data.Length - remaining, section, 0, bufSize);
                             ms.Write(section, 0, bufSize);
@@ -251,8 +250,7 @@ namespace CommonLibrary.Messages.Files
                             FileId = file.Id,
                             IsLast = remaining == 0,
                             Data = toSend,
-                            IsImage = false,
-                            Order = 0
+                            IsImage = false
                         };
                         if (chunk.IsImage)
                             ImageChunkSent?.Invoke(this, chunk);
@@ -282,9 +280,9 @@ namespace CommonLibrary.Messages.Files
                             // Посылаемые байты оформлены следующим образом:
                             // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
                             ms.Write(BitConverter.GetBytes(img.Id), 0, 4);
-                            ms.Write(BitConverter.GetBytes(chunkNumber), 0, 4);
                             ms.Write(BitConverter.GetBytes(true), 0, 1);
                             ms.Write(BitConverter.GetBytes(remaining <= 4096), 0, 1);
+                            ms.Write(BitConverter.GetBytes(bufSize), 0, 4);
                             byte[] section = new byte[bufSize];
                             Array.Copy(data, data.Length - remaining, section, 0, bufSize);
                             ms.Write(section, 0, bufSize);
@@ -302,8 +300,7 @@ namespace CommonLibrary.Messages.Files
                             FileId = img.Id,
                             IsLast = remaining == 0,
                             Data = toSend,
-                            IsImage = true,
-                            Order = 0
+                            IsImage = true
                         };
                         if (chunk.IsImage)
                             ImageChunkSent?.Invoke(this, chunk);
@@ -331,7 +328,7 @@ namespace CommonLibrary.Messages.Files
                 MemoryStream stream = new MemoryStream();
 
                 FileChunk chunk = new FileChunk();
-
+                int dataSize = 0;
                 {
                     byte[] intBytes = new byte[4];
 
@@ -362,20 +359,22 @@ namespace CommonLibrary.Messages.Files
                     else
                     {
                         chunk.FileId = BitConverter.ToInt32(intBytes, 0);
-                        Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
-                        chunk.Order = BitConverter.ToInt32(intBytes, 0);
                         byte[] boolBytes = new byte[1];
                         Tcp.Client.Receive(boolBytes, 1, SocketFlags.None);
                         chunk.IsImage = BitConverter.ToBoolean(boolBytes, 0);
                         Tcp.Client.Receive(boolBytes, 1, SocketFlags.None);
                         chunk.IsLast = BitConverter.ToBoolean(boolBytes, 0);
-                        Console.WriteLine($"File #{chunk.FileId} Chunk #{chunk.Order} (isImage: {chunk.IsImage}, isLastChunk: {chunk.IsLast})");
+
+                        Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
+                        dataSize = BitConverter.ToInt32(intBytes,0);
+
+                        Console.WriteLine($"File #{chunk.FileId} (isImage: {chunk.IsImage}, isLastChunk: {chunk.IsLast})");
                     }
                 }
 
-                chunk.Data = new byte[DEFAULT_BUFFER_SIZE];
+                chunk.Data = new byte[dataSize];
 
-                int received = Tcp.Client.Receive(chunk.Data, DEFAULT_BUFFER_SIZE, SocketFlags.None);
+                int received = Tcp.Client.Receive(chunk.Data, dataSize, SocketFlags.None);
 
                 if (chunk.IsImage)
                     ImageChunkReceived?.Invoke(this, chunk);
