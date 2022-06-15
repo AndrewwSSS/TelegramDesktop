@@ -123,17 +123,7 @@ namespace Telegram
             HideRightMenu();
             Me = me;
             Users.Add(new UserItemWrap(me));
-            FileContainer file = FileContainer.FromFile("readme.txt");
-            file.Id = -1;
-            CachedFiles.Add(file);
-            GroupItemWrap test = new GroupItemWrap(new PublicGroupInfo("TEST", "desc", -228));
-            test.Messages.Add(new ChatMessage("Test!")
-            {
-                FilesId = new List<int>() { -1 }
-            }.SetFrom(Me).SetGroupId(-228));
-            if (!Groups.Contains(test))
-                Groups.Add(test);
-
+            
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
 
