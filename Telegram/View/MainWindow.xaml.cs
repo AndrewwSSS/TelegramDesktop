@@ -98,14 +98,15 @@ namespace Telegram
         }
 
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
-        public MainWindow() : 
+        public MainWindow() :
             this(
                 new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"),
                 null,
-                null) { }
+                null)
+        { }
 
         TcpFileClientWrap FileClient { get; set; }
-        
+
         public MainWindow(PublicUserInfo me, TcpClientWrap client, ArrayMessage<BaseMessage> offlineMessages)
         {
             Client = client;
@@ -122,13 +123,13 @@ namespace Telegram
 
             OpenLeftMenuAnim.EasingFunction = new CubicEase();
             CloseLeftMenuAnim.EasingFunction = new CubicEase();
-            
+
             DataContext = this;
             InitializeComponent();
             HideRightMenu();
             Me = me;
             Users.Add(new UserItemWrap(me));
-            
+
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
 
@@ -139,7 +140,7 @@ namespace Telegram
             CloseLeftMenuAnim.From = LeftMenu.BorderThickness;
             CloseLeftMenuAnim.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(300);
-            
+
 
 
             Messages = new ObservableCollection<MessageItemWrap>();
@@ -338,7 +339,7 @@ namespace Telegram
                     group.GroupChat.Messages.Add(chatMsg);
                     group.OnPropertyChanged("Messages");
                     group.OnPropertyChanged("LastMessage");
-                    
+
                     if (group == CurGroup)
                         AddMessageToUI(chatMsg);
                 }
@@ -387,18 +388,19 @@ namespace Telegram
                     PendingMessages[result.LocalId].Id = result.MessageId;
                     PendingMessages.Remove(result.LocalId);
                 }
-                else if(msg is DeleteChatMessageResultMessage)
+                else if (msg is DeleteChatMessageResultMessage)
                 {
                     var result = msg as DeleteChatMessageResultMessage;
-                    if (result.Result == AuthenticationResult.Success) {
+                    if (result.Result == AuthenticationResult.Success)
+                    {
                         var group = Groups.First(g => g.GroupChat.Id == result.GroupId);
                         group.Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
                         group.OnPropertyChanged("LastMessage");
                     }
                     Messages.Remove(Messages.First(m => m.Message.Id == result.DeletedMessageId));
-                
+
                 }
-                else if(msg is ChatMessageDeleteMessage)
+                else if (msg is ChatMessageDeleteMessage)
                 {
                     var msgDel = msg as ChatMessageDeleteMessage;
                     Groups.First(g => g.GroupChat.Id == msgDel.GroupId).Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
@@ -407,12 +409,27 @@ namespace Telegram
                 else if (msg is MetadataResultMessage)
                 {
                     var result = msg as MetadataResultMessage;
-                    foreach(var pair in result.Files)
+                    foreach (var pair in result.Files)
                     {
                         var file = PendingFiles[pair.Key];
                         PendingFiles.Remove(pair.Key);
                         file.Id = pair.Value;
                         CachedFilesMetadata.Add(file);
+                    }
+                    var msgToGroup = PendingMsgWithFiles[result.LocalMessageId];
+                    msgToGroup.FilesId = result.Files.Select(p=>p.Value).ToList();
+                    msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
+                    Client.SendAsync(msgToGroup);
+                    var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msgToGroup.Message.GroupId);
+                    if (group != null)
+                    {
+
+                        group.GroupChat.Messages.Add(msgToGroup.Message);
+                        group.OnPropertyChanged("Messages");
+                        group.OnPropertyChanged("LastMessage");
+
+                        if (CurGroup == group)
+                            AddMessageToUI(msgToGroup.Message);
                     }
                 }
             });
@@ -498,8 +515,8 @@ namespace Telegram
                         AddMessageToUI(msg);
             };
             Dispatcher.Invoke(action);
-            
-            
+
+
         }
         private void BTNFullScreen_Click(object sender, RoutedEventArgs e)
         {
@@ -669,7 +686,7 @@ namespace Telegram
             CurGroup = lb.SelectedItem as GroupItemWrap;
             if (CurGroup.GroupChat.GroupType != GroupType.Personal && !Groups.Contains(CurGroup))
                 B_JoinGroup.Visibility = Visibility.Visible;
-            else 
+            else
                 B_JoinGroup.Visibility = Visibility.Hidden;
             ShowGroupMessages(CurGroup);
         }
@@ -691,7 +708,7 @@ namespace Telegram
                 LB_Groups.SelectedItem = CurGroup;
                 ShowGroupMessages(CurGroup);
             }
-            
+
         }
 
         private void B_JoinGroup_Click(object sender, RoutedEventArgs e)
@@ -742,19 +759,22 @@ namespace Telegram
                     {
                         MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                         // отправляем файлы
-                        if(MsgFilesUI.Count != 0 ||
+                        if (MsgFilesUI.Count != 0 ||
                             MsgImagesUI.Count != 0)
                         {
+                            PendingMsgWithFiles.Add(msgToGroup.LocalMessageId, msgToGroup);
                             List<int> filesLocalId = new List<int>();
                             Client.SendAsync(
                                 new MetadataMessage(
+                                    msgToGroup.LocalMessageId,
                                     //images:
                                     //MsgImages.Select(
                                     //    img => new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img)
                                     //    ) 
-                                    files:  
+                                    files:
                                     MsgFilesUI.Select(
-                                        file => {
+                                        file =>
+                                        {
                                             PendingFiles.Add(App.MetadataLocalIdCounter, file);
                                             filesLocalId.Add(App.MetadataLocalIdCounter);
                                             return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
@@ -762,9 +782,12 @@ namespace Telegram
                                         )
                                     )
                                 );
-                            for(int i =0; i < filesLocalId.Count; i++)
+                            for (int i = 0; i < filesLocalId.Count; i++)
                                 FileClient.SendFileAsync(MsgFiles[i], filesLocalId[i], false);
-                        } else
+                            Dispatcher.Invoke(ResetMessageForm);
+                            return;
+                        }
+                        else
                             Client.SendAsync(msgToGroup);
                     }
 
@@ -773,17 +796,20 @@ namespace Telegram
                     CurGroup.OnPropertyChanged("LastMessage");
 
                     AddMessageToUI(msg);
-
-                    textBox.Text = "";
-                    RespondingTo = null;
-                    MsgFilesUI.Clear();
-                    MsgImagesUI.Clear();
-                    MsgImages.Clear();
-                    MsgFiles.Clear();
+                    Dispatcher.Invoke(ResetMessageForm);
                 }
             });
         }
 
+        private void ResetMessageForm()
+        {
+            TB_Message.Text = "";
+            RespondingTo = null;
+            MsgFilesUI.Clear();
+            MsgImagesUI.Clear();
+            MsgImages.Clear();
+            MsgFiles.Clear();
+        }
         private void CloseRespondingToPanel(object sender, RoutedEventArgs e)
         {
             RespondingTo = null;
@@ -811,9 +837,9 @@ namespace Telegram
         private void B_AddFilesToMsg_OnClick(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
-            if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                foreach(var fileName in dialog.FileNames)
+                foreach (var fileName in dialog.FileNames)
                 {
                     FileInfo info = new FileInfo(fileName);
                     if (ImageMetadata.AllowedExtensions.Contains(Path.GetExtension(fileName)))

@@ -568,6 +568,7 @@
                                  FontSize="20"
                                  Foreground="White"
                                  BorderThickness="0"
+                                     x:Name="TB_Message"
                                      KeyDown="TB_SendMsg_OnEnter"/>
 
                             <Border Margin="-8" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" CornerRadius="360" Background="IndianRed">

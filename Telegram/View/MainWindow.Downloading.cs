@@ -1,6 +1,7 @@
 ﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
+using CommonLibrary.Messages.Groups;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,10 +13,11 @@ namespace Telegram
 {
     public partial class MainWindow
     {
-        public List<MessageItemWrap> PendingMetadataMsg = new List<MessageItemWrap>();
-        
-        public List<ImageMetadata> CachedImagesMetadata = new List<ImageMetadata>();
-        public List<FileMetadata> CachedFilesMetadata = new List<FileMetadata>();
+        public List<MessageItemWrap> PendingMetadataMsg { get; set; } = new List<MessageItemWrap>();
+
+        public Dictionary<int, MessageToGroupMessage> PendingMsgWithFiles { get; set; } = new Dictionary<int, MessageToGroupMessage>();
+        public List<ImageMetadata> CachedImagesMetadata { get; set; } = new List<ImageMetadata>();
+        public List<FileMetadata> CachedFilesMetadata { get; set; } = new List<FileMetadata>();
 
         public Dictionary<int, FileStream> FileDownloadStreams = new Dictionary<int, FileStream>();
         public Dictionary<int, FileStream> ImageDownloadStreams = new Dictionary<int, FileStream>();

@@ -10,12 +10,12 @@ namespace CommonLibrary.Messages.Files
         //LocalId - DbId
         public List<KeyValuePair<int, int>> Images { get; set; }
         public List<KeyValuePair<int, int>> Files { get; set; }
-
-
-        public MetadataResultMessage(List<KeyValuePair<int, int>> images, List<KeyValuePair<int, int>> files)
+        public int LocalMessageId { get; set; }
+        public MetadataResultMessage(int msgId, List<KeyValuePair<int, int>> images, List<KeyValuePair<int, int>> files)
         {
             Images = images;
             Files = files;
+            LocalMessageId = msgId;
         }
 
 

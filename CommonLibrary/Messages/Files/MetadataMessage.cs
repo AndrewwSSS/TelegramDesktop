@@ -13,8 +13,10 @@ namespace CommonLibrary.Messages.Files
         public List<KeyValuePair<int, ImageMetadata>> Images { get; set; }
         public List<KeyValuePair<int, FileMetadata>> Files { get; set; }
 
-        public MetadataMessage(IEnumerable<KeyValuePair<int, ImageMetadata>> images = null, IEnumerable<KeyValuePair<int, FileMetadata>> files = null)
+        public int LocalMessageId { get; set; }
+        public MetadataMessage(int msgId, IEnumerable<KeyValuePair<int, ImageMetadata>> images = null, IEnumerable<KeyValuePair<int, FileMetadata>> files = null)
         {
+            LocalMessageId = msgId;
             Images = images?.ToList();
             Files = files?.ToList();
         }
