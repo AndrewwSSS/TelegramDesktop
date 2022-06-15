@@ -715,12 +715,12 @@ namespace Telegram
                     else
                     {
                         MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
-                        foreach(var file in MsgFiles)
+                        if(MsgFiles.Count != 0 ||
+                            MsgImages.Count != 0)
                         {
-                            msgToGroup.Files.Add(new KeyValuePair<FileContainer, int>(file, App.ContainerLocalIdCounter));
-                            PendingFiles.Add(App.ContainerLocalIdCounter++, file);
-                        }
-                        Client.SendAsync(msgToGroup);
+                            Client.SendAsync(new MetadataMessage(MsgImages, MsgFiles));
+                        } else
+                            Client.SendAsync(msgToGroup);
                     }
 
                     CurGroup.GroupChat.Messages.Add(msg);
@@ -755,8 +755,8 @@ namespace Telegram
             var msg = (MessageItemWrap)menuItem.DataContext;
             Client.SendAsync(new ChatMessageDeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
         }
-        public ObservableCollection<FileContainer> MsgFiles { get; set; } = new ObservableCollection<FileContainer>();
-        public ObservableCollection<ImageContainer> MsgImages { get; set; } = new ObservableCollection<ImageContainer>();
+        public ObservableCollection<FileMetadata> MsgFiles { get; set; } = new ObservableCollection<FileMetadata>();
+        public ObservableCollection<ImageMetadata> MsgImages { get; set; } = new ObservableCollection<ImageMetadata>();
         public Dictionary<int, FileContainer> PendingFiles { get; set; } = new Dictionary<int, FileContainer>();
         public Dictionary<int, ImageContainer> PendingImages { get; set; } = new Dictionary<int, ImageContainer>();
         private void B_AddFilesToMsg_OnClick(object sender, RoutedEventArgs e)
@@ -765,17 +765,13 @@ namespace Telegram
             if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 foreach(var fileName in dialog.FileNames)
-                { 
-                    if (CommonLibrary.Containers.ImageMetadata.AllowedExtensions.Contains(Path.GetExtension(fileName)))
-                    {
-                        ImageContainer img = ImageContainer.FromFile(fileName);
-                        MsgImages.Add(img);                        
-                    }
+                {
+                    FileInfo info = new FileInfo(fileName);
+                    if (ImageMetadata.AllowedExtensions.Contains(Path.GetExtension(fileName)))
+                        MsgImages.Add(new ImageMetadata(info.Name, (int)info.Length));                        
                     else
-                    {
-                        FileContainer file = FileContainer.FromFile(fileName);
-                        MsgFiles.Add(file);
-                    }
+                        MsgFiles.Add(new FileMetadata(info.Name, (int)info.Length));
+                    
                 }
             }
         }

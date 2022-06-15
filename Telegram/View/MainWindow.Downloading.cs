@@ -35,7 +35,12 @@ namespace Telegram
                 stream.Write(chunk.Data, 0, chunk.Data.Length);
             }
             else
+            {
                 FileDownloadStreams[chunk.FileId].Write(chunk.Data, 0, chunk.Data.Length);
+                if (chunk.IsLast)
+                    FileDownloadStreams[chunk.FileId].Close();
+                FileDownloadStreams.Remove(chunk.FileId);
+            }
         }
         public void AddMetadataToMessages(FileMetadata metadata)
         {
