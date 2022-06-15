@@ -620,6 +620,22 @@ namespace TelegramServer
 
                         break;
                     }
+                case "MetadataMessage":
+                    {
+                        MetadataMessage metadataMessage = (MetadataMessage)msg;
+
+                        UserClient senderClient = ClientsOnline[client];
+
+                        UsersDownloads[senderClient] = new UserDownload(metadataMessage.Images,metadataMessage.Files)
+
+
+
+
+
+
+
+                        break;
+                    }
             }
         }
     }
