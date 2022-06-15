@@ -464,12 +464,12 @@ namespace Telegram
                     var metadata = CachedFilesMetadata.FirstOrDefault(md => md.Id == id);
                     if (metadata == null)
                     {
-                        Client.SendAsync(new DataRequestMessage(id, DataRequestType.FileMetadata));
                         if (!pending)
                         {
                             pending = true;
                             PendingMetadataMsg.Add(item);
                         }
+                        Client.SendAsync(new DataRequestMessage(id, DataRequestType.FileMetadata));
                     }
                     else
                         item.FilesMetadata.Add(metadata);

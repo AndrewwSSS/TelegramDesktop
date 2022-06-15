@@ -7,8 +7,8 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class MessageToGroupMessage : Message
     {
-        private List<int> filesId;
-        private List<int> imagesId;
+        private List<int> filesId = new List<int>();
+        private List<int> imagesId = new List<int>();
 
         public int LocalMessageId { get; set; }
         public ChatMessage Message { get; set; }
@@ -31,7 +31,7 @@ namespace CommonLibrary.Messages.Groups
         }
 
 
-        public MessageToGroupMessage(ChatMessage message, int localId) : this()
+        public MessageToGroupMessage(ChatMessage message, int localId)
         {
             LocalMessageId = localId;
             Message = message;
@@ -39,8 +39,6 @@ namespace CommonLibrary.Messages.Groups
 
         public MessageToGroupMessage()
         {
-            FilesId = new List<int>();
-            ImagesId = new List<int>();
         }
     }
 }
