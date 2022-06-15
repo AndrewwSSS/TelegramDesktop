@@ -98,12 +98,17 @@ namespace Telegram
         }
 
         public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
-        public MainWindow() : this(new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"), null) { }
+        public MainWindow() : 
+            this(
+                new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"),
+                null,
+                null) { }
 
         TcpFileClientWrap FileClient { get; set; }
         
-        public MainWindow(PublicUserInfo me, ArrayMessage<BaseMessage> offlineMessages)
+        public MainWindow(PublicUserInfo me, TcpClientWrap client, ArrayMessage<BaseMessage> offlineMessages)
         {
+            Client = client;
             CacheManager.Instance.CachePath = "Cache\\";
             MessageDoubleClick = new UICommand((o) => true, (obj) =>
               {
@@ -143,10 +148,9 @@ namespace Telegram
             FileClient.FileChunkReceived += FileClient_FileChunkReceived; ;
             FileClient.ImageChunkReceived += FileClient_ImageChunkReceived; ;
             FileClient.ConnectAsync();
-            
+
             if (offlineMessages != null)
                 Client_MessageReceived(Client, offlineMessages);
-            
 
             Closing += OnClosed;
         }
@@ -155,7 +159,7 @@ namespace Telegram
 
         private void FileClient_Connected(TcpFileClientWrap client)
         {
-            
+            Console.WriteLine("FileClient Connected");
             client.ReceiveAsync();
         }
 

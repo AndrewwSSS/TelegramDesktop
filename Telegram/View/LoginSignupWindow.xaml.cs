@@ -110,8 +110,7 @@ namespace Telegram.View
         ArrayMessage<BaseMessage> OfflineMessages;
         private void GoToMainWnd(PublicUserInfo info)
         {
-            wnd = new MainWindow(info, OfflineMessages);
-            wnd.Client = App.Client;
+            wnd = new MainWindow(info, App.Client, OfflineMessages);
             wnd.Show();
             Close();
         }

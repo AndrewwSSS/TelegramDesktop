@@ -12,10 +12,15 @@ namespace MessageLibrary
     {
 
 
-        protected IPEndPoint endPoint;
-        protected TcpClient client;
-        public TcpClient Tcp => client;
-        public bool IsConnected => client == null ? false : client.Connected;
+        private IPEndPoint endPoint;
+        private TcpClient client;
+
+        private TcpClient Client {
+            get => client;
+            set => client = value;
+        }
+        public TcpClient Tcp => Client;
+        public bool IsConnected => Client == null ? false : Client.Connected;
 
         public event ClientEventHandler Connected;
         public event ClientEventHandler Disconnected;
@@ -29,7 +34,7 @@ namespace MessageLibrary
                 throw new ArgumentException("IP не может быть пустым");
 
             endPoint = new IPEndPoint(ip, port);
-            client = null;
+            Client = null;
         }
 
 
@@ -38,27 +43,27 @@ namespace MessageLibrary
             if (tcpClient == null)
                 throw new ArgumentException("Подключение не может быть пустым");
 
-            client = tcpClient;
+            Client = tcpClient;
         }
 
         public bool Connect()
         {
-            if (client != null)
-                return client.Connected;
+            if (Client != null)
+                return Client.Connected;
             try
             {
-                client = new TcpClient();
-                client.Connect(endPoint);
+                Client = new TcpClient();
+                Client.Connect(endPoint);
             }
             catch (Exception)
             {
                 ConnectFailed?.Invoke(this);
                 return false;
             }
-            if (client.Connected)
+            if (Client.Connected)
                 Connected?.Invoke(this);
-            
-            return client.Connected;
+
+            return Client.Connected;
         }
         /// <summary>
         /// Асинхронно подключает клиент к адресу
@@ -66,12 +71,12 @@ namespace MessageLibrary
         /// <returns>Была ли начата операция подключения</returns>
         public bool ConnectAsync()
         {
-            if (client != null)
+            if (Client != null)
                 return false;
             try
             {
-                client = new TcpClient();
-                client.BeginConnect(endPoint.Address, endPoint.Port, ConnectCB, client);
+                Client = new TcpClient();
+                Client.BeginConnect(endPoint.Address, endPoint.Port, ConnectCB, Client);
             }
             catch (Exception)
             {
@@ -101,8 +106,8 @@ namespace MessageLibrary
         public void Disconnect()
         {
             Disconnected?.Invoke(this);
-            client?.Client?.Close();
-            client?.Close();
+            Client?.Client?.Close();
+            Client?.Close();
         }
         public void DisconnectAsync()
         {
@@ -110,7 +115,7 @@ namespace MessageLibrary
         }
         public bool Send(Message message)
         {
-            if (client != null && client.Connected)
+            if (Client != null && Client.Connected)
             {
                 Tcp.Client.Send(message.ToByteArray());
                 MessageSent?.Invoke(this, message);
@@ -123,48 +128,50 @@ namespace MessageLibrary
         /// </summary>
         /// <param name="message">Сообщение</param>
         /// <returns>Была ли начата операция отправки</returns>
-        public bool SendAsync(Message message) {
-            if (client != null && client.Connected)
+        public bool SendAsync(Message message)
+        {
+            if (Client != null && Client.Connected)
             {
                 message.SendToAsync(Tcp.Client, SendCB);
                 return true;
             }
             return false;
         }
-        private void SendCB(IAsyncResult ar) {
+        private void SendCB(IAsyncResult ar)
+        {
             StateObject state = (StateObject)ar.AsyncState;
             state.Socket.EndSend(ar);
 
-            byte[] obj = state.Buffer.ToList().GetRange(4, state.Buffer.Length-4).ToArray();
+            byte[] obj = state.Buffer.ToList().GetRange(4, state.Buffer.Length - 4).ToArray();
             MessageSent?.Invoke(this, Message.FromByteArray(obj));
         }
 
         public Message Receive()
         {
-            if (client != null && client.Connected)
+            if (Client != null && Client.Connected)
             {
-                var message = Message.FromNetworkStream(client.GetStream());
+                var message = Message.FromNetworkStream(Client.GetStream());
                 MessageReceived?.Invoke(this, message);
-                return message ;
+                return message;
             }
             return null;
         }
-        protected const int DEFAULT_BUFFER_SIZE = 4096;
+        public const int DEFAULT_BUFFER_SIZE = 4096;
         public void ReceiveAsync()
         {
             try
             {
-                if (client != null  && client.Client != null && client.Connected)
+                if (Client != null && Client.Client != null && Client.Connected)
                 {
                     Task.Run(() =>
                     {
                         try
                         {
                             MemoryStream stream = new MemoryStream();
-                            
+
                             int objectSize;
                             {
-                                byte[] lenBytes= new byte[4];
+                                byte[] lenBytes = new byte[4];
 
                                 int sizeReceived = Tcp.Client.Receive(lenBytes, 4, SocketFlags.None);
                                 if (sizeReceived == 0)
@@ -178,7 +185,7 @@ namespace MessageLibrary
                             int bufSize = objectSize < DEFAULT_BUFFER_SIZE ? objectSize : DEFAULT_BUFFER_SIZE;
                             byte[] buffer = new byte[bufSize];
                             int remaining = objectSize;
-                            while (client.Available > 0 && remaining != 0)
+                            while (Client.Available > 0 && remaining != 0)
                             {
                                 int received = Tcp.Client.Receive(buffer, remaining < DEFAULT_BUFFER_SIZE ? remaining : DEFAULT_BUFFER_SIZE, SocketFlags.None);
                                 remaining -= received;
@@ -188,7 +195,7 @@ namespace MessageLibrary
                             Message msg = Message.FromMemoryStream(stream);
 
                             MessageReceived?.Invoke(this, msg);
-                           
+
 
                             ReceiveAsync();
                         }
@@ -201,7 +208,7 @@ namespace MessageLibrary
                     });
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Out TcpClientWrap.ReceiveAsync() exception: {ex.Message}");
                 Disconnected?.Invoke(this);
