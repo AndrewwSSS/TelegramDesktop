@@ -628,12 +628,6 @@ namespace TelegramServer
 
                         UsersDownloads[senderClient] = new UserDownload(metadataMessage.Images,metadataMessage.Files)
 
-
-
-
-
-
-
                         break;
                     }
             }

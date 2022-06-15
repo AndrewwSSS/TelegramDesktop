@@ -30,7 +30,7 @@ namespace TelegramServer
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
-        private Dictionary<UserClient, UserDownload> UsersDownloads;
+        private Dictionary<UserClient, UserDownloas> UsersDownloads;
 
 
         private static Mutex mutex;
@@ -60,7 +60,7 @@ namespace TelegramServer
             FileClientsOnline = new Dictionary<UserClient, TcpFileClientWrap>();
             Server = new TcpServerWrap();
             FileServer = new TcpFileServerWrap();
-            UsersDownloads = new Dictionary<UserClient, UserDownload>();
+            UsersDownloads = new Dictionary<UserClient, UserDownloas>();
 
             DbTelegram.GroupChats.Load();
             
@@ -101,7 +101,29 @@ namespace TelegramServer
 
         private void FileServer_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
+            UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
+
+            UserDownloas downloads = UsersDownloads[senderClient];
+
+            if (chunk.IsImage)
+            {
+                if (chunk.IsLast)
+                {
+                    downloads.ImagesInProcess.FirstOrDefault(kv => kv.Key == chunk.id);
+                }
+                else
+                {
+
+                }
+            }
+            else
+            {
+
+            }
+
+
             
+
         }
 
         #region ServerEvents
