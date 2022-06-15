@@ -70,6 +70,7 @@
     <Compile Include="Containers\ImageData.cs" />
     <Compile Include="Containers\ImageMetadata.cs" />
     <Compile Include="Messages\Files\MetadataMessage.cs" />
+    <Compile Include="Messages\Files\MetadataResultMessage.cs" />
     <Compile Include="PreparingFileData.cs" />
     <Compile Include="Messages\Files\TcpFileClientWrap.cs" />
     <Compile Include="Messages\Files\TcpFileServerWrap.cs" />

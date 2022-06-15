@@ -9,12 +9,8 @@ namespace CommonLibrary.Messages.Groups
     {
         public int LocalId { get; set; }
         public int MessageId { get; set; }
-        // LocalId - FileId
-        public List<KeyValuePair<int, int>> FilesId { get; set; }
-        // LocalId - ImageId
-        public List<KeyValuePair<int, int>> ImagesId { get; set; }
 
-        public ChatMessageSendResult(int localId, int dbId) : this()
+        public ChatMessageSendResult(int localId, int dbId) 
         {
             LocalId = localId;
             MessageId = dbId;
@@ -22,8 +18,7 @@ namespace CommonLibrary.Messages.Groups
 
         public ChatMessageSendResult()
         {
-            FilesId = new List<KeyValuePair<int, int>>();
-            ImagesId = new List<KeyValuePair<int, int>>();
+
         }
 
     }

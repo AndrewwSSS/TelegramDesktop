@@ -222,50 +222,7 @@ namespace TelegramServer
                             = new ChatMessageSendResult();
 
 
-                        //if(toGroupMessage.LocalFilesId.Count != 0)
-                        //{
-                        //    foreach (var LocalFileId in toGroupMessage.LocalFilesId)
-                        //}
-
-                        //if (toGroupMessage.Files.Count > 0)
-                        //{
-                        //    List<FileContainer> newFiles 
-                        //        = toGroupMessage.Files.Select(f => f.Key).ToList();
-
-                        //    DbTelegram.Files.AddRange(newFiles);
-
-                            
-                        //    DbTelegram.SaveChanges();
-                        //    //DbTelegram.Files.Load();
-
-                        //    foreach (var file in newFiles)
-                        //    {
-                        //        int key = toGroupMessage.Files.First(f => f.Key == file).Value;
-                        //        resultMessage.FilesId.Add(new KeyValuePair<int, int>(key, file.Id));
-                        //    }
-
-                        //    newMessage.FilesId.AddRange(newFiles.Select(f => f.Id));
-
-
-                        //}
-
-                        //if (toGroupMessage.Images.Count > 0)
-                        //{
-                        //    List<ImageContainer> newImages
-                        //        = toGroupMessage.Images.Select(f => f.Key).ToList();
-
-
-                        //    DbTelegram.Images.AddRange(newImages);
-                        //    DbTelegram.SaveChanges();
-                        //    //DbTelegram.Images.Load();
-
-                        //    foreach (var image in newImages)
-                        //    {
-                        //        int key = toGroupMessage.Images.First(i => i.Key == image).Value;
-                        //        resultMessage.ImagesId.Add(new KeyValuePair<int, int>(key, image.Id));
-                        //    }
-                        //    newMessage.ImagesId.AddRange(newImages.Select(i => i.Id));
-                        //}
+                
 
 
                         sender.Messages.Add(newMessage);

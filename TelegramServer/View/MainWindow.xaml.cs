@@ -31,9 +31,7 @@ namespace TelegramServer
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
 
-        // localMessageId - ...
-        private Dictionary<int, MemoryStream> PreparingFilesData { get; set; }
-        private Dictionary<int, PreparingFileData> PreparingFiles { get; set; }
+        
         
         private static Mutex mutex;
 
