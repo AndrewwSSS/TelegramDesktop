@@ -12,5 +12,7 @@ namespace CommonLibrary.Messages.Groups
         public int GroupId { get; set; }
 
         public LeaveFromGroupMessage(int groupId) => GroupId = groupId;
+
+        public LeaveFromGroupMessage() { }
     }
 }
