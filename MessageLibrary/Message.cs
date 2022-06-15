@@ -11,6 +11,9 @@ namespace MessageLibrary
         public DateTime Time { get; protected set; } = DateTime.UtcNow;
         protected static BinaryFormatter bf = new BinaryFormatter();
 
+    
+
+
         /// <summary>
         /// Возвращает байт-массив с сериализованным объектом. Первые четыре байте отведены под размер(для чтения на клиенте)
         /// </summary>

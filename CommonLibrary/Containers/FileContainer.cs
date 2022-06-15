@@ -22,6 +22,8 @@ namespace CommonLibrary.Containers
             FileData = new FileData(data);
         }
 
+        public FileContainer() { }
+
 
         public static FileContainer FromFile(string path)
         {

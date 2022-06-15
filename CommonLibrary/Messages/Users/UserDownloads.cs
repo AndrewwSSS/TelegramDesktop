@@ -27,13 +27,21 @@ namespace CommonLibrary.Messages.Users
         }
 
         public UserDownloads(List<KeyValuePair<int, ImageMetadata>> localImages,
-            List<KeyValuePair<int, FileMetadata>> localFiles)
+            List<KeyValuePair<int, FileMetadata>> localFiles) : this()
         {
             RemainingImages = localImages;
             RemainingFiles = localFiles;
         }
 
+        public UserDownloads()
+        {
+            ImagesInProcess = new List<KeyValuePair<int, MemoryStream>>();
+            FilesInProcess = new List<KeyValuePair< int, MemoryStream >> ();
+            FinishedImages = new List<KeyValuePair<int, int>>();
+            FinishedFiles = new List<KeyValuePair<int, int>>();
+        }
 
-     
+
+
     }
 }
