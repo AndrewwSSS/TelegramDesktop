@@ -30,7 +30,7 @@ namespace TelegramServer
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
-        private Dictionary<UserClient, UserDownloas> UsersDownloads;
+        private Dictionary<UserClient, UserDownloads> UsersDownloads;
 
 
         private static Mutex mutex;
@@ -60,7 +60,7 @@ namespace TelegramServer
             FileClientsOnline = new Dictionary<UserClient, TcpFileClientWrap>();
             Server = new TcpServerWrap();
             FileServer = new TcpFileServerWrap();
-            UsersDownloads = new Dictionary<UserClient, UserDownloas>();
+            UsersDownloads = new Dictionary<UserClient, UserDownloads>();
 
             DbTelegram.GroupChats.Load();
             
@@ -103,22 +103,74 @@ namespace TelegramServer
         {
             UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
 
-            UserDownloas downloads = UsersDownloads[senderClient];
+            UserDownloads downloads = UsersDownloads[senderClient];
 
             if (chunk.IsImage)
             {
-                if (chunk.IsLast)
-                {
-                    downloads.ImagesInProcess.FirstOrDefault(kv => kv.Key == chunk.id);
-                }
+                KeyValuePair<int, MemoryStream> StreamInfo;
+
+                if (downloads.ImagesInProcess.Any(kv => kv.Key == chunk.FileId))
+                    StreamInfo = downloads.ImagesInProcess.First(kv => kv.Key == chunk.FileId);
                 else
                 {
+                    StreamInfo = new KeyValuePair<int, MemoryStream>(chunk.FileId, new MemoryStream());
+                    downloads.ImagesInProcess.Add(StreamInfo);
+                }
+     
+                MemoryStream stream = StreamInfo.Value;
+                stream.Write(chunk.Data, 0, chunk.Data.Length);
+
+                if (chunk.IsLast)
+                {
+
+                    KeyValuePair<int, ImageMetadata> info = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                    ImageMetadata metaData = info.Value;
+                    ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
+
+                    DbTelegram.Images.Add(newImage);
+                    DbTelegram.SaveChanges();
+                    DbTelegram.Images.Load();
+
+                    downloads.RemainingImages.Remove(info);
+                    downloads.ImagesInProcess.Remove(StreamInfo);
+
+                    downloads.FinishedImages.Add(new KeyValuePair<int, int>(newImage.Id, chunk.FileId));
 
                 }
+              
             }
             else
             {
+                KeyValuePair<int, MemoryStream> StreamInfo;
 
+                if (downloads.FilesInProcess.Any(kv => kv.Key == chunk.FileId))
+                    StreamInfo = downloads.FilesInProcess.First(kv => kv.Key == chunk.FileId);
+                else
+                {
+                    StreamInfo = new KeyValuePair<int, MemoryStream>(chunk.FileId, new MemoryStream());
+                    downloads.FilesInProcess.Add(StreamInfo);
+                }
+
+                MemoryStream stream = StreamInfo.Value;
+                stream.Write(chunk.Data, 0, chunk.Data.Length);
+
+                if (chunk.IsLast)
+                {
+
+                    KeyValuePair<int, FileMetadata> info = downloads.RemainingFiles.FirstOrDefault(rf => rf.Key == chunk.FileId);
+                    FileMetadata metaData = info.Value;
+                    FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
+
+                    DbTelegram.Files.Add(newFile);
+                    DbTelegram.SaveChanges();
+                    DbTelegram.Files.Load();
+
+                    downloads.RemainingFiles.Remove(info);
+                    downloads.FilesInProcess.Remove(StreamInfo);
+
+                    downloads.FinishedFiles.Add(new KeyValuePair<int, int>(newFile.Id, chunk.FileId));
+
+                }
             }
 
 

@@ -626,7 +626,7 @@ namespace TelegramServer
 
                         UserClient senderClient = ClientsOnline[client];
 
-                        UsersDownloads[senderClient] = new UserDownload(metadataMessage.Images, metadataMessage.Files);
+                        UsersDownloads[senderClient] = new UserDownloads(metadataMessage.Images, metadataMessage.Files);
 
                         break;
                     }

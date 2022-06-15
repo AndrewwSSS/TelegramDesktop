@@ -4,7 +4,7 @@ using System.IO;
 
 namespace CommonLibrary.Messages.Users
 {
-    public class UserDownloas
+    public class UserDownloads
     {
         // LocalId - MetaData
         public List<KeyValuePair<int, ImageMetadata>> RemainingImages { get; set; }
@@ -26,7 +26,7 @@ namespace CommonLibrary.Messages.Users
             }
         }
 
-        public UserDownloas(List<KeyValuePair<int, ImageMetadata>> localImages,
+        public UserDownloads(List<KeyValuePair<int, ImageMetadata>> localImages,
             List<KeyValuePair<int, FileMetadata>> localFiles)
         {
             RemainingImages = localImages;
