@@ -30,11 +30,9 @@ namespace TelegramServer
         private TelegramDb DbTelegram;
         private TcpServerWrap Server;
         private TcpFileServerWrap FileServer;
+        private Dictionary<UserClient, UserDownload> UsersDownloads;
 
-        // localMessageId - ...
-        private Dictionary<int, MemoryStream> PreparingFilesData { get; set; }
-        private Dictionary<int, PreparingFileData> PreparingFiles { get; set; }
-        
+
         private static Mutex mutex;
 
         [DllImport("USER32.DLL")]
@@ -62,7 +60,7 @@ namespace TelegramServer
             FileClientsOnline = new Dictionary<UserClient, TcpFileClientWrap>();
             Server = new TcpServerWrap();
             FileServer = new TcpFileServerWrap();
-            PreparingFilesData = new Dictionary<int, MemoryStream>();
+            UsersDownloads = new Dictionary<UserClient, UserDownload>();
 
             DbTelegram.GroupChats.Load();
             
@@ -103,7 +101,7 @@ namespace TelegramServer
 
         private void FileServer_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
-            throw new NotImplementedException();
+            
         }
 
         #region ServerEvents
