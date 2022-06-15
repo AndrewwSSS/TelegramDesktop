@@ -176,8 +176,11 @@ namespace Telegram.View
 
         private void B_ClearCache_OnClick(object sender, RoutedEventArgs e)
         {
-            Directory.Delete("Cache", true);
-            CacheManager.Reset();
+            if (Directory.Exists("Cache"))
+            {
+                Directory.Delete("Cache", true);
+                CacheManager.Reset();
+            }
         }
     }
 }
