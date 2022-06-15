@@ -17,10 +17,16 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="{StaticResource DarkBgBrush}">
-        <Button Width="100" Height="50" 
-                HorizontalAlignment="Left" VerticalAlignment="Top" 
-                Content="CONNECT" Margin="10"
-                Click="ConnectButton_Click"/>
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" >
+            <Button Width="100" Height="50" 
+               
+                    Content="CONNECT" Margin="10"
+                    Click="ConnectButton_Click"/>
+            <Button Width="100" Height="50" 
+                    Content="CLEAR CACHE" Margin="10"
+                    Click="B_ClearCache_OnClick"/>
+            
+        </StackPanel>
         <TabControl 
             x:Name="tabControl"
             BorderThickness="0"

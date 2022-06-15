@@ -24,6 +24,8 @@ namespace CacheLibrary
             Directory.CreateDirectory(Path.Combine(CachePath, DIR_LOGIN));
         }
 
+        public static void Reset() => instance = null;
+
         public string CachePath { get; set; } = "Cache\\";
 
         private static BinaryFormatter bf = new BinaryFormatter();

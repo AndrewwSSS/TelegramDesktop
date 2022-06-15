@@ -7,6 +7,7 @@ using CommonLibrary.Messages.Users;
 using MessageLibrary;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -172,6 +173,12 @@ namespace Telegram.View
             client.Connected += Client_Connected;
             client.ConnectFailed += Client_ConnectFailed;
             client.ConnectAsync();
+        }
+
+        private void B_ClearCache_OnClick(object sender, RoutedEventArgs e)
+        {
+            Directory.Delete("Cache", true);
+            CacheManager.Reset();
         }
     }
 }
