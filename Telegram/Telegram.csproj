@@ -74,6 +74,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Utility\Buffers.cs" />
+    <Compile Include="Utility\MetadataState.cs" />
     <Compile Include="View\LoginSignupWindow.xaml.cs">
       <DependentUpon>LoginSignupWindow.xaml</DependentUpon>
     </Compile>
