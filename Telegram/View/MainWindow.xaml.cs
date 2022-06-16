@@ -107,10 +107,17 @@ namespace Telegram
 
         TcpFileClientWrap FileClient { get; set; }
 
+        public UICommand MsgFileClick { get; set; }
+
         public MainWindow(PublicUserInfo me, TcpClientWrap client, ArrayMessage<BaseMessage> offlineMessages)
         {
             Client = client;
             CacheManager.Instance.CachePath = "Cache\\";
+            MsgFileClick = new UICommand((o) => true, (obj) =>
+            {
+                FileMetadata file = (FileMetadata)obj;
+                Client.SendAsync(new DataRequestMessage(file.Id, DataRequestType.FileData));
+            });
             MessageDoubleClick = new UICommand((o) => true, (obj) =>
               {
                   Dispatcher.Invoke(() =>
@@ -417,10 +424,10 @@ namespace Telegram
                         CachedFilesMetadata.Add(file);
                     }
                     var msgToGroup = PendingMsgWithFiles[result.LocalMessageId];
-                    msgToGroup.FilesId = result.Files.Select(p=>p.Value).ToList();
+                    msgToGroup.FilesId = result.Files.Select(p => p.Value).ToList();
                     msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
                     Client.SendAsync(msgToGroup);
-                    
+
                     var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msgToGroup.Message.GroupId);
                     if (group != null)
                     {
@@ -562,7 +569,7 @@ namespace Telegram
             this.DragMove();
         }
 
-        private void BTNClose_Click(object sender, RoutedEventArgs e) => Close();
+        private void BTNClose_Click(object sender, RoutedEventArgs e) => Environment.Exit(0);
 
 
         private void BTNHiDEWindow_Click(object sender, RoutedEventArgs e)
