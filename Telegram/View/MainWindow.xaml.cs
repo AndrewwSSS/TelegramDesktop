@@ -327,6 +327,15 @@ namespace Telegram
                         }
                     }
                 }
+                else if(msg is MetadataSyncMessage)
+                {
+                    var syncMsg = msg as MetadataSyncMessage;
+                    var md = PendingMetadata[syncMsg.LocalReturnId];
+                    PendingMetadata.Remove(syncMsg.LocalReturnId);
+
+                    for (int i = 0; i < md.FilesLocalId.Count; i++)
+                        FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i], false);
+                }
                 else if (msg is GroupJoinResultMessage)
                 {
                     var result = msg as GroupJoinResultMessage;
@@ -771,9 +780,9 @@ namespace Telegram
                         {
                             PendingMsgWithFiles.Add(msgToGroup.LocalMessageId, msgToGroup);
                             List<int> filesLocalId = new List<int>();
-                            Client.SendAsync(
-                                new MetadataMessage(
+                            var mdMsg = new MetadataMessage(
                                     msgToGroup.LocalMessageId,
+                                    App.MessageLocalIdCounter++,
                                     //images:
                                     //MsgImages.Select(
                                     //    img => new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img)
@@ -787,10 +796,9 @@ namespace Telegram
                                             return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
                                         }
                                         )
-                                    )
-                                );
-                            for (int i = 0; i < filesLocalId.Count; i++)
-                                FileClient.SendFileAsync(MsgFiles[i], filesLocalId[i], false);
+                                    );
+                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState() { FilesName = MsgFiles, FilesLocalId = filesLocalId };
+                            Client.SendAsync(mdMsg);
                             Dispatcher.Invoke(ResetMessageForm);
                             return;
                         }
@@ -807,6 +815,8 @@ namespace Telegram
                 }
             });
         }
+
+        private Dictionary<int, MetadataState> PendingMetadata { get; set; } = new Dictionary<int, MetadataState>();
 
         private void ResetMessageForm()
         {
