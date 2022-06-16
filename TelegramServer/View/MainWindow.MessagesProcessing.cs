@@ -221,13 +221,8 @@ namespace TelegramServer
                         ChatMessageSendResult resultMessage
                             = new ChatMessageSendResult();
 
-
-                
-
-
                         sender.Messages.Add(newMessage);
                         group.Messages.Add(newMessage);
-
 
                         DbTelegram.SaveChanges();
                         DbTelegram.GroupChats.Load();
@@ -443,6 +438,10 @@ namespace TelegramServer
                                     List<FileContainer> Files = DbTelegram.Files.Where(file => dataRequestMessage.ItemsId.Contains(file.Id)).ToList();
                                     TcpFileClientWrap fileClient = FileClientsOnline[ClientsOnline[client]];
 
+
+                                    foreach (var file in Files)
+                                        fileClient.SendFileAsync(file);
+                                  
                                     //TODO: send file
                                     break;
                                 }
@@ -451,6 +450,10 @@ namespace TelegramServer
                                     List<ImageContainer> Images = DbTelegram.Images.Where(image => dataRequestMessage.ItemsId.Contains(image.Id)).ToList();
 
                                     TcpFileClientWrap fileClient = FileClientsOnline[ClientsOnline[client]];
+
+
+                                    foreach (var img in Images)
+                                        fileClient.SendImageAsync(img);
 
                                     //TODO: send file
 
@@ -626,8 +629,7 @@ namespace TelegramServer
 
                         UserClient senderClient = ClientsOnline[client];
 
-                        UsersDownloads[senderClient] = new UserDownloads(metadataMessage.Images, metadataMessage.Files);
-
+                        UsersDownloads[senderClient] = new UserDownloads(metadataMessage.LocalMessageId, metadataMessage.Images, metadataMessage.Files);
                         break;
                     }
             }

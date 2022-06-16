@@ -131,8 +131,7 @@ namespace TelegramServer
                     downloads.RemainingImages.Remove(info);
                     downloads.ImagesInProcess.Remove(StreamInfo);
 
-                    downloads.FinishedImages.Add(new KeyValuePair<int, int>(newImage.Id, chunk.FileId));
-
+                    downloads.FinishedImages.Add(new KeyValuePair<int, int>(chunk.FileId, newImage.Id));
                 }
                
             }
@@ -151,10 +150,12 @@ namespace TelegramServer
                 MemoryStream stream = StreamInfo.Value;
                 stream.Write(chunk.Data, 0, chunk.Data.Length);
 
-                if (chunk.IsLast)
+                if(chunk.IsLast)
                 {
 
-                    KeyValuePair<int, FileMetadata> info = downloads.RemainingFiles.FirstOrDefault(rf => rf.Key == chunk.FileId);
+                    KeyValuePair<int, FileMetadata> info
+                        = downloads.RemainingFiles.FirstOrDefault(rf => rf.Key == chunk.FileId);
+
                     FileMetadata metaData = info.Value;
                     FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
 
@@ -165,17 +166,17 @@ namespace TelegramServer
                     downloads.RemainingFiles.Remove(info);
                     downloads.FilesInProcess.Remove(StreamInfo);
 
-                    downloads.FinishedFiles.Add(new KeyValuePair<int, int>(newFile.Id, chunk.FileId));
+                    downloads.FinishedFiles.Add(new KeyValuePair<int, int>(chunk.FileId, newFile.Id));
 
                 }
             }
 
-
-
             if (downloads.IsCompleted)
             {
                 MetadataResultMessage resultMessage 
-                    = new MetadataResultMessage(downloads.FinishedImages, downloads.FinishedFiles);
+                    = new MetadataResultMessage(downloads.ForMessageId,
+                                                downloads.FinishedImages,
+                                                downloads.FinishedFiles);
 
                 TcpClientWrap TcpClient = ClientsOnline.FirstOrDefault(co => co.Value == senderClient).Key;
 

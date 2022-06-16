@@ -17,6 +17,8 @@ namespace CommonLibrary.Messages.Users
         public List<KeyValuePair<int, int>> FinishedImages { get; set; }
         public List<KeyValuePair<int, int>> FinishedFiles { get; set; }
 
+        public int ForMessageId { get; set; }
+
 
         public bool IsCompleted
         {
@@ -26,11 +28,18 @@ namespace CommonLibrary.Messages.Users
             }
         }
 
-        public UserDownloads(List<KeyValuePair<int, ImageMetadata>> localImages,
+        public UserDownloads(int msgId, List<KeyValuePair<int, ImageMetadata>> localImages,
             List<KeyValuePair<int, FileMetadata>> localFiles) : this()
         {
-            RemainingImages = localImages;
-            RemainingFiles = localFiles;
+
+            ForMessageId = msgId;
+
+            if(localImages != null)
+                RemainingImages = localImages;
+
+            if(localFiles != null)
+                RemainingFiles = localFiles;
+
         }
 
         public UserDownloads()
@@ -39,6 +48,9 @@ namespace CommonLibrary.Messages.Users
             FilesInProcess = new List<KeyValuePair< int, MemoryStream >> ();
             FinishedImages = new List<KeyValuePair<int, int>>();
             FinishedFiles = new List<KeyValuePair<int, int>>();
+            RemainingImages = new List<KeyValuePair<int, ImageMetadata>> ();
+            RemainingFiles = new List<KeyValuePair<int, FileMetadata>>();
+
         }
 
 
