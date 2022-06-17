@@ -75,11 +75,11 @@ namespace TelegramServer
                                 Name = sender.Name
                             };
 
-                            UserClient newUserClient
+                            UserClient senderClient
                                 = new UserClient(loginMessage.MachineName, Guid.NewGuid().ToString());
 
-                            newUserClient.User = sender;
-                            sender.Clients.Add(newUserClient);
+                            senderClient.User = sender;
+                            sender.Clients.Add(senderClient);
 
                             UserInfo.ImagesId.AddRange(sender.ImagesId);
 
@@ -87,12 +87,12 @@ namespace TelegramServer
                                 UserInfo.Login = sender.Login;
 
 
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, newUserClient.Guid));
+                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, senderClient.Guid));
 
 
                             client.Disconnected += OnClientDisconnected;
 
-                            ClientsOnline[client] = newUserClient;
+                            ClientsOnline[client] = senderClient;
 
 
                             Dispatcher.Invoke(() =>
@@ -104,8 +104,19 @@ namespace TelegramServer
 
                             DbTelegram.SaveChanges();
 
-                            if (sender.Messages.Count != 0)
-                                client.SendAsync(new ArrayMessage<ChatMessage>(sender.Messages));
+                            if (senderClient.MessagesToSend.Count != 0)
+                            {
+                                ClientMessageEventHandler onMessagesSent = null;
+                                onMessagesSent = (cl, message) =>
+                                {
+                                    senderClient.MessagesToSend.Clear();
+                                    client.MessageSent -= onMessagesSent;
+                                };
+
+                                client.MessageSent += onMessagesSent;
+                                client.SendAsync(new ArrayMessage<BaseMessage>(senderClient.MessagesToSend));
+                            }
+                               
 
 
 
@@ -147,8 +158,6 @@ namespace TelegramServer
                                 ClientsOnline[client] = userClient;
 
 
-
-
                                 if (userClient.MessagesToSend.Count > 0)
                                 {
                                     onMessagesSent = (cl, message) =>
@@ -157,8 +166,9 @@ namespace TelegramServer
                                         client.MessageSent -= onMessagesSent;
                                     };
 
-                                    client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
                                     client.MessageSent += onMessagesSent;
+                                    client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
+                                    
                                 }
 
 
@@ -628,8 +638,10 @@ namespace TelegramServer
                         MetadataMessage metadataMessage = (MetadataMessage)msg;
 
                         UserClient senderClient = ClientsOnline[client];
-
+    
                         UsersDownloads[senderClient] = new UserDownloads(metadataMessage.LocalMessageId, metadataMessage.Images, metadataMessage.Files);
+
+                        client.SendAsync(new MetadataSyncMessage(metadataMessage.LocalReturnId));
                         break;
                     }
             }

@@ -105,35 +105,58 @@ namespace TelegramServer
 
             if (chunk.IsImage)
             {
-                KeyValuePair<int, MemoryStream> StreamInfo;
+                KeyValuePair<int, FileDownload> ChunksInfo;
 
                 if (downloads.ImagesInProcess.Any(kv => kv.Key == chunk.FileId))
-                    StreamInfo = downloads.ImagesInProcess.First(kv => kv.Key == chunk.FileId);
+                    ChunksInfo = downloads.ImagesInProcess.First(kv => kv.Key == chunk.FileId);
                 else
                 {
-                    StreamInfo = new KeyValuePair<int, MemoryStream>(chunk.FileId, new MemoryStream());
-                    downloads.ImagesInProcess.Add(StreamInfo);
+                    ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
+                    downloads.ImagesInProcess.Add(ChunksInfo);
                 }
      
-                MemoryStream stream = StreamInfo.Value;
-                stream.Write(chunk.Data, 0, chunk.Data.Length);
+                FileDownload fileDownload = ChunksInfo.Value;
+                fileDownload.Chunks.Add(chunk);
+
 
                 if (chunk.IsLast)
                 {
-                    KeyValuePair<int, ImageMetadata> info = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
-                    ImageMetadata metaData = info.Value;
+                    //fileDownload.RightCount = chunk.
+
+                    //KeyValuePair<int, ImageMetadata> info = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                    //ImageMetadata metaData = info.Value;
+                    //ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
+
+                    //DbTelegram.Images.Add(newImage);
+                    //DbTelegram.SaveChanges();
+                    //DbTelegram.Images.Load();
+
+                    //downloads.RemainingImages.Remove(info);
+                    //downloads.ImagesInProcess.Remove(StreamInfo);
+
+                    //downloads.FinishedImages.Add(new KeyValuePair<int, int>(chunk.FileId, newImage.Id));
+                }
+
+                if (fileDownload.isComplete)
+                {
+                    KeyValuePair<int, ImageMetadata> metadataInfo = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                    ImageMetadata metaData = metadataInfo.Value;
+                  
+                    MemoryStream stream = new MemoryStream();
+                    foreach (var fileChunk in fileDownload.GetOrderedChanks())
+                        stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
+
                     ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
+
+
 
                     DbTelegram.Images.Add(newImage);
                     DbTelegram.SaveChanges();
                     DbTelegram.Images.Load();
 
-                    downloads.RemainingImages.Remove(info);
-                    downloads.ImagesInProcess.Remove(StreamInfo);
-
-                    downloads.FinishedImages.Add(new KeyValuePair<int, int>(chunk.FileId, newImage.Id));
+                    downloads.ImageFinished(chunk.FileId, newImage.Id);
                 }
-               
+
             }
             else
             {
@@ -231,7 +254,6 @@ namespace TelegramServer
 
         #endregion ServerEvents
 
-
         #region WpfEvents
 
         private void BtnStartServer_Click(object sender, RoutedEventArgs e)
@@ -285,7 +307,6 @@ namespace TelegramServer
         }
 
         #endregion WpfEvents
-
 
         private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, List<User> usersToSend)
         {

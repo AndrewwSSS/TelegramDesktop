@@ -15,7 +15,7 @@ namespace CommonLibrary.Messages.Users
         public string MachineName { get; set; }
         public string Guid { get; set; }
         public User User { get; set; }
-        public virtual List<BaseMessage> MessagesToSend { get; set; }
+        public virtual ICollection<BaseMessage> MessagesToSend { get; set; }
 
         public UserClient(string machineName, string guid) : this()
         {

@@ -11,10 +11,12 @@ namespace CommonLibrary.Messages.Files
     public class MetadataSyncMessage : Message
     {
         public int LocalReturnId { get; set; }
+     
+        public MetadataSyncMessage(int lrId) => LocalReturnId = lrId;
+
         public MetadataSyncMessage()
         {
 
         }
-        public MetadataSyncMessage(int lrId) => LocalReturnId = lrId;
     }
 }
