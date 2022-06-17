@@ -155,6 +155,7 @@ namespace Telegram
             FileClient.Connected += FileClient_Connected;
             FileClient.FileChunkReceived += FileClient_FileChunkReceived; ;
             FileClient.ImageChunkReceived += FileClient_ImageChunkReceived; ;
+            FileClient.Disconnected += FileClient_Disconnected;
             FileClient.ConnectAsync();
 
             if (offlineMessages != null)
@@ -164,7 +165,10 @@ namespace Telegram
             SaveCache();
         }
 
-
+        private void FileClient_Disconnected(TcpFileClientWrap client)
+        {
+            Console.WriteLine("DISCONNECT");
+        }
 
         private void FileClient_Connected(TcpFileClientWrap client)
         {

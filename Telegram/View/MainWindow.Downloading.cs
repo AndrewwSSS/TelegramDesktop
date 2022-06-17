@@ -34,7 +34,14 @@ namespace Telegram
             if (!FileDownloadStreams.ContainsKey(chunk.FileId))
             {
                 FileMetadata metadata = CachedFilesMetadata.First(md => md.Id == chunk.FileId);
-                var stream = new FileStream($"Downloads/{chunk.FileId}_{metadata.Name}", FileMode.OpenOrCreate);
+                Directory.CreateDirectory("Downloads");
+                string saveName = $"{chunk.FileId}_{metadata.Name}";
+                int i = 0;
+                if (File.Exists(saveName))
+                    while (File.Exists($"Downloads/{i}_" + saveName))
+                        i++;
+                saveName = $"{i}_" + saveName; 
+                var stream = new FileStream($"Downloads/{saveName}", FileMode.OpenOrCreate);
                 FileDownloadStreams.Add(chunk.FileId, stream);
                 stream.Write(chunk.Data, 0, chunk.Data.Length);
             }
