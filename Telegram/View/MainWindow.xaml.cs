@@ -161,6 +161,7 @@ namespace Telegram
                 Client_MessageReceived(Client, offlineMessages);
 
             Closing += OnClosed;
+            SaveCache();
         }
 
 

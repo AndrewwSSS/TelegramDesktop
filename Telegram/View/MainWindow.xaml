@@ -653,7 +653,6 @@
                     <StackPanel Grid.Row="1" Orientation="Vertical">
                         <StackPanel.Resources>
                             <Style TargetType="Button">
-                                
                                 <Setter Property="Padding" Value="20,0,0,0"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                 <Setter Property="BorderThickness" Value="0"/>
@@ -683,7 +682,7 @@
 
                         <Button Height="40"
                                 Content="Выйти"
-                                    Foreground="IndianRed"
+                                Foreground="IndianRed"
                                 Click="B_Quit_OnClick"
                                 />
                     </StackPanel>
