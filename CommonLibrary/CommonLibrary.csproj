@@ -72,6 +72,7 @@
     <Compile Include="Messages\Files\MetadataMessage.cs" />
     <Compile Include="Messages\Files\MetadataResultMessage.cs" />
     <Compile Include="Messages\Files\MetadataSyncMessage.cs" />
+    <Compile Include="Messages\Users\FileDownload.cs" />
     <Compile Include="Messages\Users\UserDownloads.cs" />
     <Compile Include="PreparingFileData.cs" />
     <Compile Include="Messages\Files\TcpFileClientWrap.cs" />
