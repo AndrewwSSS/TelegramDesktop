@@ -37,11 +37,11 @@ namespace Telegram
                 Directory.CreateDirectory("Downloads");
                 string saveName = $"{chunk.FileId}_{metadata.Name}";
                 int i = 0;
-                if (File.Exists(saveName))
-                    while (File.Exists($"Downloads/{i}_" + saveName))
+                if (File.Exists("Downloads\\" + saveName))
+                    while (File.Exists($"Downloads\\{i}_" + saveName))
                         i++;
                 saveName = $"{i}_" + saveName; 
-                var stream = new FileStream($"Downloads/{saveName}", FileMode.OpenOrCreate);
+                var stream = new FileStream($"Downloads\\{saveName}", FileMode.OpenOrCreate);
                 FileDownloadStreams.Add(chunk.FileId, stream);
                 stream.Write(chunk.Data, 0, chunk.Data.Length);
             }
