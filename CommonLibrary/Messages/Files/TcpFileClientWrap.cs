@@ -377,7 +377,7 @@ namespace CommonLibrary.Messages.Files
                         Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
                         dataSize = BitConverter.ToInt32(intBytes,0);
 
-                        Console.WriteLine($"File #{chunk.FileId} (isImage: {chunk.IsImage}, isLastChunk: {chunk.IsLast})");
+                        Console.WriteLine($"File #{chunk.FileId} Chunk#{chunk.Order} (isImage: {chunk.IsImage}, isLastChunk: {chunk.IsLast})");
                     }
                 }
 
