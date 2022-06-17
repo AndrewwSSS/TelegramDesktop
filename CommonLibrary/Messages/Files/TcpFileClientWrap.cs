@@ -165,7 +165,7 @@ namespace CommonLibrary.Messages.Files
                         byte[] data = new byte[bufSize];
                         int bytesRead = 0;
 
-                        while(remaining != 0)
+                        for(int chunkOrder= 0; remaining != 0; chunkOrder++)
                         {
                             byte[] toSend;
                             bytesRead = reader.Read(data, 0, bufSize);
@@ -175,10 +175,12 @@ namespace CommonLibrary.Messages.Files
                             {
                                 MemoryStream ms = new MemoryStream();
                                 // Посылаемые байты оформлены следующим образом:
-                                // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
+                                // Локальный ID, bool если изображение, bool если кусок последний,
+                                // номер куска, размер содержимого, содержимое файла
                                 ms.Write(BitConverter.GetBytes(localId), 0, 4);
                                 ms.Write(BitConverter.GetBytes(isImage), 0, 1);
                                 ms.Write(BitConverter.GetBytes(remaining == 0), 0, 1);
+                                ms.Write(BitConverter.GetBytes(chunkOrder), 0, 4);
                                 ms.Write(BitConverter.GetBytes(bufSize), 0, 4);
                                 ms.Write(data, 0, bufSize);
                                 toSend = ms.ToArray();
@@ -194,7 +196,8 @@ namespace CommonLibrary.Messages.Files
                                 FileId = localId,
                                 IsLast = remaining == 0,
                                 Data = toSend,
-                                IsImage = isImage
+                                IsImage = isImage,
+                                Order = chunkOrder
                             };
                             if (chunk.IsImage)
                                 ImageChunkSent?.Invoke(this, chunk);
@@ -221,17 +224,19 @@ namespace CommonLibrary.Messages.Files
                 {
                     var data = file.FileData.Bytes;
                     int remaining = data.Length;
-                    for (int chunkNumber = 0; remaining > 0; chunkNumber++)
+                    for (int chunkOrder = 0; remaining > 0; chunkOrder++)
                     {
                         byte[] toSend;
                         {
                             int bufSize = remaining > DEFAULT_BUFFER_SIZE ? DEFAULT_BUFFER_SIZE : remaining;
                             MemoryStream ms = new MemoryStream();
                             // Посылаемые байты оформлены следующим образом:
-                            // Локальный ID, номер куска, bool если изображение, bool если кусок последний, содержимое файла
+                            // Локальный ID, bool если изображение, bool если кусок последний, 
+                            // номер куска, размер содержимого, содержимое файла
                             ms.Write(BitConverter.GetBytes(file.Id), 0, 4);
                             ms.Write(BitConverter.GetBytes(false), 0, 1);
                             ms.Write(BitConverter.GetBytes(remaining <= 4096), 0, 1);
+                            ms.Write(BitConverter.GetBytes(chunkOrder), 0, 4);
                             ms.Write(BitConverter.GetBytes(bufSize), 0, 4);
                             byte[] section = new byte[bufSize];
                             Array.Copy(data, data.Length - remaining, section, 0, bufSize);
@@ -250,7 +255,8 @@ namespace CommonLibrary.Messages.Files
                             FileId = file.Id,
                             IsLast = remaining == 0,
                             Data = toSend,
-                            IsImage = false
+                            IsImage = false,
+                            Order=chunkOrder
                         };
                         if (chunk.IsImage)
                             ImageChunkSent?.Invoke(this, chunk);
@@ -365,6 +371,9 @@ namespace CommonLibrary.Messages.Files
                         Tcp.Client.Receive(boolBytes, 1, SocketFlags.None);
                         chunk.IsLast = BitConverter.ToBoolean(boolBytes, 0);
 
+                        Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
+                        chunk.Order = BitConverter.ToInt32(intBytes, 0);
+                        
                         Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
                         dataSize = BitConverter.ToInt32(intBytes,0);
 

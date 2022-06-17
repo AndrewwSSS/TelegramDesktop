@@ -797,7 +797,7 @@ namespace Telegram
                                         }
                                         )
                                     );
-                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState() { FilesName = MsgFiles, FilesLocalId = filesLocalId };
+                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState() { FilesName = new List<string>(MsgFiles), FilesLocalId = filesLocalId };
                             Client.SendAsync(mdMsg);
                             Dispatcher.Invoke(ResetMessageForm);
                             return;
