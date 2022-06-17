@@ -578,7 +578,7 @@ namespace Telegram
             this.DragMove();
         }
 
-        private void BTNClose_Click(object sender, RoutedEventArgs e) => Environment.Exit(0);
+        private void BTNClose_Click(object sender, RoutedEventArgs e) => Close();
 
 
         private void BTNHiDEWindow_Click(object sender, RoutedEventArgs e)
