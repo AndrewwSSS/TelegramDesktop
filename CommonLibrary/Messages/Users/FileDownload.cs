@@ -1,5 +1,6 @@
 ﻿using CommonLibrary.Containers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CommonLibrary.Messages.Users
 {
@@ -11,15 +12,12 @@ namespace CommonLibrary.Messages.Users
         public int RightCount { get; set; } = -1;
         public bool isComplete => Chunks.Count == RightCount;
 
-        public FileDownload()
-        {
+        public FileDownload() {
             Chunks = new List<FileChunk>();
         }
 
-        public List<FileChunk> GetOrderedChanks()
-        {
-            //tmp
-            return Chunks;
+        public List<FileChunk> GetOrderedChanks() {
+            return Chunks.OrderBy(c => c.Order).ToList();
         }
 
     }
