@@ -13,9 +13,9 @@ namespace Telegram
 {
     public partial class MainWindow
     {
-        public List<MessageItemWrap> PendingMetadataMsg { get; set; } = new List<MessageItemWrap>();
-
-        public Dictionary<int, MessageToGroupMessage> PendingMsgWithFiles { get; set; } = new Dictionary<int, MessageToGroupMessage>();
+        public List<MessageItemWrap> PendingImageMsg { get; set; } = new List<MessageItemWrap>();
+        public List<MessageItemWrap> PendingFileMetadataMsg { get; set; } = new List<MessageItemWrap>();
+        public Dictionary<int, MessageToGroupMessage> PendingMsgWithAttachments { get; set; } = new Dictionary<int, MessageToGroupMessage>();
         public List<ImageMetadata> CachedImagesMetadata { get; set; } = new List<ImageMetadata>();
         public List<FileMetadata> CachedFilesMetadata { get; set; } = new List<FileMetadata>();
 
@@ -26,24 +26,62 @@ namespace Telegram
 
         private void FileClient_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
-            throw new NotImplementedException();
+            string saveName = "";
+            if (!ImageDownloadStreams.ContainsKey(chunk.FileId))
+            {
+                var metadata = CachedImagesMetadata.First(md => md.Id == chunk.FileId);
+                var dirName = "Downloads\\Files";
+                Directory.CreateDirectory(dirName);
+                saveName = $"{chunk.FileId}_{metadata.Name}";
+                if (File.Exists(Path.Combine(dirName, saveName)))
+                {
+                    int i = 0;
+                    while (File.Exists($"{dirName}\\{i}_" + saveName))
+                        i++;
+                    saveName = $"{i}_" + saveName;
+                }
+                var stream = new FileStream(Path.Combine(dirName, saveName), FileMode.OpenOrCreate);
+                ImageDownloadStreams.Add(chunk.FileId, stream);
+                stream.Write(chunk.Data, 0, chunk.Data.Length);
+            }
+            else
+                ImageDownloadStreams[chunk.FileId].Write(chunk.Data, 0, chunk.Data.Length);
+            
+
+            if (chunk.IsLast)
+            {
+                ImageDownloadStreams[chunk.FileId].Close();
+                CachedImages.Add(chunk.FileId, saveName);
+                List<MessageItemWrap> fullMessages = new List<MessageItemWrap>();
+                foreach(var item in PendingImageMsg.Where(msg => msg.Message.ImagesId.Contains(chunk.FileId)))
+                {
+                    item.Images.Add(new StringViewModel(saveName));
+                    if (item.FilesMetadata.Count == item.Message.FilesId.Count)
+                        fullMessages.Add(item);
+                }
+                foreach (var item in fullMessages)
+                    PendingImageMsg.Remove(item);
+                
+                ImageDownloadStreams.Remove(chunk.FileId);
+            }
         }
 
         private void FileClient_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         {
             if (!FileDownloadStreams.ContainsKey(chunk.FileId))
             {
-                FileMetadata metadata = CachedFilesMetadata.First(md => md.Id == chunk.FileId);
-                Directory.CreateDirectory("Downloads");
+                var metadata = CachedFilesMetadata.First(md => md.Id == chunk.FileId);
+                var dirName = "Downloads\\Files";
+                Directory.CreateDirectory(dirName);
                 string saveName = $"{chunk.FileId}_{metadata.Name}";
-                int i = 0;
-                if (File.Exists("Downloads\\" + saveName))
+                if (File.Exists(Path.Combine(dirName, saveName)))
                 {
-                    while (File.Exists($"Downloads\\{i}_" + saveName))
+                    int i = 0;
+                    while (File.Exists($"{dirName}\\{i}_" + saveName))
                         i++;
                     saveName = $"{i}_" + saveName;
                 }
-                var stream = new FileStream($"Downloads\\{saveName}", FileMode.OpenOrCreate);
+                var stream = new FileStream(Path.Combine(dirName, saveName), FileMode.OpenOrCreate);
                 FileDownloadStreams.Add(chunk.FileId, stream);
                 stream.Write(chunk.Data, 0, chunk.Data.Length);
             }
@@ -61,36 +99,17 @@ namespace Telegram
         public void AddMetadataToMessages(FileMetadata metadata)
         {
             List<MessageItemWrap> fullMessages = new List<MessageItemWrap>();
-            foreach(var msg in PendingMetadataMsg)
+            foreach(var msg in PendingFileMetadataMsg)
             {
                 if(msg.Message.FilesId.Contains(metadata.Id) &&
                     !msg.FilesMetadata.Contains(metadata))
-                {
                     msg.FilesMetadata.Add(metadata);
-                }
-                if (msg.FilesMetadata.Count == msg.Message.FilesId.Count
-                    && msg.ImagesMetadata.Count == msg.Message.ImagesId.Count)
+
+                if (msg.FilesMetadata.Count == msg.Message.FilesId.Count)
                     fullMessages.Add(msg);
             }
             foreach (var msg in fullMessages)
-                PendingMetadataMsg.Remove(msg);
-        }
-        public void AddMetadataToMessages(ImageMetadata metadata)
-        {
-            List<MessageItemWrap> fullMessages = new List<MessageItemWrap>();
-            foreach (var msg in PendingMetadataMsg)
-            {
-                if (msg.Message.ImagesId.Contains(metadata.Id) &&
-                    !msg.ImagesMetadata.Contains(metadata))
-                {
-                    msg.ImagesMetadata.Add(metadata);
-                }
-                if (msg.FilesMetadata.Count == msg.Message.FilesId.Count
-                    && msg.ImagesMetadata.Count == msg.Message.ImagesId.Count)
-                    fullMessages.Add(msg);
-            }
-            foreach (var msg in fullMessages)
-                PendingMetadataMsg.Remove(msg);
+                PendingFileMetadataMsg.Remove(msg);
         }
     }
 }

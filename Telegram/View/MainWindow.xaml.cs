@@ -62,8 +62,8 @@ namespace Telegram
             set
             {
                 client = value;
-
-                client.MessageReceived += Client_MessageReceived;
+                if (client != null)
+                    client.MessageReceived += Client_MessageReceived;
             }
         }
         public const int LeftMenuWidth = 290;
@@ -162,6 +162,24 @@ namespace Telegram
                 Client_MessageReceived(Client, offlineMessages);
 
             Closing += OnClosed;
+            CachedImages.Add(-1, @"G:\VS Repo\Project2\Project2\Textures\rat.png");
+            Groups.Add(new GroupItemWrap(new PublicGroupInfo()
+            {
+                Id=-1,
+                Name = "TESTGROUP",
+                Messages = new List<ChatMessage>()
+                {
+                   new ChatMessage("hello")
+                   {
+                       Id=-1,
+                       ImagesId = new List<int>()
+                       {
+                           -1
+                       }
+                   }.SetFrom(me).SetGroupId(-1)
+                }
+            }));
+
             SaveCache();
         }
 
@@ -221,8 +239,9 @@ namespace Telegram
                     foreach (var container in drr.Result)
                     {
                         UserItemWrap user = new UserItemWrap(container.User);
-                        if (container.Images != null)
-                            user.Images = new ObservableCollection<ImageContainer>(container.Images);
+                        //TO DO: caching
+                        //if (container.Images != null)
+                        //    user.Images = new ObservableCollection<ImageContainer>(container.Images);
                         Users.Add(user);
                         foreach (var group in CachedGroups.Where(g => g.GroupChat.MembersId.Contains(container.User.Id)))
                         {
@@ -264,8 +283,8 @@ namespace Telegram
                     var result = msg as DataRequestResultMessage<ImageMetadata>;
                     foreach (var md in result.Result)
                     {
-                        AddMetadataToMessages(md);
                         CachedImagesMetadata.Add(md);
+                        Client.SendAsync(new DataRequestMessage(md.Id, DataRequestType.ImageData));
                     }
                 }
                 else if (msg is ChatLookupResultMessage)
@@ -332,7 +351,7 @@ namespace Telegram
                         }
                     }
                 }
-                else if(msg is MetadataSyncMessage)
+                else if (msg is MetadataSyncMessage)
                 {
                     var syncMsg = msg as MetadataSyncMessage;
                     var md = PendingMetadata[syncMsg.LocalReturnId];
@@ -340,6 +359,9 @@ namespace Telegram
 
                     for (int i = 0; i < md.FilesLocalId.Count; i++)
                         FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i], false);
+                    for (int i = 0; i < md.ImagesLocalId.Count; i++)
+                        FileClient.SendFileAsync(md.ImagesName[i], md.ImagesLocalId[i], true);
+
                 }
                 else if (msg is GroupJoinResultMessage)
                 {
@@ -437,7 +459,7 @@ namespace Telegram
                         file.Id = pair.Value;
                         CachedFilesMetadata.Add(file);
                     }
-                    var msgToGroup = PendingMsgWithFiles[result.LocalMessageId];
+                    MessageToGroupMessage msgToGroup = PendingMsgWithAttachments[result.LocalMessageId];
                     msgToGroup.FilesId = result.Files.Select(p => p.Value).ToList();
                     msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
                     Client.SendAsync(msgToGroup);
@@ -488,12 +510,29 @@ namespace Telegram
                         if (!pending)
                         {
                             pending = true;
-                            PendingMetadataMsg.Add(item);
+                            PendingFileMetadataMsg.Add(item);
                         }
                         Client.SendAsync(new DataRequestMessage(id, DataRequestType.FileMetadata));
                     }
                     else
                         item.FilesMetadata.Add(metadata);
+                }
+                pending = false;
+                foreach (var id in msg.ImagesId)
+                {
+                    string path = null;
+                    CachedImages.TryGetValue(id, out path);
+                    if (path == null)
+                    {
+                        if (!pending)
+                        {
+                            pending = true;
+                            PendingImageMsg.Add(item);
+                        }
+                        Client.SendAsync(new DataRequestMessage(id, DataRequestType.ImageMetaData));
+                    }
+                    else
+                        item.Images.Add(new StringViewModel(path));
                 }
             }
 
@@ -696,6 +735,21 @@ namespace Telegram
                 return;
 
             CurGroup = lb.SelectedItem as GroupItemWrap;
+            MsgFilesUI.Clear();
+            MsgImagesUI.Clear();
+            if (MsgFiles.ContainsKey(CurGroup))
+            {
+                var fileList = MsgFiles[CurGroup];
+                foreach (var md in fileList)
+                    MsgFilesUI.Add(new FileMetadata(md.Name, md.Size));
+            }
+            if (MsgImages.ContainsKey(CurGroup))
+            {
+                var imgList = MsgImages[CurGroup];
+                foreach (var md in imgList)
+                    MsgImagesUI.Add(new ImageMetadata(md.Name, md.Size));
+            }
+
             ShowGroupMessages(CurGroup);
         }
 
@@ -780,11 +834,16 @@ namespace Telegram
                     {
                         MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                         // отправляем файлы
-                        if (MsgFilesUI.Count != 0 ||
-                            MsgImagesUI.Count != 0)
+                        if (
+                            (MsgFiles.ContainsKey(CurGroup) ||
+                             MsgImages.ContainsKey(CurGroup))
+                            &&
+                            (MsgFiles[CurGroup].Count != 0 ||
+                            MsgImages[CurGroup].Count != 0))
                         {
-                            PendingMsgWithFiles.Add(msgToGroup.LocalMessageId, msgToGroup);
+                            PendingMsgWithAttachments.Add(msgToGroup.LocalMessageId, msgToGroup);
                             List<int> filesLocalId = new List<int>();
+                            List<int> imagesLocalId = new List<int>();
                             var mdMsg = new MetadataMessage(
                                     msgToGroup.LocalMessageId,
                                     App.MessageLocalIdCounter++,
@@ -793,16 +852,32 @@ namespace Telegram
                                     //    img => new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img)
                                     //    ) 
                                     files:
-                                    MsgFilesUI.Select(
+                                    MsgFiles[CurGroup].Select(
                                         file =>
                                         {
                                             PendingFiles.Add(App.MetadataLocalIdCounter, file);
                                             filesLocalId.Add(App.MetadataLocalIdCounter);
                                             return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
                                         }
-                                        )
+                                        ),
+                                    images:
+                                        MsgImages[CurGroup].Select(
+                                            img =>
+                                            {
+                                                PendingImages.Add(App.MetadataLocalIdCounter, img);
+                                                imagesLocalId.Add(App.MetadataLocalIdCounter);
+                                                return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
+                                            }
+                                            )
+
                                     );
-                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState() { FilesName = new List<string>(MsgFiles), FilesLocalId = filesLocalId };
+                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState()
+                            {
+                                FilesName = new List<string>(MsgFiles[CurGroup].Select(file => file.Name)),
+                                FilesLocalId = filesLocalId,
+                                ImagesName = new List<string>(MsgImages[CurGroup].Select(img => img.Name)),
+                                ImagesLocalId = imagesLocalId
+                            };
                             Client.SendAsync(mdMsg);
                             Dispatcher.Invoke(ResetMessageForm);
                             return;
@@ -852,8 +927,8 @@ namespace Telegram
         }
 
 
-        public List<string> MsgFiles { get; set; } = new List<string>();
-        public List<string> MsgImages { get; set; } = new List<string>();
+        public Dictionary<GroupItemWrap, List<FileMetadata>> MsgFiles { get; set; } = new Dictionary<GroupItemWrap, List<FileMetadata>>();
+        public Dictionary<GroupItemWrap, List<ImageMetadata>> MsgImages { get; set; } = new Dictionary<GroupItemWrap, List<ImageMetadata>>();
         public ObservableCollection<FileMetadata> MsgFilesUI { get; set; } = new ObservableCollection<FileMetadata>();
         public ObservableCollection<ImageMetadata> MsgImagesUI { get; set; } = new ObservableCollection<ImageMetadata>();
         private void B_AddFilesToMsg_OnClick(object sender, RoutedEventArgs e)
@@ -863,16 +938,22 @@ namespace Telegram
             {
                 foreach (var fileName in dialog.FileNames)
                 {
-                    FileInfo info = new FileInfo(fileName);
+                    var info = new FileInfo(fileName);
                     if (ImageMetadata.AllowedExtensions.Contains(Path.GetExtension(fileName)))
                     {
-                        MsgImages.Add(fileName);
-                        MsgImagesUI.Add(new ImageMetadata(info.Name, (int)info.Length));
+                        if (!MsgImages.ContainsKey(CurGroup))
+                            MsgImages.Add(CurGroup, new List<ImageMetadata>());
+                        var md = new ImageMetadata(info.FullName, (int)info.Length);
+                        MsgImages[CurGroup].Add(md);
+                        MsgImagesUI.Add(md);
                     }
                     else
                     {
-                        MsgFiles.Add(fileName);
-                        MsgFilesUI.Add(new FileMetadata(info.Name, (int)info.Length));
+                        if (!MsgFiles.ContainsKey(CurGroup))
+                            MsgFiles.Add(CurGroup, new List<FileMetadata>());
+                        var md = new FileMetadata(info.FullName, (int)info.Length);
+                        MsgFiles[CurGroup].Add(md);
+                        MsgFilesUI.Add(md);
                     }
                 }
             }

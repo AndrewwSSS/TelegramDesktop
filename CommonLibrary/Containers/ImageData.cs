@@ -10,25 +10,29 @@ namespace CommonLibrary.Containers
     [Serializable]
     public class ImageData
     {
+        private byte[] bytes;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        public byte[] Bytes { get; set; }
-
-        [NotMapped]
-        public ImageSource ImageSource
+        public byte[] Bytes
         {
-            get
+            get => bytes;
+            set
             {
-                MemoryStream stream = new MemoryStream(Bytes);
+                bytes = value;
+
+                MemoryStream stream = new MemoryStream(bytes);
                 BitmapImage image = new BitmapImage();
                 image.BeginInit();
                 image.StreamSource = stream;
                 image.EndInit();
-                return image;
             }
         }
+
+        [NotMapped]
+        public ImageSource ImageSource { get; set; }
 
         public ImageData(byte[] data) => Bytes = data;
 

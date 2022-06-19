@@ -238,7 +238,7 @@
                                 ItemsSource="{Binding FoundGroups}"
                                 SelectionChanged="FoundGroupSelected"
                                 Style="{StaticResource LBGroup}">
-                            
+
                         </ListBox>
                         <TextBlock  Grid.Row="1" Margin="15"
                                 x:Name="TB_GroupsNotFound"   
@@ -270,7 +270,6 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-
 
                         <Grid Grid.Row="0" >
                             <Grid.ColumnDefinitions>
@@ -331,7 +330,8 @@
                                      Background="{StaticResource DarkBgBrush}"
                                      BorderThickness="0"
                                      Style="{StaticResource LB_Messages}"
-                                     HorizontalContentAlignment="Stretch">
+                                     HorizontalContentAlignment="Stretch"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -419,6 +419,8 @@
                                                         <RowDefinition Name="response" Height="Auto"></RowDefinition>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Name="files" Height="Auto"/>
+                                                        <RowDefinition Name="img" Height="Auto"/>
+                                                        <RowDefinition Name="time" Height="Auto"/>
                                                     </Grid.RowDefinitions>
                                                     <Grid.ColumnDefinitions>
                                                         <!--Для иконки-->
@@ -432,9 +434,9 @@
                                                            Grid.Row="0"
                                                            Grid.Column="1"/>
                                                     <TextBlock 
-                                                    Grid.Row="1"
-                                                    Grid.Column="1"
-                                                    FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.User.Name}" Margin="0,0,0,2"/>
+                                                        Grid.Row="1"
+                                                        Grid.Column="1"
+                                                        FontSize="12" Foreground="LightYellow" Text="{Binding FromUser.User.Name}" Margin="0,0,0,2"/>
                                                     <!--Сообщение, на которое отвечаем-->
                                                     <Grid PreviewMouseDown="Responce_OnClick" Grid.Row="2" Grid.Column="1" Margin="0,2,0,5">
                                                         <Grid.ColumnDefinitions>
@@ -454,21 +456,19 @@
                                                         </StackPanel>
                                                     </Grid>
                                                     <StackPanel Grid.Column="1" Grid.Row="3">
-
+                                                        
                                                         <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" TextWrapping="Wrap" Text="{Binding Message.Text}"></TextBlock>
-                                                        <TextBlock HorizontalAlignment="Right" 
-                                                               Margin="9,0,0,0" 
-                                                               FontSize="12" 
-                                                               Foreground="{StaticResource DarkGreyBrush}" 
-                                                               Text="{Binding FormattedTime}"></TextBlock>
+                                                        
+                                                        
+                                                        
                                                     </StackPanel>
-                                                    <ListBox
+                                                    <ItemsControl
                                                              Margin="0, 5"
                                                              Grid.Column="1" Grid.Row="4"
                                                              ItemsSource="{Binding FilesMetadata}"
                                                              Background="Transparent"
                                                              BorderThickness="0">
-                                                        <ListBox.ItemTemplate>
+                                                        <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
                                                                 <Grid Cursor="Hand">
                                                                     <Grid.InputBindings>
@@ -487,11 +487,34 @@
                                                                         <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource GreyBrush}"></TextBlock>
                                                                         <TextBlock Text="{Binding Size,StringFormat={}{0} байт}" FontSize="12" Foreground="{StaticResource DarkGreyBrush}"></TextBlock>
                                                                     </StackPanel>
-                                                                    
+
                                                                 </Grid>
                                                             </DataTemplate>
-                                                        </ListBox.ItemTemplate>
-                                                    </ListBox>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                    <ItemsControl
+                                                             Margin="0, 5"
+                                                             Grid.Column="1" Grid.Row="5"
+                                                             ItemsSource="{Binding Images}"
+                                                             Background="Transparent"
+                                                             BorderThickness="0">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Cursor="Hand">
+
+                                                                    <Image MaxWidth="400" Stretch="UniformToFill" Source="{Binding String}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                     <!--Время отправки-->
+                                                    <TextBlock HorizontalAlignment="Right" 
+                                                            Margin="9,0,0,0" 
+                                                               Grid.Row="6"
+                                                               Grid.Column="1"
+                                                            FontSize="12" 
+                                                            Foreground="{StaticResource DarkGreyBrush}" 
+                                                            Text="{Binding FormattedTime}"/>
                                                 </Grid>
                                             </Border>
                                         </Grid>
@@ -572,12 +595,35 @@
                                      x:Name="TB_Message"
                                      KeyDown="TB_SendMsg_OnEnter"/>
 
-                            <Border Margin="-8" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" CornerRadius="360" Background="IndianRed">
-                                <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding MsgFilesUI.Count}"/>
+                            <Border Margin="-8" 
+                                    Padding="3"
+                                    Width="32" Height="16" 
+                                    HorizontalAlignment="Right" VerticalAlignment="Top" 
+                                    Grid.Column="0" Grid.Row="1" 
+                                    CornerRadius="10" 
+                                    Background="IndianRed">
+                                <TextBlock Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0}/{1}">
+                                            <Binding Path="MsgFilesUI.Count" />
+                                            <Binding Path="MsgImagesUI.Count" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
                                 <Border.Style>
                                     <Style TargetType="Border">
+                                        <Style.Resources>
+                                            <entities:AllZeroConverter x:Key="allZero"/>
+                                        </Style.Resources>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding MsgFilesUI.Count}" Value="0">
+                                            <DataTrigger Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource allZero}">
+                                                        <Binding Path="MsgFilesUI.Count"/>
+                                                        <Binding Path="MsgImagesUI.Count"/>
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
                                                 <Setter Property="Visibility" Value="Hidden" />
                                             </DataTrigger>
                                         </Style.Triggers>

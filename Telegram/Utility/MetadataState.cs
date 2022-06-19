@@ -10,5 +10,7 @@ namespace Telegram.Utility
     {
         public List<int> FilesLocalId { get; set; }
         public List<string> FilesName { get; set; }
+        public List<int> ImagesLocalId { get; set; }
+        public List<string> ImagesName { get; set; }
     }
 }

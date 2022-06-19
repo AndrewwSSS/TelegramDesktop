@@ -84,7 +84,7 @@
     <Compile Include="WPF Entities\OrConverter.cs" />
     <Compile Include="WPF Entities\UICommand.cs" />
     <Compile Include="WPF Entities\NotNullConverter.cs" />
-    <Compile Include="WPF Entities\VisibilityToBoolConverter.cs" />
+    <Compile Include="WPF Entities\AllZeroConverter.cs" />
     <Page Include="View\BrushDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
