@@ -851,23 +851,23 @@ namespace Telegram
                                     msgToGroup.LocalMessageId,
                                     App.MessageLocalIdCounter++,
                                     files:
-                                    MsgFiles[CurGroup].Select(
+                                    MsgFiles.ContainsKey(CurGroup) ? MsgFiles[CurGroup].Select(
                                         file =>
                                         {
                                             PendingFiles.Add(App.MetadataLocalIdCounter, file);
                                             filesLocalId.Add(App.MetadataLocalIdCounter);
                                             return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
                                         }
-                                        ),
+                                        ) : null,
                                     images:
-                                        MsgImages[CurGroup].Select(
+                                        MsgImages.ContainsKey(CurGroup) ? MsgImages[CurGroup].Select(
                                             img =>
                                             {
                                                 PendingImages.Add(App.MetadataLocalIdCounter, img);
                                                 imagesLocalId.Add(App.MetadataLocalIdCounter);
                                                 return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
                                             }
-                                            )
+                                            ) : null
                                     );
                             PendingMetadata[mdMsg.LocalReturnId] = new MetadataState()
                             {
