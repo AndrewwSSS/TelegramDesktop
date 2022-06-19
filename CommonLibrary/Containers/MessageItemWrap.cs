@@ -19,7 +19,6 @@ namespace CommonLibrary.Containers
         private bool showAvatar = false;
         private bool showUsername = false;
         public ObservableCollection<FileMetadata> FilesMetadata { get; set; } = new ObservableCollection<FileMetadata>();
-        public ObservableCollection<ImageMetadata> ImagesMetadata { get; set; } = new ObservableCollection<ImageMetadata>();
         public ChatMessage Message { get; set; }
         public UserItemWrap FromUser { get; set; }
         public MessageItemWrap RespondingTo { get; set; }
@@ -34,7 +33,8 @@ namespace CommonLibrary.Containers
                 OnPropertyChanged();
             }
         }
-        public bool ShowUsername { 
+        public bool ShowUsername
+        {
             get => showUsername;
             set
             {
@@ -48,5 +48,9 @@ namespace CommonLibrary.Containers
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public MessageItemWrap(ChatMessage msg) => Message = msg;
+        /// <summary>
+        /// Список путей к файлам с изображениями
+        /// </summary>
+        public ObservableCollection<StringViewModel> Images { get; set; } = new ObservableCollection<StringViewModel>();
     }
 }

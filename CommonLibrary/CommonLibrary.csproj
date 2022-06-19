@@ -69,6 +69,7 @@
     <Compile Include="Containers\ImageContainer.cs" />
     <Compile Include="Containers\ImageData.cs" />
     <Compile Include="Containers\ImageMetadata.cs" />
+    <Compile Include="Containers\StringViewModel.cs" />
     <Compile Include="Messages\Files\MetadataMessage.cs" />
     <Compile Include="Messages\Files\MetadataResultMessage.cs" />
     <Compile Include="Messages\Files\MetadataSyncMessage.cs" />
