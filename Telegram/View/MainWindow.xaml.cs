@@ -162,23 +162,23 @@ namespace Telegram
                 Client_MessageReceived(Client, offlineMessages);
 
             Closing += OnClosed;
-            CachedImages.Add(-1, @"G:\VS Repo\Project2\Project2\Textures\rat.png");
-            Groups.Add(new GroupItemWrap(new PublicGroupInfo()
-            {
-                Id=-1,
-                Name = "TESTGROUP",
-                Messages = new List<ChatMessage>()
-                {
-                   new ChatMessage("hello")
-                   {
-                       Id=-1,
-                       ImagesId = new List<int>()
-                       {
-                           -1
-                       }
-                   }.SetFrom(me).SetGroupId(-1)
-                }
-            }));
+            //CachedImages.Add(-1, @"G:\VS Repo\Project2\Project2\Textures\rat.png");
+            //Groups.Add(new GroupItemWrap(new PublicGroupInfo()
+            //{
+            //    Id=-1,
+            //    Name = "TESTGROUP",
+            //    Messages = new List<ChatMessage>()
+            //    {
+            //       new ChatMessage("hello")
+            //       {
+            //           Id=-1,
+            //           ImagesId = new List<int>()
+            //           {
+            //               -1
+            //           }
+            //       }.SetFrom(me).SetGroupId(-1)
+            //    }
+            //}));
 
             SaveCache();
         }
@@ -462,6 +462,9 @@ namespace Telegram
                     MessageToGroupMessage msgToGroup = PendingMsgWithAttachments[result.LocalMessageId];
                     msgToGroup.FilesId = result.Files.Select(p => p.Value).ToList();
                     msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
+                    PendingMsgWithAttachments.Remove(result.LocalMessageId);
+
+
                     Client.SendAsync(msgToGroup);
 
                     var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msgToGroup.Message.GroupId);
@@ -847,10 +850,6 @@ namespace Telegram
                             var mdMsg = new MetadataMessage(
                                     msgToGroup.LocalMessageId,
                                     App.MessageLocalIdCounter++,
-                                    //images:
-                                    //MsgImages.Select(
-                                    //    img => new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img)
-                                    //    ) 
                                     files:
                                     MsgFiles[CurGroup].Select(
                                         file =>
@@ -869,7 +868,6 @@ namespace Telegram
                                                 return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
                                             }
                                             )
-
                                     );
                             PendingMetadata[mdMsg.LocalReturnId] = new MetadataState()
                             {
