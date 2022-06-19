@@ -57,7 +57,7 @@
                                                        Foreground="#768c9e"/>
 
                                             <TextBlock Grid.Column="1"
-                                                       Text="{Binding NameByGroup}"
+                                                       Text="{Binding NameByGroupType}"
                                                        FontSize="17"
                                                        Foreground="#768c9e"/>
                                         </Grid>
@@ -179,7 +179,7 @@
 
 
                                             <TextBlock Grid.Column="1"
-                                                       Text="{Binding LocalLastVistDate}"
+                                                       Text="{Binding LocalVistDate}"
                                                        FontSize="17"
                                                        Foreground="#768c9e"/>
 
@@ -189,17 +189,16 @@
 
                                     <Border.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Block"
-                                                      x:Name="BlockOfflineUser"
-                                                      Click="BlockOfflineUser_Click"/>
-                                            
-                                            <MenuItem Header="Additional info"/>
+                                            <MenuItem Header="Additional info"
+                                                      x:Name="InfoAboutUser"
+                                                      Click="InfoAboutUserOffline_Click"/>
                                         </ContextMenu>
                                     </Border.ContextMenu>
                                 </Border>
 
                                 <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True"/>
+                                    <Trigger Property="IsMouseOver"
+                                             Value="True"/>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Setter.Value>
@@ -263,11 +262,9 @@
 
                                     <Border.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Block"
-                                                      x:Name="BlockOnlineUser"
-                                                      Click="BlockOnlineUser_Click"/>
-
-                                            <MenuItem Header="Additional info"/>
+                                            <MenuItem Header="Additional info"
+                                                      x:Name="InfoAboutUser"
+                                                      Click="InfoAboutUserOnline_Click"/>
                                         </ContextMenu>
                                     </Border.ContextMenu>
                                 </Border>
@@ -391,8 +388,5 @@
                      ScrollViewer.CanContentScroll="False"/>
 
         </GroupBox>
-
-
-
     </Grid>
 </Window>

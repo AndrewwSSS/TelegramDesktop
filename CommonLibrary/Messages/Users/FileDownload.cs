@@ -10,15 +10,27 @@ namespace CommonLibrary.Messages.Users
 
         public List<FileChunk> Chunks { get; set; }
         public int RightCount { get; set; } = -1;
-        public bool isComplete => Chunks.Count == RightCount;
+        public bool isCompleted => Chunks.Count == RightCount;
 
         public FileDownload() {
             Chunks = new List<FileChunk>();
         }
 
+
+
+
         public List<FileChunk> GetOrderedChanks() {
             return Chunks.OrderBy(c => c.Order).ToList();
         }
 
+        public void AddChunk(FileChunk chunk)
+        {
+            Chunks.Add(chunk);
+
+            if (chunk.IsLast)
+                RightCount = chunk.Order + 1;
+
+        }   
+    
     }
 }

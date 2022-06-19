@@ -25,11 +25,10 @@ namespace CommonLibrary.Messages.Users
         public virtual List<GroupChat> Chats { get; set; }
         public virtual List<ChatMessage> Messages { get; set; }
 
-        public DateTime LocalRegistrationDate => RegistrationDate.ToLocalTime();
-        public DateTime LocalVisitDate => VisitDate.ToLocalTime();
-
         [NotMapped]
-        public DateTime LocalLastVistDate => VisitDate.ToLocalTime();
+        public DateTime LocalRegistrationDate => RegistrationDate.ToLocalTime();
+        [NotMapped]
+        public DateTime LocalVistDate => VisitDate.ToLocalTime();
 
 
         public User()
@@ -39,8 +38,8 @@ namespace CommonLibrary.Messages.Users
             Clients = new List<UserClient>();
             Banned = false;
             Messages = new List<ChatMessage>();
-            
         }
+
 
         public User(int id) : this()
         {

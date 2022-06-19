@@ -43,8 +43,6 @@
         </GradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    
-    
     <Style TargetType="ContextMenu">
         <Style.Setters>
             <Setter Property="Template">
@@ -57,7 +55,7 @@
 
                             <StackPanel IsItemsHost="True"
                                         KeyboardNavigation.DirectionalNavigation="Cycle"
-                                        Margin="0, 5, 0, 5"                                              />
+                                        Margin="0, 5, 0, 5"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -103,9 +101,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border  x:Name="border" 
-                                         Background="#282E33"
-                                        
-                                         CornerRadius="5">
+                                 Background="#282E33"
+                                 CornerRadius="5">
 
                             <TextBlock Text="{TemplateBinding Property=Content}"
                                                    Foreground="White" 
@@ -150,7 +147,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Border Background="#0e1621"
+                    <Border Background="#202b36"
                             x:Name="Border"
                             BorderThickness="0">
                         
@@ -291,16 +288,16 @@
                 <Track.Thumb>
 
                     <Thumb Style="{StaticResource ScrollBarThumb}"
-                                   Margin="1,0,1,0" 
-                                   Background="{StaticResource HorizontalNormalBrush}"
-                                   BorderBrush="{StaticResource HorizontalNormalBorderBrush}"/>
+                           Margin="1,0,1,0" 
+                           Background="{StaticResource HorizontalNormalBrush}"
+                           BorderBrush="{StaticResource HorizontalNormalBorderBrush}"/>
 
                 </Track.Thumb>
 
                 <Track.IncreaseRepeatButton>
 
                     <RepeatButton Style="{StaticResource ScrollBarPageButton}"
-                                          Command="ScrollBar.PageDownCommand" />
+                                  Command="ScrollBar.PageDownCommand" />
 
                 </Track.IncreaseRepeatButton>
 

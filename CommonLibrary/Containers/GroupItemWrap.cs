@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace CommonLibrary.Containers
 {
@@ -30,14 +31,23 @@ namespace CommonLibrary.Containers
         public ObservableCollection<ImageContainer> Images { get; set; } = new ObservableCollection<ImageContainer>();
         public List<ChatMessage> Messages => GroupChat.Messages;
         public ChatMessage LastMessage => GroupChat.Messages.LastOrDefault();
-        public GroupItemWrap(PublicGroupInfo group)
+        public ImageSource Avatar
         {
-            GroupChat = group;
+            get
+            {
+                if(Images.Count > 0)
+                    return Images[0].ImageData.ImageSource;
+                else
+                    return null;
+            }
         }
+
+        public GroupItemWrap(PublicGroupInfo group) => GroupChat = group;
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

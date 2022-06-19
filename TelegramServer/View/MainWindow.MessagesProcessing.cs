@@ -11,6 +11,7 @@ using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -23,6 +24,7 @@ namespace TelegramServer
     {
         private void ClientMessageRecived(TcpClientWrap client, Message msg)
         {
+            //DEBUG
             Console.WriteLine($"Message recieved. Type {msg.GetType().Name}");
 
             switch (msg.GetType().Name)
@@ -46,7 +48,11 @@ namespace TelegramServer
 
                             DbTelegram.Users.Add(newUser);
                             Dispatcher.Invoke(() => UsersOffline.Add(newUser));
-                            DbTelegram.SaveChanges();
+                            lock (DbTelegram)
+                            {
+                                DbTelegram.SaveChanges();
+                            }
+                            
 
 
                             client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Success));
@@ -101,8 +107,11 @@ namespace TelegramServer
                                 UsersOnline.Add(sender);
                             });
 
-
-                            DbTelegram.SaveChanges();
+                            lock(DbTelegram)
+                            {
+                                DbTelegram.SaveChanges();
+                            }
+                            
 
                             if (senderClient.MessagesToSend.Count != 0)
                             {
@@ -234,8 +243,12 @@ namespace TelegramServer
                         sender.Messages.Add(newMessage);
                         group.Messages.Add(newMessage);
 
-                        DbTelegram.SaveChanges();
-                        DbTelegram.GroupChats.Load();
+                        lock (DbTelegram)
+                        {
+                            DbTelegram.SaveChanges();
+                            DbTelegram.GroupChats.Load();
+                        }
+                      
 
                         client.SendAsync(new ChatMessageSendResult(toGroupMessage.LocalMessageId, newMessage.Id));
 
@@ -303,8 +316,14 @@ namespace TelegramServer
                             Dispatcher.Invoke(() =>
                             {
                                 DbTelegram.GroupChats.Add(newChat);
-                                DbTelegram.SaveChanges();
-                                DbTelegram.GroupChats.Load();
+
+                                lock(DbTelegram)
+                                {
+                                    DbTelegram.SaveChanges();
+                                    DbTelegram.GroupChats.Load();
+                                }
+                               
+                                
                             });
 
 
@@ -360,23 +379,16 @@ namespace TelegramServer
                         newGroup.Members.Add(sender);
                         newGroup.Administrators.Add(sender);
 
-                        if (createNewGroupMessage.Image != null)
-                        {
-                            //ImageContainer newImage = new ImageContainer(createNewGroupMessage.Image);
-                            //DbTelegram.Images.Add(newImage);
-
-                            //DbTelegram.SaveChanges();
-                            //DbTelegram.Images.Load();
-
-                            //newGroup.ImagesId.Add(newImage.Id);
-                        }
-
 
                         Dispatcher.Invoke(() =>
                         {
                             DbTelegram.GroupChats.Add(newGroup);
-                            DbTelegram.SaveChanges();
-                            DbTelegram.GroupChats.Load();
+                            lock(DbTelegram)
+                            {
+                                DbTelegram.SaveChanges();
+                                DbTelegram.GroupChats.Load();
+                            }
+                           
                         });
 
 
@@ -390,7 +402,11 @@ namespace TelegramServer
                             foreach (var member in newGroupMembers)
                                 member.Chats.Add(newGroup);
 
-                            DbTelegram.SaveChanges();
+                            lock (DbTelegram)
+                            {
+                                DbTelegram.SaveChanges();
+                            }
+                          
 
                             PublicGroupInfo GroupInfo = new PublicGroupInfo(newGroup.Name,
                                                                             newGroup.Description,
@@ -423,6 +439,11 @@ namespace TelegramServer
                             sender.Chats.Add(group);
                             group.AddMember(sender);
 
+                            lock (DbTelegram){
+                                DbTelegram.SaveChanges();
+                            }
+
+
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
                    
@@ -452,7 +473,7 @@ namespace TelegramServer
                                     foreach (var file in Files)
                                         fileClient.SendFileAsync(file);
                                   
-                                    //TODO: send file
+                                    
                                     break;
                                 }
                             case DataRequestType.ImageData:
@@ -464,8 +485,6 @@ namespace TelegramServer
 
                                     foreach (var img in Images)
                                         fileClient.SendImageAsync(img);
-
-                                    //TODO: send file
 
                                     break;
                                 }
@@ -536,7 +555,11 @@ namespace TelegramServer
                             {
 
                                 group.Messages.Remove(deletedMessage);
-                                DbTelegram.SaveChanges();
+                                lock (DbTelegram)
+                                {
+                                    DbTelegram.SaveChanges();
+                                }
+                               
 
                                 client.SendAsync(new DeleteChatMessageResultMessage(group.Id, deletedMessage.Id));
 
@@ -561,7 +584,11 @@ namespace TelegramServer
                             case SystemMessageType.Logout:
                                 {
                                     sender.Clients.Remove(senderClient);
-                                    DbTelegram.SaveChanges();
+                                    lock (DbTelegram)
+                                    {
+                                        DbTelegram.SaveChanges();
+                                    }
+                                    
                                     break;
                                 }
                         }
@@ -585,7 +612,10 @@ namespace TelegramServer
                         {
                             
                             group.Members.Remove(sender);
-                            DbTelegram.SaveChanges();
+                            lock (DbTelegram) {
+                                DbTelegram.SaveChanges();
+                            }
+                            
 
 
                             GroupUpdateMessage groupUpdate = new GroupUpdateMessage()
@@ -594,9 +624,21 @@ namespace TelegramServer
                                 RemovedUserId = sender.Id
                             };
 
-                            SendMessageToUsers(groupUpdate, sender.Id,
-                                               senderClient.Id,
-                                               new List<User>(group.Members) { sender });
+
+                            if(group.Members.Count == 0) {
+
+                                DbTelegram.GroupChats.Remove(group);
+
+                                lock (DbTelegram) {
+                                    DbTelegram.SaveChanges();
+                                }
+                            }
+                            else
+                            {
+                                SendMessageToUsers(groupUpdate, sender.Id,
+                                              senderClient.Id,
+                                              new List<User>(group.Members) { sender });
+                            }
                         }
                         break;
                     }
@@ -628,7 +670,13 @@ namespace TelegramServer
                             }
 
                             if (ChangesExists)
-                                DbTelegram.SaveChanges();
+                            {
+                                lock (DbTelegram)
+                                {
+                                    DbTelegram.SaveChanges();
+                                }
+                            }
+                                
                         }
 
                         break;
@@ -646,5 +694,102 @@ namespace TelegramServer
                     }
             }
         }
+
+        private void FileServer_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
+        {
+            UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
+            UserDownloads downloads = UsersDownloads[senderClient];
+
+
+            if (chunk.IsImage)
+            {
+                KeyValuePair<int, FileDownload> ChunksInfo;
+
+                if (downloads.ImagesInProcess.Any(kv => kv.Key == chunk.FileId))
+                    ChunksInfo = downloads.ImagesInProcess.First(kv => kv.Key == chunk.FileId);
+                else
+                {
+                    ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
+                    downloads.ImagesInProcess.Add(ChunksInfo);
+                }
+
+                FileDownload fileDownload = ChunksInfo.Value;
+
+                fileDownload.AddChunk(chunk);
+
+                if (fileDownload.isCompleted)
+                {
+                    KeyValuePair<int, ImageMetadata> metadataInfo = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                    ImageMetadata metaData = metadataInfo.Value;
+
+                    MemoryStream stream = new MemoryStream();
+                    foreach (var fileChunk in fileDownload.GetOrderedChanks())
+                        stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
+
+                    ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
+
+                    DbTelegram.Images.Add(newImage);
+                    DbTelegram.SaveChanges();
+                    DbTelegram.Images.Load();
+
+                    downloads.ImageFinished(chunk.FileId, newImage.Id);
+                }
+
+            }
+            else
+            {
+                KeyValuePair<int, FileDownload> ChunksInfo;
+
+                if (downloads.FilesInProcess.Any(kv => kv.Key == chunk.FileId))
+                    ChunksInfo = downloads.FilesInProcess.First(kv => kv.Key == chunk.FileId);
+                else
+                {
+                    ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
+                    downloads.FilesInProcess.Add(ChunksInfo);
+                }
+
+                FileDownload fileDownload = ChunksInfo.Value;
+
+
+                fileDownload.AddChunk(chunk);
+
+
+                if (fileDownload.isCompleted)
+                {
+                    KeyValuePair<int, FileMetadata> metadataInfo = downloads.RemainingFiles.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                    FileMetadata metaData = metadataInfo.Value;
+
+                    MemoryStream stream = new MemoryStream();
+                    foreach (var fileChunk in fileDownload.GetOrderedChanks())
+                        stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
+
+                    FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
+
+                    lock (DbTelegram)
+                    {
+                        DbTelegram.Files.Add(newFile);
+                        DbTelegram.SaveChanges();
+                        DbTelegram.Files.Load();
+                    }
+
+
+                    downloads.FileFinished(chunk.FileId, newFile.Id);
+                }
+
+            }
+
+            if (downloads.IsCompleted)
+            {
+                MetadataResultMessage resultMessage
+                    = new MetadataResultMessage(downloads.ForMessageId,
+                                                downloads.FinishedImages,
+                                                downloads.FinishedFiles);
+
+                TcpClientWrap TcpClient = ClientsOnline.FirstOrDefault(co => co.Value == senderClient).Key;
+
+                TcpClient.SendAsync(resultMessage);
+            }
+        }
+
     }
 }

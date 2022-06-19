@@ -1,14 +1,9 @@
-﻿using CommonLibrary.Containers;
-using CommonLibrary.Messages.Users;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace CommonLibrary.Messages.Groups
 {
-    /// <summary>
-    /// Представляет собой класс, содержащий доступную для клиентов информацию о группе
-    /// </summary>
     [Serializable]
     public class PublicGroupInfo : UserEntity
     {
