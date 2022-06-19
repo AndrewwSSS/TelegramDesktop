@@ -838,10 +838,10 @@ namespace Telegram
                         MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                         // отправляем файлы
                         if (
-                            (MsgFiles.ContainsKey(CurGroup) ||
-                             MsgImages.ContainsKey(CurGroup))
-                            &&
-                            (MsgFiles[CurGroup].Count != 0 ||
+                            (MsgFiles.ContainsKey(CurGroup) &&
+                            MsgFiles[CurGroup].Count != 0)
+                            ||
+                            (MsgImages.ContainsKey(CurGroup) &&
                             MsgImages[CurGroup].Count != 0))
                         {
                             PendingMsgWithAttachments.Add(msgToGroup.LocalMessageId, msgToGroup);
