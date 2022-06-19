@@ -844,6 +844,12 @@ namespace Telegram
                             (MsgImages.ContainsKey(CurGroup) &&
                             MsgImages[CurGroup].Count != 0))
                         {
+                            List<FileMetadata> fileMdList = null;
+                            MsgFiles.TryGetValue(CurGroup, out fileMdList);
+                            List<ImageMetadata> imgMdList = null;
+                            MsgImages.TryGetValue(CurGroup, out imgMdList);
+
+
                             PendingMsgWithAttachments.Add(msgToGroup.LocalMessageId, msgToGroup);
                             List<int> filesLocalId = new List<int>();
                             List<int> imagesLocalId = new List<int>();
@@ -851,31 +857,38 @@ namespace Telegram
                                     msgToGroup.LocalMessageId,
                                     App.MessageLocalIdCounter++,
                                     files:
-                                    MsgFiles.ContainsKey(CurGroup) ? MsgFiles[CurGroup].Select(
+                                    fileMdList?.Select(
                                         file =>
                                         {
                                             PendingFiles.Add(App.MetadataLocalIdCounter, file);
                                             filesLocalId.Add(App.MetadataLocalIdCounter);
                                             return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
                                         }
-                                        ) : null,
+                                        ),
                                     images:
-                                        MsgImages.ContainsKey(CurGroup) ? MsgImages[CurGroup].Select(
-                                            img =>
-                                            {
-                                                PendingImages.Add(App.MetadataLocalIdCounter, img);
-                                                imagesLocalId.Add(App.MetadataLocalIdCounter);
-                                                return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
-                                            }
-                                            ) : null
+                                    imgMdList?.Select(
+                                        img =>
+                                        {
+                                            PendingImages.Add(App.MetadataLocalIdCounter, img);
+                                            imagesLocalId.Add(App.MetadataLocalIdCounter);
+                                            return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
+                                        }
+                                        )
                                     );
-                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState()
+
+                            var state = new MetadataState();
+                            if(imgMdList != null)
                             {
-                                FilesName = new List<string>(MsgFiles[CurGroup].Select(file => file.Name)),
-                                FilesLocalId = filesLocalId,
-                                ImagesName = new List<string>(MsgImages[CurGroup].Select(img => img.Name)),
-                                ImagesLocalId = imagesLocalId
-                            };
+                                state.ImagesName = new List<string>(imgMdList.Select(img => img.Name));
+                                state.ImagesLocalId = imagesLocalId;
+                            }
+                            if(fileMdList != null)
+                            {
+                                state.FilesName = new List<string>(fileMdList.Select(file => file.Name));
+                                state.FilesLocalId = filesLocalId;
+                            }
+                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState();
+                            
                             Client.SendAsync(mdMsg);
                             Dispatcher.Invoke(ResetMessageForm);
                             return;
