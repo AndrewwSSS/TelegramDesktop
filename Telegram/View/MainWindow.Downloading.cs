@@ -30,6 +30,7 @@ namespace Telegram
             if (!ImageDownloadStreams.ContainsKey(chunk.FileId))
             {
                 var metadata = CachedImagesMetadata.First(md => md.Id == chunk.FileId);
+                metadata.Name = Path.GetFileName(metadata.Name);
                 var dirName = "Downloads\\Files";
                 Directory.CreateDirectory(dirName);
                 saveName = $"{chunk.FileId}_{metadata.Name}";
@@ -71,6 +72,7 @@ namespace Telegram
             if (!FileDownloadStreams.ContainsKey(chunk.FileId))
             {
                 var metadata = CachedFilesMetadata.First(md => md.Id == chunk.FileId);
+                metadata.Name = Path.GetFileName(metadata.Name);
                 var dirName = "Downloads\\Files";
                 Directory.CreateDirectory(dirName);
                 string saveName = $"{chunk.FileId}_{metadata.Name}";
