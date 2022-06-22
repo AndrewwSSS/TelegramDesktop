@@ -20,10 +20,10 @@ namespace CommonLibrary.Messages.Users
         public DateTime RegistrationDate { get; set; }
         public DateTime VisitDate { get; set; }
 
-        public virtual List<UserClient> Clients { get; set; }
-        public virtual List<int> BlockedUsersId { get; set; } 
-        public virtual List<GroupChat> Chats { get; set; }
-        public virtual List<ChatMessage> Messages { get; set; }
+        public virtual ICollection<UserClient> Clients { get; set; }
+        public virtual ICollection<int> BlockedUsersId { get; set; } 
+        public virtual ICollection<GroupChat> Chats { get; set; }
+        public virtual ICollection<ChatMessage> Messages { get; set; }
 
         [NotMapped]
         public DateTime LocalRegistrationDate => RegistrationDate.ToLocalTime();
@@ -33,21 +33,11 @@ namespace CommonLibrary.Messages.Users
 
         public User()
         {
-            BlockedUsersId = new List<int>();
-            Chats = new List<GroupChat>();
-            Clients = new List<UserClient>();
+            BlockedUsersId = new HashSet<int>();
+            Chats = new HashSet<GroupChat>();
+            Clients = new HashSet<UserClient>();
             Banned = false;
-            Messages = new List<ChatMessage>();
+            Messages = new HashSet<ChatMessage>();
         }
-
-
-        public User(int id) : this()
-        {
-            Id = id;
-        }
-
-
-    
-
     }
 }

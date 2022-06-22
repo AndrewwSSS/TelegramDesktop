@@ -24,7 +24,7 @@ namespace CommonLibrary.Messages.Users
         }
 
         public UserClient() {
-            MessagesToSend = new List<BaseMessage>();
+            MessagesToSend = new HashSet<BaseMessage>();
         }
 
     }

@@ -26,9 +26,9 @@ namespace CommonLibrary.Messages.Groups
 
         public GroupType Type { get; set; }
         public DateTime DateCreated { get; set; }
-        public virtual List<ChatMessage> Messages { get; set; }
-        public virtual List<User> Members { get; set; } = new List<User>();
-        public virtual List<User> Administrators { get; set; }
+        public virtual ICollection<ChatMessage> Messages { get; set; }
+        public virtual ICollection<User> Members { get; set; }
+        public virtual ICollection<User> Administrators { get; set; }
 
         public ChatMessage LastMessage => Messages != null ? Messages.LastOrDefault() : null;
 
@@ -40,7 +40,7 @@ namespace CommonLibrary.Messages.Groups
             get
             {
                 if (Type == GroupType.Personal)
-                    return Members[0].Login + " - " + Members[1].Login;
+                    return Members.ElementAt(0).Login + " - " + Members.ElementAt(0).Login;
                 else
                     return Name;
             }
@@ -48,9 +48,9 @@ namespace CommonLibrary.Messages.Groups
 
         public GroupChat() 
         {
-            Messages = new List<ChatMessage>();
-            Members = new List<User>();
-            Administrators = new List<User>();
+            Messages = new HashSet<ChatMessage>();
+            Members = new HashSet<User>();
+            Administrators = new HashSet<User>();
         }
         
 
