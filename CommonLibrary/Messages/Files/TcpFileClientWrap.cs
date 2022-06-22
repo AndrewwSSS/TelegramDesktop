@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommonLibrary.Messages.Files
@@ -42,6 +43,7 @@ namespace CommonLibrary.Messages.Files
         }
 
 
+        private static ManualResetEvent SendLocker = new ManualResetEvent(true);
         public TcpFileClientWrap(TcpClient tcpClient, int userId = -1, string guid = null)
         {
             UserId = userId;
@@ -190,6 +192,7 @@ namespace CommonLibrary.Messages.Files
                                 Socket = Tcp.Client
                             };
                             state.SetBuffer(toSend, toSend.Length);
+                            SendLocker.WaitOne();
                             Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
                             FileChunk chunk = new FileChunk()
                             {
@@ -249,6 +252,7 @@ namespace CommonLibrary.Messages.Files
                             Socket = Tcp.Client
                         };
                         state.SetBuffer(toSend, toSend.Length);
+                        SendLocker.WaitOne();
                         Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
                         FileChunk chunk = new FileChunk()
                         {
@@ -277,7 +281,7 @@ namespace CommonLibrary.Messages.Files
                 {
                     var data = img.ImageData.Bytes;
                     int remaining = data.Length;
-                    for (int chunkNumber = 0; remaining > 0; chunkNumber++)
+                    for (int chunkOrder = 0; remaining > 0; chunkOrder++)
                     {
                         byte[] toSend;
                         {
@@ -288,6 +292,7 @@ namespace CommonLibrary.Messages.Files
                             ms.Write(BitConverter.GetBytes(img.Id), 0, 4);
                             ms.Write(BitConverter.GetBytes(true), 0, 1);
                             ms.Write(BitConverter.GetBytes(remaining <= 4096), 0, 1);
+                            ms.Write(BitConverter.GetBytes(chunkOrder), 0, 4);
                             ms.Write(BitConverter.GetBytes(bufSize), 0, 4);
                             byte[] section = new byte[bufSize];
                             Array.Copy(data, data.Length - remaining, section, 0, bufSize);
@@ -300,6 +305,7 @@ namespace CommonLibrary.Messages.Files
                             Socket = Tcp.Client
                         };
                         state.SetBuffer(toSend, toSend.Length);
+                        SendLocker.WaitOne();
                         Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
                         FileChunk chunk = new FileChunk()
                         {
@@ -322,6 +328,7 @@ namespace CommonLibrary.Messages.Files
         {
             StateObject state = (StateObject)ar.AsyncState;
             state.Socket.EndSend(ar);
+            SendLocker.Set();
         }
         public int UserId { get; private set; } = -1;
         public string Guid { get; private set; }
