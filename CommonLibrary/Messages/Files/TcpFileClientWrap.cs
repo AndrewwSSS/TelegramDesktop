@@ -193,6 +193,7 @@ namespace CommonLibrary.Messages.Files
                             };
                             state.SetBuffer(toSend, toSend.Length);
                             SendLocker.WaitOne();
+                            SendLocker.Reset();
                             Tcp.Client.BeginSend(toSend, 0, toSend.Length, SocketFlags.None, SendCB, state);
                             FileChunk chunk = new FileChunk()
                             {

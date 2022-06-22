@@ -456,6 +456,12 @@ namespace Telegram
                         file.Id = pair.Value;
                         CachedFilesMetadata.Add(file);
                     }
+                    foreach(var pair in result.Images)
+                    {
+                        var img = PendingImages[pair.Key];
+                        PendingImages.Remove(pair.Key);
+                        CachedImages[pair.Value] = img;
+                    }
                     MessageToGroupMessage msgToGroup = PendingMsgWithAttachments[result.LocalMessageId];
                     msgToGroup.FilesId = result.Files.Select(p => p.Value).ToList();
                     msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
@@ -499,7 +505,6 @@ namespace Telegram
             if (item.Message.FromUserId == Me.Id)
                 item.ShowUsername = false;
             item.ShowAvatar = true;
-
             {
                 bool pending = false;
                 foreach (var id in msg.FilesId)
@@ -870,7 +875,7 @@ namespace Telegram
                                     imgMdList?.Select(
                                         img =>
                                         {
-                                            PendingImages.Add(App.MetadataLocalIdCounter, img);
+                                            PendingImages.Add(App.MetadataLocalIdCounter, img.Name);
                                             imagesLocalId.Add(App.MetadataLocalIdCounter);
                                             return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
                                         }
