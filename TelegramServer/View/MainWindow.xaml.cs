@@ -1,6 +1,4 @@
-﻿using CommonLibrary;
-using CommonLibrary.Containers;
-using CommonLibrary.Messages;
+﻿using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
@@ -10,7 +8,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -128,8 +125,8 @@ namespace TelegramServer
             lock (DbTelegram) {
                 DbTelegram.SaveChanges();
             }
-           
 
+        
             Dispatcher.Invoke(() =>
             {
                 UsersOnline.Remove(DisconnectedClient.User);

@@ -2,7 +2,6 @@
 using CommonLibrary.Messages;
 using CommonLibrary.Messages.Auth;
 using CommonLibrary.Messages.Auth.Login;
-using CommonLibrary.Messages.Auth.Logout;
 using CommonLibrary.Messages.Auth.SignUp;
 using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Groups;
@@ -252,7 +251,7 @@ namespace TelegramServer
 
                         client.SendAsync(new ChatMessageSendResult(toGroupMessage.LocalMessageId, newMessage.Id));
 
-                        SendMessageToUsers(newMessage, sender.Id, senderClient.Id, group.Members);
+                        SendMessageToUsers(newMessage, sender.Id, senderClient.Id, group.Members.ToList());
                         break;
                     }
                 case "ChatLookupMessage":
@@ -341,7 +340,7 @@ namespace TelegramServer
                             SendMessageToUsers(new PersonalChatCreatedMessage(newChatInfo),
                                                sender.Id,
                                                senderClient.Id,
-                                               newChat.Members);
+                                               newChat.Members.ToList());
                         }
 
 
@@ -378,7 +377,7 @@ namespace TelegramServer
 
                         newGroup.Members.Add(sender);
                         newGroup.Administrators.Add(sender);
-
+                        sender.Chats.Add(newGroup);
 
                         Dispatcher.Invoke(() =>
                         {
@@ -388,7 +387,6 @@ namespace TelegramServer
                                 DbTelegram.SaveChanges();
                                 DbTelegram.GroupChats.Load();
                             }
-                           
                         });
 
 
@@ -397,13 +395,15 @@ namespace TelegramServer
 
                         if (newGroupMembers.Count > 0)
                         {
-                            newGroup.Members.AddRange(newGroupMembers);
+                            foreach (var newGroupMember in newGroupMembers)
+                                newGroup.Members.Add(newGroupMember);
+
 
                             foreach (var member in newGroupMembers)
                                 member.Chats.Add(newGroup);
 
-                            lock (DbTelegram)
-                            {
+
+                            lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
                           
@@ -443,6 +443,8 @@ namespace TelegramServer
                                 DbTelegram.SaveChanges();
                             }
 
+                            User test = DbTelegram.Users.FirstOrDefault(u => u.Id == sender.Id);
+                            GroupChat testg = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == group.Id);
 
                             client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
 
@@ -450,7 +452,7 @@ namespace TelegramServer
                             SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUserId = sender.Id },
                                                sender.Id,
                                                senderClient.Id,
-                                               group.Members);
+                                               group.Members.ToList());
 
                         }
                         else
@@ -563,7 +565,10 @@ namespace TelegramServer
 
                                 client.SendAsync(new DeleteChatMessageResultMessage(group.Id, deletedMessage.Id));
 
-                                SendMessageToUsers(MsgDeleteMessage, sender.Id, senderClient.Id, group.Members);
+                                SendMessageToUsers(MsgDeleteMessage, 
+                                                    sender.Id,
+                                                    senderClient.Id,
+                                                    group.Members.ToList());
                             }
                             else
                                 client.SendAsync(new DeleteChatMessageResultMessage(AuthenticationResult.Denied));

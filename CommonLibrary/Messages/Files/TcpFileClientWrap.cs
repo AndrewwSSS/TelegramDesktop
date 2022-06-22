@@ -346,8 +346,7 @@ namespace CommonLibrary.Messages.Files
                     byte[] intBytes = new byte[4];
 
                     int sizeReceived = Tcp.Client.Receive(intBytes, 4, SocketFlags.None);
-                    if (sizeReceived == 0)
-                    {
+                    if (sizeReceived == 0) {
                         DisconnectAsync();
                         return;
                     }

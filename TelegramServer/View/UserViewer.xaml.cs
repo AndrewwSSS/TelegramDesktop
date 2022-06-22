@@ -47,6 +47,7 @@ namespace TelegramServer.View
             UserId = userId;
             Groups = new ObservableCollection<GroupItemWrap>();
             DataContext = this;
+            LB_Groups.ItemsSource = Groups;
             Updade();
         }
 
