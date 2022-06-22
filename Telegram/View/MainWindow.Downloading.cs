@@ -102,8 +102,8 @@ namespace Telegram
             foreach(var msg in PendingFileMetadataMsg)
             {
                 if(msg.Message.FilesId.Contains(metadata.Id) &&
-                    !msg.FilesMetadata.Contains(metadata))
-                    msg.FilesMetadata.Add(metadata);
+                    !msg.FilesMetadata.Any(vm=>vm.Value == metadata))
+                    msg.FilesMetadata.Add(new FileMetadataViewModel(metadata));
 
                 if (msg.FilesMetadata.Count == msg.Message.FilesId.Count)
                     fullMessages.Add(msg);

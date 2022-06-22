@@ -65,6 +65,7 @@
     <Compile Include="Containers\FileContainer.cs" />
     <Compile Include="Containers\FileData.cs" />
     <Compile Include="Containers\FileMetadata.cs" />
+    <Compile Include="Containers\FileMetadataViewModel.cs" />
     <Compile Include="Containers\GroupItemWrap.cs" />
     <Compile Include="Containers\ImageContainer.cs" />
     <Compile Include="Containers\ImageData.cs" />

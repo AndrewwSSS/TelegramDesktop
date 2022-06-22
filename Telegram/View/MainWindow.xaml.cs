@@ -519,7 +519,7 @@ namespace Telegram
                         Client.SendAsync(new DataRequestMessage(id, DataRequestType.FileMetadata));
                     }
                     else
-                        item.FilesMetadata.Add(metadata);
+                        item.FilesMetadata.Add(new FileMetadataViewModel(metadata));
                 }
                 pending = false;
                 foreach (var id in msg.ImagesId)
@@ -889,7 +889,11 @@ namespace Telegram
                             }
                             if(fileMdList != null)
                             {
-                                state.FilesName = new List<string>(fileMdList.Select(file => file.Name));
+                                state.FilesName = new List<string>(fileMdList.Select(file => {
+                                    string result = file.Name;
+                                    file.Name = Path.GetFileName(file.Name);
+                                    return result;
+                                    }));
                                 state.FilesLocalId = filesLocalId;
                             }
                             PendingMetadata[mdMsg.LocalReturnId] = state;
