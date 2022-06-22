@@ -343,11 +343,12 @@ namespace Telegram
                     var syncMsg = msg as MetadataSyncMessage;
                     var md = PendingMetadata[syncMsg.LocalReturnId];
                     PendingMetadata.Remove(syncMsg.LocalReturnId);
-
-                    for (int i = 0; i < md.FilesLocalId.Count; i++)
-                        FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i], false);
-                    for (int i = 0; i < md.ImagesLocalId.Count; i++)
-                        FileClient.SendFileAsync(md.ImagesName[i], md.ImagesLocalId[i], true);
+                    if(md.FilesLocalId!=null)
+                        for (int i = 0; i < md.FilesLocalId.Count; i++)
+                            FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i], false);
+                    if(md.ImagesLocalId!=null)
+                        for (int i = 0; i < md.ImagesLocalId.Count; i++)
+                            FileClient.SendFileAsync(md.ImagesName[i], md.ImagesLocalId[i], true);
 
                 }
                 else if (msg is GroupJoinResultMessage)
@@ -833,9 +834,13 @@ namespace Telegram
                         {
                             List<FileMetadata> fileMdList = null;
                             MsgFiles.TryGetValue(CurGroup, out fileMdList);
+                            if (fileMdList == null)
+                                fileMdList = new List<FileMetadata>();
+
                             List<ImageMetadata> imgMdList = null;
                             MsgImages.TryGetValue(CurGroup, out imgMdList);
-
+                            if (imgMdList == null)
+                                imgMdList = new List<ImageMetadata>();
 
                             PendingMsgWithAttachments.Add(msgToGroup.LocalMessageId, msgToGroup);
                             List<int> filesLocalId = new List<int>();
@@ -874,7 +879,7 @@ namespace Telegram
                                 state.FilesName = new List<string>(fileMdList.Select(file => file.Name));
                                 state.FilesLocalId = filesLocalId;
                             }
-                            PendingMetadata[mdMsg.LocalReturnId] = new MetadataState();
+                            PendingMetadata[mdMsg.LocalReturnId] = state;
                             
                             Client.SendAsync(mdMsg);
                             Dispatcher.Invoke(ResetMessageForm);
