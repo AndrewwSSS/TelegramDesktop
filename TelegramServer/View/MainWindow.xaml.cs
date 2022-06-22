@@ -66,6 +66,7 @@ namespace TelegramServer
 
             FileServer.UserSynchronized += UserSynchronized;
             FileServer.FileChunkReceived += FileServer_FileChunkReceived;
+            FileServer.ImageChunkReceived += FileServer_ImageChunkReceived;
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
@@ -89,8 +90,8 @@ namespace TelegramServer
             //    Credentials = new NetworkCredential("telegramdesktopbyadat@gmail.com", ""),
             //    EnableSsl = true
             //};
-
             //smtp.Send(message);
+
 
         }
 

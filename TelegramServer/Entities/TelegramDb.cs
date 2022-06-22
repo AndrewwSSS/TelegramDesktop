@@ -21,10 +21,11 @@ namespace TelegramServer
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
             modelBuilder.Entity<GroupChat>().HasMany(g => g.Messages)
             .WithOptional()
             .WillCascadeOnDelete(true);
-        }
+
+            modelBuilder.Entity<User>().HasMany(u => u.Chats).WithMany(g => g.Members);
+        }  
     }
 }
