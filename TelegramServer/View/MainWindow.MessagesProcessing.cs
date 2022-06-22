@@ -705,82 +705,93 @@ namespace TelegramServer
             UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
             UserDownloads downloads = UsersDownloads[senderClient];
 
+            KeyValuePair<int, FileDownload> ChunksInfo;
 
-            if (chunk.IsImage)
-            {
-                KeyValuePair<int, FileDownload> ChunksInfo;
-
-                if (downloads.ImagesInProcess.Any(kv => kv.Key == chunk.FileId))
-                    ChunksInfo = downloads.ImagesInProcess.First(kv => kv.Key == chunk.FileId);
-                else
-                {
-                    ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
-                    downloads.ImagesInProcess.Add(ChunksInfo);
-                }
-
-                FileDownload fileDownload = ChunksInfo.Value;
-
-                fileDownload.AddChunk(chunk);
-
-                if (fileDownload.isCompleted)
-                {
-                    KeyValuePair<int, ImageMetadata> metadataInfo = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
-                    ImageMetadata metaData = metadataInfo.Value;
-
-                    MemoryStream stream = new MemoryStream();
-                    foreach (var fileChunk in fileDownload.GetOrderedChanks())
-                        stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
-
-                    ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
-
-                    DbTelegram.Images.Add(newImage);
-                    DbTelegram.SaveChanges();
-                    DbTelegram.Images.Load();
-
-                    downloads.ImageFinished(chunk.FileId, newImage.Id);
-                }
-
-            }
+            if (downloads.FilesInProcess.Any(kv => kv.Key == chunk.FileId))
+                ChunksInfo = downloads.FilesInProcess.First(kv => kv.Key == chunk.FileId);
             else
             {
-                KeyValuePair<int, FileDownload> ChunksInfo;
+                ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
+                downloads.FilesInProcess.Add(ChunksInfo);
+            }
 
-                if (downloads.FilesInProcess.Any(kv => kv.Key == chunk.FileId))
-                    ChunksInfo = downloads.FilesInProcess.First(kv => kv.Key == chunk.FileId);
-                else
+            FileDownload fileDownload = ChunksInfo.Value;
+
+
+            fileDownload.AddChunk(chunk);
+
+
+            if (fileDownload.isCompleted)
+            {
+                KeyValuePair<int, FileMetadata> metadataInfo = downloads.RemainingFiles.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                FileMetadata metaData = metadataInfo.Value;
+
+                MemoryStream stream = new MemoryStream();
+                foreach (var fileChunk in fileDownload.GetOrderedChanks())
+                    stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
+
+                FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
+
+                lock (DbTelegram)
                 {
-                    ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
-                    downloads.FilesInProcess.Add(ChunksInfo);
+                    DbTelegram.Files.Add(newFile);
+                    DbTelegram.SaveChanges();
+                    DbTelegram.Files.Load();
                 }
 
-                FileDownload fileDownload = ChunksInfo.Value;
+
+                downloads.FileFinished(chunk.FileId, newFile.Id);
+            }
+
+            if (downloads.IsCompleted)
+            {
+                MetadataResultMessage resultMessage
+                    = new MetadataResultMessage(downloads.ForMessageId,
+                                                downloads.FinishedImages,
+                                                downloads.FinishedFiles);
+
+                TcpClientWrap TcpClient = ClientsOnline.FirstOrDefault(co => co.Value == senderClient).Key;
+
+                TcpClient.SendAsync(resultMessage);
+            }
+        }
+
+        private void FileServer_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
+        {
+            UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
+            UserDownloads downloads = UsersDownloads[senderClient];
 
 
-                fileDownload.AddChunk(chunk);
+            KeyValuePair<int, FileDownload> ChunksInfo;
 
+            if (downloads.ImagesInProcess.Any(kv => kv.Key == chunk.FileId))
+                ChunksInfo = downloads.ImagesInProcess.First(kv => kv.Key == chunk.FileId);
+            else
+            {
+                ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
+                downloads.ImagesInProcess.Add(ChunksInfo);
+            }
 
-                if (fileDownload.isCompleted)
-                {
-                    KeyValuePair<int, FileMetadata> metadataInfo = downloads.RemainingFiles.FirstOrDefault(ri => ri.Key == chunk.FileId);
-                    FileMetadata metaData = metadataInfo.Value;
+            FileDownload fileDownload = ChunksInfo.Value;
 
-                    MemoryStream stream = new MemoryStream();
-                    foreach (var fileChunk in fileDownload.GetOrderedChanks())
-                        stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
+            fileDownload.AddChunk(chunk);
 
-                    FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
+            if (fileDownload.isCompleted)
+            {
+                KeyValuePair<int, ImageMetadata> metadataInfo = downloads.RemainingImages.FirstOrDefault(ri => ri.Key == chunk.FileId);
+                ImageMetadata metaData = metadataInfo.Value;
 
-                    lock (DbTelegram)
-                    {
-                        DbTelegram.Files.Add(newFile);
-                        DbTelegram.SaveChanges();
-                        DbTelegram.Files.Load();
-                    }
+                MemoryStream stream = new MemoryStream();
+                foreach (var fileChunk in fileDownload.GetOrderedChanks())
+                    stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
 
+                ImageContainer newImage = new ImageContainer(metaData.Name, stream.ToArray());
 
-                    downloads.FileFinished(chunk.FileId, newFile.Id);
-                }
+                DbTelegram.Images.Add(newImage);
+                DbTelegram.SaveChanges();
+                DbTelegram.Images.Load();
 
+                downloads.ImageFinished(chunk.FileId, newImage.Id);
             }
 
             if (downloads.IsCompleted)
