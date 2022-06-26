@@ -126,13 +126,15 @@ namespace CommonLibrary.Messages.Files
         {
             if (client != null && client.Connected)
             {
-                NetworkStream ns = Tcp.GetStream();
-                byte[] idBytes = BitConverter.GetBytes(UserId);
-                byte[] guidBytes = Encoding.UTF8.GetBytes(Guid);
-                byte[] guidLengthBytes = BitConverter.GetBytes(guidBytes.Length);
-                ns.Write(idBytes, 0, idBytes.Length);
-                ns.Write(guidLengthBytes, 0, guidLengthBytes.Length);
-                ns.Write(guidBytes, 0, guidBytes.Length);
+                using (var ns = Tcp.GetStream())
+                {
+                    byte[] idBytes = BitConverter.GetBytes(UserId);
+                    byte[] guidBytes = Encoding.UTF8.GetBytes(Guid);
+                    byte[] guidLengthBytes = BitConverter.GetBytes(guidBytes.Length);
+                    ns.Write(idBytes, 0, idBytes.Length);
+                    ns.Write(guidLengthBytes, 0, guidLengthBytes.Length);
+                    ns.Write(guidBytes, 0, guidBytes.Length);
+                }
                 return true;
             }
             return false;
@@ -148,15 +150,17 @@ namespace CommonLibrary.Messages.Files
                 {
                     long fileSize = new FileInfo(path).Length;
                     using (FileStream reader = new FileStream(path, FileMode.Open))
+                    using (var ns = Tcp.GetStream())
                     {
-                        NetworkStream ns = Tcp.GetStream();
                         FilesInProcessing.Add(path);
                         ns.Write(BitConverter.GetBytes(localId), 0, 4);
                         ns.Write(BitConverter.GetBytes(isImage), 0, 1);
-                        ns.Write(BitConverter.GetBytes(fileSize), 0, 8);
+                        var kek = (int)fileSize;
+                        ns.Write(BitConverter.GetBytes((int)fileSize), 0, 4);
                         reader.CopyTo(ns);
                         FilesInProcessing.Remove(path);
                     }
+
                 });
                 return true;
             }
@@ -222,16 +226,18 @@ namespace CommonLibrary.Messages.Files
                 {
                     var data = file.FileData.Bytes;
 
-                    NetworkStream ns = Tcp.GetStream();
-                    lock (SendLocker)
+                    using (var ns = Tcp.GetStream())
                     {
-                        // Посылаемые байты оформлены следующим образом:
-                        // Локальный ID, bool если изображение, bool если кусок последний, 
-                        // номер куска, размер содержимого, содержимое файла
-                        ns.Write(BitConverter.GetBytes(file.Id), 0, 4);
-                        ns.Write(BitConverter.GetBytes(false), 0, 1);
-                        ns.Write(BitConverter.GetBytes(data.Length), 0, 4);
-                        ns.Write(data, 0, data.Length);
+                        lock (SendLocker)
+                        {
+                            // Посылаемые байты оформлены следующим образом:
+                            // Локальный ID, bool если изображение, bool если кусок последний, 
+                            // номер куска, размер содержимого, содержимое файла
+                            ns.Write(BitConverter.GetBytes(file.Id), 0, 4);
+                            ns.Write(BitConverter.GetBytes(false), 0, 1);
+                            ns.Write(BitConverter.GetBytes(data.Length), 0, 4);
+                            ns.Write(data, 0, data.Length);
+                        }
                     }
                 });
                 return true;
@@ -247,16 +253,18 @@ namespace CommonLibrary.Messages.Files
                 {
                     var data = img.ImageData.Bytes;
 
-                    NetworkStream ns = Tcp.GetStream();
-                    lock (SendLocker)
+                    using (var ns = Tcp.GetStream())
                     {
-                        // Посылаемые байты оформлены следующим образом:
-                        // Локальный ID, bool если изображение, bool если кусок последний, 
-                        // номер куска, размер содержимого, содержимое файла
-                        ns.Write(BitConverter.GetBytes(img.Id), 0, 4);
-                        ns.Write(BitConverter.GetBytes(true), 0, 1);
-                        ns.Write(BitConverter.GetBytes(data.Length), 0, 4);
-                        ns.Write(data, 0, data.Length);
+                        lock (SendLocker)
+                        {
+                            // Посылаемые байты оформлены следующим образом:
+                            // Локальный ID, bool если изображение, bool если кусок последний, 
+                            // номер куска, размер содержимого, содержимое файла
+                            ns.Write(BitConverter.GetBytes(img.Id), 0, 4);
+                            ns.Write(BitConverter.GetBytes(true), 0, 1);
+                            ns.Write(BitConverter.GetBytes(data.Length), 0, 4);
+                            ns.Write(data, 0, data.Length);
+                        }
                     }
                 });
                 return true;
@@ -310,12 +318,9 @@ namespace CommonLibrary.Messages.Files
                         byte[] boolBytes = new byte[1];
                         ns.Read(boolBytes, 0, 1);
                         chunk.IsImage = BitConverter.ToBoolean(boolBytes, 0);
-                        ns.Read(boolBytes, 0, 1);
 
-                        byte[] longBytes = new byte[8];
-                        ns.Read(longBytes, 0, 8);
-                        remaining = BitConverter.ToInt32(longBytes, 0);
-
+                        ns.Read(intBytes, 0, 4);
+                        remaining = BitConverter.ToInt32(intBytes, 0);
                     }
                 }
 
