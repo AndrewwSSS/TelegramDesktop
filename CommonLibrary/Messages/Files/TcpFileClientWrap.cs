@@ -141,7 +141,7 @@ namespace CommonLibrary.Messages.Files
                     };
                     var data = ms.ToArray();
                     state.SetBuffer(data, data.Length);
-                    Tcp.Client.BeginSend(data, 0, data.Length, SocketFlags.None, SendCB, state)
+                    Tcp.Client.BeginSend(data, 0, data.Length, SocketFlags.None, SendCB, state);
                 }
                 return true;
             }
