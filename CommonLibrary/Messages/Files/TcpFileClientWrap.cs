@@ -280,64 +280,61 @@ namespace CommonLibrary.Messages.Files
         {
             try
             {
-                using (var ns = Tcp.GetStream())
+                MemoryStream stream = new MemoryStream();
+
+                FileChunk chunk = new FileChunk();
+                int remaining = 0;
                 {
-                    MemoryStream stream = new MemoryStream();
+                    byte[] intBytes = new byte[4];
 
-                    FileChunk chunk = new FileChunk();
-                    int remaining = 0;
+                    int sizeReceived = Tcp.Client.Receive(intBytes, 0, 4, SocketFlags.None);
+                    if (sizeReceived == 0)
                     {
-                        byte[] intBytes = new byte[4];
-
-                        int sizeReceived = ns.Read(intBytes, 0, 4);
-                        if (sizeReceived == 0)
-                        {
-                            DisconnectAsync();
-                            return;
-                        }
-                        if (RequiresSync && !Synchronized)
-                        {
-                            UserId = BitConverter.ToInt32(intBytes, 0);
-                            Synchronized = true;
-                            // Получаем длинну ГУИДа
-                            int guidLength = 0;
-                            {
-                                byte[] guidLengthBytes = new byte[4];
-                                ns.Read(guidLengthBytes, 0, 4);
-                                guidLength = BitConverter.ToInt32(guidLengthBytes, 0);
-                            }
-                            byte[] guidBytes = new byte[guidLength];
-                            ns.Read(guidBytes, 0, guidLength);
-                            Guid = Encoding.UTF8.GetString(guidBytes);
-                            UserSynchronized?.Invoke(this);
-                            ReceiveAsync();
-                            return;
-                        }
-                        else
-                        {
-                            chunk.FileId = BitConverter.ToInt32(intBytes, 0);
-                            byte[] boolBytes = new byte[1];
-                            ns.Read(boolBytes, 0, 1);
-                            chunk.IsImage = BitConverter.ToBoolean(boolBytes, 0);
-
-                            ns.Read(intBytes, 0, 4);
-                            remaining = BitConverter.ToInt32(intBytes, 0);
-                        }
+                        DisconnectAsync();
+                        return;
                     }
-
-                    for (int chunkOrder = 0; remaining > 0; chunkOrder++)
+                    if (RequiresSync && !Synchronized)
                     {
-                        chunk.Data = new byte[DEFAULT_BUFFER_SIZE > remaining ? remaining : DEFAULT_BUFFER_SIZE];
-
-                        int received = ns.Read(chunk.Data, 0, chunk.Data.Length);
-                        remaining -= received;
-                        chunk.IsLast = remaining == 0;
-                        Console.WriteLine($"{(chunk.IsImage ? "Image" : "File")} #{chunk.FileId} Chunk #{chunkOrder}{(chunk.IsLast ? " LAST" : "")}");
-                        if (chunk.IsImage)
-                            ImageChunkReceived?.Invoke(this, chunk);
-                        else
-                            FileChunkReceived?.Invoke(this, chunk);
+                        UserId = BitConverter.ToInt32(intBytes, 0);
+                        Synchronized = true;
+                        // Получаем длинну ГУИДа
+                        int guidLength = 0;
+                        {
+                            byte[] guidLengthBytes = new byte[4];
+                            Tcp.Client.Receive(guidLengthBytes, 0, 4, SocketFlags.None);
+                            guidLength = BitConverter.ToInt32(guidLengthBytes, 0);
+                        }
+                        byte[] guidBytes = new byte[guidLength];
+                        Tcp.Client.Receive(guidBytes, 0, guidLength, SocketFlags.None);
+                        Guid = Encoding.UTF8.GetString(guidBytes);
+                        UserSynchronized?.Invoke(this);
+                        ReceiveAsync();
+                        return;
                     }
+                    else
+                    {
+                        chunk.FileId = BitConverter.ToInt32(intBytes, 0);
+                        byte[] boolBytes = new byte[1];
+                        Tcp.Client.Receive(boolBytes, 0, 4, SocketFlags.None);
+                        chunk.IsImage = BitConverter.ToBoolean(boolBytes, 0);
+
+                        Tcp.Client.Receive(intBytes, 0, 4, SocketFlags.None);
+                        remaining = BitConverter.ToInt32(intBytes, 0);
+                    }
+                }
+
+                for (int chunkOrder = 0; remaining > 0; chunkOrder++)
+                {
+                    chunk.Data = new byte[DEFAULT_BUFFER_SIZE > remaining ? remaining : DEFAULT_BUFFER_SIZE];
+
+                    int received = Tcp.Client.Receive(chunk.Data, 0, chunk.Data.Length, SocketFlags.None);
+                    remaining -= received;
+                    chunk.IsLast = remaining == 0;
+                    Console.WriteLine($"{(chunk.IsImage ? "Image" : "File")} #{chunk.FileId} Chunk #{chunkOrder}{(chunk.IsLast ? " LAST" : "")}");
+                    if (chunk.IsImage)
+                        ImageChunkReceived?.Invoke(this, chunk);
+                    else
+                        FileChunkReceived?.Invoke(this, chunk);
                 }
                 ReceiveAsync();
             }
