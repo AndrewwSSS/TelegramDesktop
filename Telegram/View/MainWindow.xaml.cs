@@ -354,11 +354,10 @@ namespace Telegram
                     PendingMetadata.Remove(syncMsg.LocalReturnId);
                     if(md.FilesLocalId!=null)
                         for (int i = 0; i < md.FilesLocalId.Count; i++)
-                            FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i], false);
+                            FileClient.SendFileAsync(md.FilesName[i]);
                     if(md.ImagesLocalId!=null)
                         for (int i = 0; i < md.ImagesLocalId.Count; i++)
-                            FileClient.SendFileAsync(md.ImagesName[i], md.ImagesLocalId[i], true);
-
+                            FileClient.SendFileAsync(md.ImagesName[i]);
                 }
                 else if (msg is GroupJoinResultMessage)
                 {
