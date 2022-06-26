@@ -1,8 +1,7 @@
-﻿using System.Data.Entity;
-using System.Data.Entity.ModelConfiguration.Conventions;
-using CommonLibrary.Containers;
+﻿using CommonLibrary.Containers;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
+using System.Data.Entity;
 
 namespace TelegramServer
 {
@@ -22,8 +21,8 @@ namespace TelegramServer
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GroupChat>().HasMany(g => g.Messages)
-            .WithOptional()
-            .WillCascadeOnDelete(true);
+                                            .WithOptional()
+                                            .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<User>().HasMany(u => u.Chats).WithMany(g => g.Members);
         }  
