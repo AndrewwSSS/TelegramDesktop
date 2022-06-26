@@ -126,18 +126,32 @@ namespace CommonLibrary.Messages.Files
         {
             if (client != null && client.Connected)
             {
-                using (var ns = Tcp.GetStream())
+                lock (SendLocker)
                 {
+                    MemoryStream ms = new MemoryStream();
                     byte[] idBytes = BitConverter.GetBytes(UserId);
                     byte[] guidBytes = Encoding.UTF8.GetBytes(Guid);
                     byte[] guidLengthBytes = BitConverter.GetBytes(guidBytes.Length);
-                    ns.Write(idBytes, 0, idBytes.Length);
-                    ns.Write(guidLengthBytes, 0, guidLengthBytes.Length);
-                    ns.Write(guidBytes, 0, guidBytes.Length);
+                    ms.Write(idBytes, 0, idBytes.Length);
+                    ms.Write(guidLengthBytes, 0, guidLengthBytes.Length);
+                    ms.Write(guidBytes, 0, guidBytes.Length);
+                    var state = new StateObject()
+                    {
+                        Socket = Tcp.Client
+                    };
+                    var data = ms.ToArray();
+                    state.SetBuffer(data, data.Length);
+                    Tcp.Client.BeginSend(data, 0, data.Length, SocketFlags.None, SendCB, state)
                 }
                 return true;
             }
             return false;
+        }
+
+        private void SendCB(IAsyncResult ar)
+        {
+            var state = ar.AsyncState as StateObject;
+            state.Socket.EndSend(ar);
         }
 
         private static List<string> FilesInProcessing { get; set; } = new List<string>();
@@ -150,14 +164,13 @@ namespace CommonLibrary.Messages.Files
                 {
                     long fileSize = new FileInfo(path).Length;
                     using (FileStream reader = new FileStream(path, FileMode.Open))
-                    using (var ns = Tcp.GetStream())
                     {
                         FilesInProcessing.Add(path);
-                        ns.Write(BitConverter.GetBytes(localId), 0, 4);
-                        ns.Write(BitConverter.GetBytes(isImage), 0, 1);
-                        var kek = (int)fileSize;
-                        ns.Write(BitConverter.GetBytes((int)fileSize), 0, 4);
-                        reader.CopyTo(ns);
+                        var data = new byte[DEFAULT_BUFFER_SIZE];
+                        Tcp.Client.Send(BitConverter.GetBytes(localId), 0, 4, SocketFlags.None);
+                        Tcp.Client.Send(BitConverter.GetBytes(isImage), 0, 1, SocketFlags.None);
+                        while (reader.Read(data, 0, DEFAULT_BUFFER_SIZE) != 0)
+                            Tcp.Client.Send(BitConverter.GetBytes((int)fileSize), 0, 4, SocketFlags.None);
                         FilesInProcessing.Remove(path);
                     }
 
@@ -226,18 +239,15 @@ namespace CommonLibrary.Messages.Files
                 {
                     var data = file.FileData.Bytes;
 
-                    using (var ns = Tcp.GetStream())
+                    lock (SendLocker)
                     {
-                        lock (SendLocker)
-                        {
-                            // Посылаемые байты оформлены следующим образом:
-                            // Локальный ID, bool если изображение, bool если кусок последний, 
-                            // номер куска, размер содержимого, содержимое файла
-                            ns.Write(BitConverter.GetBytes(file.Id), 0, 4);
-                            ns.Write(BitConverter.GetBytes(false), 0, 1);
-                            ns.Write(BitConverter.GetBytes(data.Length), 0, 4);
-                            ns.Write(data, 0, data.Length);
-                        }
+                        // Посылаемые байты оформлены следующим образом:
+                        // Локальный ID, bool если изображение, bool если кусок последний, 
+                        // номер куска, размер содержимого, содержимое файла
+                        Tcp.Client.Send(BitConverter.GetBytes(file.Id), 0, 4, SocketFlags.None);
+                        Tcp.Client.Send(BitConverter.GetBytes(false), 0, 1, SocketFlags.None);
+                        Tcp.Client.Send(BitConverter.GetBytes(data.Length), 0, 4, SocketFlags.None);
+                        Tcp.Client.Send(data, 0, data.Length, SocketFlags.None);
                     }
                 });
                 return true;
@@ -253,19 +263,17 @@ namespace CommonLibrary.Messages.Files
                 {
                     var data = img.ImageData.Bytes;
 
-                    using (var ns = Tcp.GetStream())
+                    lock (SendLocker)
                     {
-                        lock (SendLocker)
-                        {
-                            // Посылаемые байты оформлены следующим образом:
-                            // Локальный ID, bool если изображение, bool если кусок последний, 
-                            // номер куска, размер содержимого, содержимое файла
-                            ns.Write(BitConverter.GetBytes(img.Id), 0, 4);
-                            ns.Write(BitConverter.GetBytes(true), 0, 1);
-                            ns.Write(BitConverter.GetBytes(data.Length), 0, 4);
-                            ns.Write(data, 0, data.Length);
-                        }
+                        // Посылаемые байты оформлены следующим образом:
+                        // Локальный ID, bool если изображение, bool если кусок последний, 
+                        // номер куска, размер содержимого, содержимое файла
+                        Tcp.Client.Send(BitConverter.GetBytes(img.Id), 0, 4, SocketFlags.None);
+                        Tcp.Client.Send(BitConverter.GetBytes(true), 0, 1, SocketFlags.None);
+                        Tcp.Client.Send(BitConverter.GetBytes(data.Length), 0, 4, SocketFlags.None);
+                        Tcp.Client.Send(data, 0, data.Length, SocketFlags.None);
                     }
+
                 });
                 return true;
             }
