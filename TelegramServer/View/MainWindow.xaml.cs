@@ -66,7 +66,7 @@ namespace TelegramServer
 
             FileServer.UserSynchronized += UserSynchronized;
             FileServer.FileChunkReceived += FileServer_FileChunkReceived;
-            FileServer.ImageChunkReceived += FileServer_ImageChunkReceived;
+            //FileServer.ImageChunkReceived += FileServer_ImageChunkReceived;
 
             LB_UsersOffline.ItemsSource = UsersOffline;
             LB_UsersOnline.ItemsSource = UsersOnline;
@@ -123,11 +123,6 @@ namespace TelegramServer
 
             DisconnectedClient.User.VisitDate = DateTime.UtcNow;
 
-            lock (DbTelegram) {
-                DbTelegram.SaveChanges();
-            }
-
-        
             Dispatcher.Invoke(() =>
             {
                 UsersOnline.Remove(DisconnectedClient.User);
@@ -135,6 +130,12 @@ namespace TelegramServer
                 ClientsOnline.Remove(client);
                 FileClientsOnline.Remove(DisconnectedClient);
             });
+
+            lock (DbTelegram) {
+                DbTelegram.SaveChanges();
+            }
+
+
         }
 
         private void UserSynchronized(TcpFileClientWrap client)
