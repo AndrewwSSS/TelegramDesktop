@@ -1,6 +1,5 @@
 ﻿using CommonLibrary.Containers;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CommonLibrary.Messages.Users
 {

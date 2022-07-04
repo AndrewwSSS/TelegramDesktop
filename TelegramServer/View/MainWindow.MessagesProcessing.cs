@@ -624,8 +624,13 @@ namespace TelegramServer
                             };
 
 
-                            if(group.Members.Count == 0) {
-                                DbTelegram.GroupChats.Remove(group);
+                            if (group.Members.Count == 0) {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    DbTelegram.GroupChats.Remove(group);
+                                    DbTelegram.GroupChats.Load();
+                                });
+                               
 
                                 lock (DbTelegram) {
                                     DbTelegram.SaveChanges();
@@ -690,6 +695,8 @@ namespace TelegramServer
                         client.SendAsync(new MetadataSyncMessage(metadataMessage.LocalReturnId));
                         break;
                     }
+
+                
             }
         }
 

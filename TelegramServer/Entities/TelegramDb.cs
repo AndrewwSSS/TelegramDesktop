@@ -25,6 +25,6 @@ namespace TelegramServer
                                             .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<User>().HasMany(u => u.Chats).WithMany(g => g.Members);
-        }  
+        } 
     }
 }
