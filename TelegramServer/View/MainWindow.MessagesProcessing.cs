@@ -71,7 +71,6 @@ namespace TelegramServer
                         LoginMessage loginMessage = (LoginMessage)msg;
                         User sender = DbTelegram.Users.FirstOrDefault(u => u.Login == loginMessage.Login || u.Email == loginMessage.Login);
 
-
                         if (sender != null && sender.Password == loginMessage.Password)
                         {
                             PublicUserInfo UserInfo = new PublicUserInfo()
@@ -589,11 +588,6 @@ namespace TelegramServer
                             case SystemMessageType.Logout:
                                 {
                                     sender.Clients.Remove(senderClient);
-                                    lock (DbTelegram)
-                                    {
-                                        DbTelegram.SaveChanges();
-                                    }
-                                    
                                     break;
                                 }
                         }
@@ -631,7 +625,6 @@ namespace TelegramServer
 
 
                             if(group.Members.Count == 0) {
-
                                 DbTelegram.GroupChats.Remove(group);
 
                                 lock (DbTelegram) {
