@@ -104,7 +104,6 @@
     <Compile Include="Messages\BaseMessage.cs" />
     <Compile Include="Messages\DataRequestMessage.cs" />
     <Compile Include="Messages\Groups\GroupUpdateMessage.cs" />
-    <Compile Include="Messages\Groups\LeaveFromGroupMessage.cs" />
     <Compile Include="Messages\Groups\MessageToGroupMessage.cs" />
     <Compile Include="Messages\PersonalChatCreatedMessage.cs" />
     <Compile Include="Messages\SystemMessage.cs" />
