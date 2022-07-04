@@ -204,50 +204,56 @@ namespace Telegram
         {
             Dispatcher.Invoke(() =>
             {
-                if (msg is CreateGroupResultMessage)
+            if (msg is CreateGroupResultMessage)
+            {
+                var result = msg as CreateGroupResultMessage;
+                if (result.Result == AuthenticationResult.Success)
                 {
-                    var result = msg as CreateGroupResultMessage;
-                    if (result.Result == AuthenticationResult.Success)
+                    MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
+                    var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
                     {
-                        MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-                        var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
-                        {
-                            MembersId = new List<int>() { Me.Id },
-                            AdministratorsId = new List<int> { Me.Id }
-                        };
-                        var newGroup = new GroupItemWrap(info)
-                        {
-                            Admins = new ObservableCollection<UserItemWrap> { Users.First(u => u.User.Id == Me.Id) }
-                        };
-                        Groups.Add(newGroup);
-                        CachedGroups.Add(newGroup);
-                    }
-                }
-                else if (msg is ArrayMessage<BaseMessage>)
-                {
-                    var arrMsg = msg as ArrayMessage<BaseMessage>;
-                    foreach (var obj in arrMsg.Array)
-                        Client_MessageReceived(client, obj);
-                }
-                else if (msg is DataRequestResultMessage<UserContainer>)
-                {
-                    var drr = msg as DataRequestResultMessage<UserContainer>;
-                    foreach (var container in drr.Result)
+                        MembersId = new List<int>() { Me.Id },
+                        AdministratorsId = new List<int> { }
+                    };
+                    var newGroup = new GroupItemWrap(info)
                     {
-                        UserItemWrap user = new UserItemWrap(container.User);
-                        //TO DO: caching
-                        //if (container.Images != null)
-                        //    user.Images = new ObservableCollection<ImageContainer>(container.Images);
-                        Users.Add(user);
-                        foreach (var group in CachedGroups.Where(g => g.GroupChat.MembersId.Contains(container.User.Id)))
+                        Members = new ObservableCollection<UserItemWrap> { Users.First(u => u.User.Id == Me.Id) }
+                    };
+                    Groups.Add(newGroup);
+                    CachedGroups.Add(newGroup);
+                }
+            }
+            else if (msg is ArrayMessage<BaseMessage>)
+            {
+                var arrMsg = msg as ArrayMessage<BaseMessage>;
+                foreach (var obj in arrMsg.Array)
+                    Client_MessageReceived(client, obj);
+            }
+            else if (msg is DataRequestResultMessage<UserContainer>)
+            {
+                var drr = msg as DataRequestResultMessage<UserContainer>;
+                foreach (var container in drr.Result)
+                {
+                    UserItemWrap user = new UserItemWrap(container.User);
+                    //TO DO: caching
+                    //if (container.Images != null)
+                    //    user.Images = new ObservableCollection<ImageContainer>(container.Images);
+                    Users.Add(user);
+                        foreach (var group in CachedGroups)
                         {
-                            group.Members.Add(user);
-                            if (group.GroupChat.GroupType == GroupType.Personal)
+                            if (group.GroupChat.MembersId.Contains(user.User.Id))
                             {
-                                group.GroupChat.Name = user.User.Name;
-                                group.GroupChat.Description = user.User.Description;
-                                group.Images = user.Images;
+                                group.Members.Add(user);
+                                if (group.GroupChat.GroupType == GroupType.Personal)
+                                {
+                                    group.GroupChat.Name = user.User.Name;
+                                    group.GroupChat.Description = user.User.Description;
+                                    group.Images = user.Images;
+                                }
                             }
+
+                            if (group.GroupChat.MembersId.Contains(user.User.Id))
+                                group.Admins.Add(user);
                         }
                         foreach (var pair in TemporaryUserGroups)
                         {
@@ -258,9 +264,7 @@ namespace Telegram
                                 group.GroupChat.Name = user.User.Name;
                                 group.GroupChat.Description = user.User.Description;
                                 group.Images = user.Images;
-
-                                Dispatcher.Invoke(() =>
-                                FoundGroups.Add(group));
+                                FoundGroups.Add(group);
                             }
                         }
                     }
@@ -338,9 +342,10 @@ namespace Telegram
                                     Client.SendAsync(new DataRequestMessage(uId, DataRequestType.User));
                                 else
                                 {
-                                    item.Members.Add(user);
                                     if (item.GroupChat.AdministratorsId.Contains(user.User.Id))
                                         item.Admins.Add(user);
+                                    else
+                                        item.Members.Add(user);
                                 }
                             }
                             FoundGroups.Add(item);
@@ -352,10 +357,10 @@ namespace Telegram
                     var syncMsg = msg as MetadataSyncMessage;
                     var md = PendingMetadata[syncMsg.LocalReturnId];
                     PendingMetadata.Remove(syncMsg.LocalReturnId);
-                    if(md.FilesLocalId!=null)
+                    if (md.FilesLocalId != null)
                         for (int i = 0; i < md.FilesLocalId.Count; i++)
                             FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i]);
-                    if(md.ImagesLocalId!=null)
+                    if (md.ImagesLocalId != null)
                         for (int i = 0; i < md.ImagesLocalId.Count; i++)
                             FileClient.SendFileAsync(md.ImagesName[i], md.FilesLocalId[i], true);
                 }
@@ -455,7 +460,7 @@ namespace Telegram
                         file.Id = pair.Value;
                         CachedFilesMetadata.Add(file);
                     }
-                    foreach(var pair in result.Images)
+                    foreach (var pair in result.Images)
                     {
                         var img = PendingImages[pair.Key];
                         PendingImages.Remove(pair.Key);
@@ -882,22 +887,23 @@ namespace Telegram
                                     );
 
                             var state = new MetadataState();
-                            if(imgMdList != null)
+                            if (imgMdList != null)
                             {
                                 state.ImagesName = new List<string>(imgMdList.Select(img => img.Name));
                                 state.ImagesLocalId = imagesLocalId;
                             }
-                            if(fileMdList != null)
+                            if (fileMdList != null)
                             {
-                                state.FilesName = new List<string>(fileMdList.Select(file => {
+                                state.FilesName = new List<string>(fileMdList.Select(file =>
+                                {
                                     string result = file.Name;
                                     file.Name = Path.GetFileName(file.Name);
                                     return result;
-                                    }));
+                                }));
                                 state.FilesLocalId = filesLocalId;
                             }
                             PendingMetadata[mdMsg.LocalReturnId] = state;
-                            
+
                             Client.SendAsync(mdMsg);
                             Dispatcher.Invoke(ResetMessageForm);
                             return;
@@ -981,7 +987,15 @@ namespace Telegram
 
         private void B_Quit_OnClick(object sender, RoutedEventArgs e)
         {
-            Client?.SendAsync(new LogoutMessage(App.MyGuid));
+            Client?.Send(new SystemMessage(SystemMessageType.Logout));
+            Close();
+        }
+
+        private void B_QuitGroup_OnClick(object sender, RoutedEventArgs e)
+        {
+            Client?.SendAsync(new GroupLeaveMessage(CurGroup.GroupChat.Id));
+            Groups.Remove(CurGroup);
+            CurGroup = null;
         }
     }
 

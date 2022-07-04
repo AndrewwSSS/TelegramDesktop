@@ -166,11 +166,20 @@ namespace CommonLibrary.Messages.Files
                     using (FileStream reader = new FileStream(path, FileMode.Open))
                     {
                         FilesInProcessing.Add(path);
-                        var data = new byte[DEFAULT_BUFFER_SIZE];
-                        Tcp.Client.Send(BitConverter.GetBytes(localId), 0, 4, SocketFlags.None);
-                        Tcp.Client.Send(BitConverter.GetBytes(isImage), 0, 1, SocketFlags.None);
-                        while (reader.Read(data, 0, DEFAULT_BUFFER_SIZE) != 0)
-                            Tcp.Client.Send(BitConverter.GetBytes((int)fileSize), 0, 4, SocketFlags.None);
+                        var fileData = new byte[fileSize];
+                        MemoryStream ms = new MemoryStream();
+
+                        ms.Write(BitConverter.GetBytes(localId), 0, 4);
+                        ms.Write(BitConverter.GetBytes(isImage), 0, 1);
+                        reader.Read(fileData, 0, fileData.Length);
+                        ms.Write(BitConverter.GetBytes((int)fileSize), 0, 4);
+                        var data = ms.ToArray();
+                        var state = new StateObject()
+                        {
+                            Socket = Tcp.Client
+                        };
+                        state.SetBuffer(data, data.Length);
+                        Tcp.Client.BeginSend(data,0,data.Length, SocketFlags.None, SendCB, state);
                         FilesInProcessing.Remove(path);
                     }
 
@@ -298,7 +307,7 @@ namespace CommonLibrary.Messages.Files
                     int sizeReceived = Tcp.Client.Receive(intBytes, 0, 4, SocketFlags.None);
                     if (sizeReceived == 0)
                     {
-                        DisconnectAsync();
+                        ReceiveAsync();
                         return;
                     }
                     if (RequiresSync && !Synchronized)

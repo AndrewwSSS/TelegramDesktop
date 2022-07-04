@@ -93,7 +93,7 @@
     <Compile Include="Messages\FirstPersonalResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatLookupResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatMessageSendResult.cs" />
-    <Compile Include="Messages\Groups\DisconnectFromGroupMessage.cs" />
+    <Compile Include="Messages\Groups\GroupLeaveMessage.cs" />
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />

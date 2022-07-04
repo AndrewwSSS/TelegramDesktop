@@ -81,6 +81,7 @@
     <Compile Include="View\MainWindow.Caching.cs" />
     <Compile Include="View\MainWindow.Downloading.cs" />
     <Compile Include="WPF Entities\AndConverter.cs" />
+    <Compile Include="WPF Entities\ObjectToVisibilityConverter.cs" />
     <Compile Include="WPF Entities\OrConverter.cs" />
     <Compile Include="WPF Entities\UICommand.cs" />
     <Compile Include="WPF Entities\NotNullConverter.cs" />

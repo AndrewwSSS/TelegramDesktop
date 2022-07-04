@@ -4,11 +4,11 @@ using System;
 namespace CommonLibrary.Messages.Groups
 {
     [Serializable]
-    public class DisconnectFromGroupMessage : Message
+    public class GroupLeaveMessage : Message
     {
         public int GroupId { get; set; }
 
-        public DisconnectFromGroupMessage(int groupId) => GroupId = groupId;
+        public GroupLeaveMessage(int groupId) => GroupId = groupId;
 
     }
 }
