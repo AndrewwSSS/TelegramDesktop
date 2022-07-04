@@ -65,7 +65,7 @@ namespace Telegram.View
                 Dispatcher.Invoke(() =>
                 {
                     var result = msg as SignUpStage1ResultMessage;
-                    if (result.Result == AuthenticationResult.Success)
+                    if (result.Result == AuthResult.Success)
                         MessageBox.Show("Регистрация прошла успешно.");
                     else
                         MessageBox.Show("Регистрация не произошла.");
@@ -76,7 +76,7 @@ namespace Telegram.View
             {
                 Dispatcher.Invoke(() => {
                     var result = msg as LoginResultMessage;
-                    if(result.Result == AuthenticationResult.Success)
+                    if(result.Result == AuthResult.Success)
                     {
                         var info = result.UserInfo;
                         App.MyGuid = result.Guid;
@@ -97,7 +97,7 @@ namespace Telegram.View
                 Dispatcher.Invoke(() =>
                 {
                     var result = msg as FastLoginResultMessage;
-                    if (result.Result == AuthenticationResult.Success)
+                    if (result.Result == AuthResult.Success)
                         GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
                     
                 });

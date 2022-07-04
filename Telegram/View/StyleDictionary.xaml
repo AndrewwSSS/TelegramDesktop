@@ -367,7 +367,6 @@
             <BooleanToVisibilityConverter x:Key="boolToVis"/>
         </Style.Resources>
         <Style.Setters>
-
             <Setter Property="Visibility" Value="{Binding HasItems, 
                                           RelativeSource={RelativeSource Self}, 
                                           Converter={StaticResource boolToVis}}"/>
@@ -390,7 +389,12 @@
                             <entities:NotNullConverter x:Key="notnull"></entities:NotNullConverter>
                         </DataTemplate.Resources>
                         <Grid Name="border"  Background="{StaticResource BgBrush}">
-                            <!--Аватар группы-->
+                            <Grid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Выгнать" Click="CtxMenu_User_Kick_OnClick"></MenuItem>
+                                </ContextMenu>
+                            </Grid.ContextMenu>
+                            <!--Аватар пользователя-->
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
