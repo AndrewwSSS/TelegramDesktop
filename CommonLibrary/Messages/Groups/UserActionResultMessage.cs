@@ -19,6 +19,8 @@ namespace CommonLibrary.Messages.Groups
         public AuthResult Result { get; set; }
         public int UserId { get; set; }
         public int GroupId { get; set; }
+
+
         public UserActionResultMessage(UserActionType type, AuthResult result,
             int uId, int gId)
         {

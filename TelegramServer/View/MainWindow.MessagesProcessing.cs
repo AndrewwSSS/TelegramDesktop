@@ -442,9 +442,7 @@ namespace TelegramServer
                                 DbTelegram.SaveChanges();
                             }
 
-                            User test = DbTelegram.Users.FirstOrDefault(u => u.Id == sender.Id);
-                            GroupChat testg = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == group.Id);
-
+                    
                             client.SendAsync(new GroupJoinResultMessage(AuthResult.Success, group.Id));
 
                    
@@ -695,8 +693,52 @@ namespace TelegramServer
                         client.SendAsync(new MetadataSyncMessage(metadataMessage.LocalReturnId));
                         break;
                     }
+                case "KickUserMessage":
+                    {
+                        KickUserMessage kickUserMessage = (KickUserMessage)msg;
 
-                
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+
+                        GroupChat group = 
+                            DbTelegram.GroupChats.FirstOrDefault(g => g.Id == kickUserMessage.GroupId);
+
+
+                        if(group != null)
+                        {
+                            if(group.Administrators.Any(a => a.Id == sender.Id) &&
+                              !group.Administrators.Any(a => a.Id == kickUserMessage.UserId))
+                            {
+                                User deletedUser
+                                    = group.Members.FirstOrDefault(m => m.Id == kickUserMessage.UserId);
+
+                                group.Members.Remove(deletedUser);
+
+                                lock (DbTelegram) {
+                                    DbTelegram.SaveChanges();
+                                }
+
+                                client.SendAsync(new UserActionResultMessage(UserActionType.Kick,
+                                                                             AuthResult.Success,
+                                                                             sender.Id, group.Id));
+
+                                SendMessageToUsers(new GroupUpdateMessage() { RemovedUserId = deletedUser.Id },
+                                                   sender.Id,
+                                                   senderClient.Id,
+                                                   new List<User>(group.Members) { deletedUser });
+                            }
+                            else
+                            {
+                                client.SendAsync(new UserActionResultMessage(UserActionType.Kick,
+                                                                             AuthResult.Denied,
+                                                                             sender.Id, group.Id));
+                            }
+                        }
+                        break;
+                    }
+
+
+
             }
         }
 
