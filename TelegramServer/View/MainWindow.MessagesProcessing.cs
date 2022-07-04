@@ -595,16 +595,16 @@ namespace TelegramServer
 
                         break;
                     }
-                case "LeaveFromGroupMessage":
+                case "GroupLeaveMessage":
                     {
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
-                        LeaveFromGroupMessage 
-                            leaveFromGroup = (LeaveFromGroupMessage)msg;
+                        GroupLeaveMessage 
+                            leaveFromGroup = (GroupLeaveMessage)msg;
 
                         GroupChat group
-                            = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.Id);
+                            = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.GroupId);
                         
 
                         if(group != null)
