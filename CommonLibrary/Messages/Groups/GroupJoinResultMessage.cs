@@ -7,15 +7,15 @@ namespace CommonLibrary.Messages.Groups
     [Serializable]
     public class GroupJoinResultMessage : BaseMessage
     {
-        public AuthenticationResult Result { get; set; }
+        public AuthResult Result { get; set; }
         public int GroupId { get; set; }
 
-        public GroupJoinResultMessage(AuthenticationResult Result, int groupId) {
+        public GroupJoinResultMessage(AuthResult Result, int groupId) {
             this.Result = Result;
             GroupId = groupId;
         }
 
-        public GroupJoinResultMessage(AuthenticationResult Result) => this.Result = Result;
+        public GroupJoinResultMessage(AuthResult Result) => this.Result = Result;
 
 
         public GroupJoinResultMessage() { }

@@ -93,7 +93,7 @@ namespace Telegram
             }
         }
 
-        public List<UserItemWrap> Users { get; set; } = new List<UserItemWrap>();
+        public List<UserItemWrap> CachedUsers { get; set; } = new List<UserItemWrap>();
         public MainWindow() :
             this(
                 new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"),
@@ -131,7 +131,7 @@ namespace Telegram
             InitializeComponent();
             HideRightMenu();
             Me = me;
-            Users.Add(new UserItemWrap(me));
+            CachedUsers.Add(new UserItemWrap(me));
 
             RighMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
@@ -204,41 +204,41 @@ namespace Telegram
         {
             Dispatcher.Invoke(() =>
             {
-            if (msg is CreateGroupResultMessage)
-            {
-                var result = msg as CreateGroupResultMessage;
-                if (result.Result == AuthenticationResult.Success)
+                if (msg is CreateGroupResultMessage)
                 {
-                    MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-                    var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
+                    var result = msg as CreateGroupResultMessage;
+                    if (result.Result == AuthResult.Success)
                     {
-                        MembersId = new List<int>() { Me.Id },
-                        AdministratorsId = new List<int> { }
-                    };
-                    var newGroup = new GroupItemWrap(info)
-                    {
-                        Members = new ObservableCollection<UserItemWrap> { Users.First(u => u.User.Id == Me.Id) }
-                    };
-                    Groups.Add(newGroup);
-                    CachedGroups.Add(newGroup);
+                        MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
+                        var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
+                        {
+                            MembersId = new List<int>() { Me.Id },
+                            AdministratorsId = new List<int> { }
+                        };
+                        var newGroup = new GroupItemWrap(info)
+                        {
+                            Members = new ObservableCollection<UserItemWrap> { CachedUsers.First(u => u.User.Id == Me.Id) }
+                        };
+                        Groups.Add(newGroup);
+                        CachedGroups.Add(newGroup);
+                    }
                 }
-            }
-            else if (msg is ArrayMessage<BaseMessage>)
-            {
-                var arrMsg = msg as ArrayMessage<BaseMessage>;
-                foreach (var obj in arrMsg.Array)
-                    Client_MessageReceived(client, obj);
-            }
-            else if (msg is DataRequestResultMessage<UserContainer>)
-            {
-                var drr = msg as DataRequestResultMessage<UserContainer>;
-                foreach (var container in drr.Result)
+                else if (msg is ArrayMessage<BaseMessage>)
                 {
-                    UserItemWrap user = new UserItemWrap(container.User);
-                    //TO DO: caching
-                    //if (container.Images != null)
-                    //    user.Images = new ObservableCollection<ImageContainer>(container.Images);
-                    Users.Add(user);
+                    var arrMsg = msg as ArrayMessage<BaseMessage>;
+                    foreach (var obj in arrMsg.Array)
+                        Client_MessageReceived(client, obj);
+                }
+                else if (msg is DataRequestResultMessage<UserContainer>)
+                {
+                    var drr = msg as DataRequestResultMessage<UserContainer>;
+                    foreach (var container in drr.Result)
+                    {
+                        UserItemWrap user = new UserItemWrap(container.User);
+                        //TO DO: caching
+                        //if (container.Images != null)
+                        //    user.Images = new ObservableCollection<ImageContainer>(container.Images);
+                        CachedUsers.Add(user);
                         foreach (var group in CachedGroups)
                         {
                             if (group.GroupChat.MembersId.Contains(user.User.Id))
@@ -296,7 +296,7 @@ namespace Telegram
 
                     foreach (var userId in users)
                     {
-                        UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == userId);
+                        UserItemWrap user = CachedUsers.FirstOrDefault(u => u.User.Id == userId);
                         if (user != null)
                         {
                             GroupItemWrap tempGroup = new GroupItemWrap(
@@ -337,7 +337,7 @@ namespace Telegram
                                 id => !requestedId.Contains(id)
                                 ))
                             {
-                                var user = Users.FirstOrDefault(u => u.User.Id == uId);
+                                var user = CachedUsers.FirstOrDefault(u => u.User.Id == uId);
                                 if (user == null)
                                     Client.SendAsync(new DataRequestMessage(uId, DataRequestType.User));
                                 else
@@ -367,7 +367,7 @@ namespace Telegram
                 else if (msg is GroupJoinResultMessage)
                 {
                     var result = msg as GroupJoinResultMessage;
-                    if (result.Result == AuthenticationResult.Success)
+                    if (result.Result == AuthResult.Success)
                     {
                         Groups.Add(CachedGroups.Find(g => g.GroupChat.Id == result.GroupId));
                         B_JoinGroup.Visibility = Visibility.Hidden;
@@ -392,7 +392,7 @@ namespace Telegram
                     var info = msg as GroupUpdateMessage;
                     if (info.NewUserId != -1)
                     {
-                        var user = Users.FirstOrDefault(u => u.User.Id == info.NewUserId);
+                        var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
                         if (user == null)
                             Client.SendAsync(new DataRequestMessage(info.NewUserId, DataRequestType.User));
                         else
@@ -417,7 +417,7 @@ namespace Telegram
 
                     foreach (var userId in personalChatCreated.Group.MembersId)
                     {
-                        UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == userId);
+                        UserItemWrap user = CachedUsers.FirstOrDefault(u => u.User.Id == userId);
 
                         if (user == null)
                             client.SendAsync(new DataRequestMessage(userId, DataRequestType.User));
@@ -435,7 +435,7 @@ namespace Telegram
                 else if (msg is DeleteChatMessageResultMessage)
                 {
                     var result = msg as DeleteChatMessageResultMessage;
-                    if (result.Result == AuthenticationResult.Success)
+                    if (result.Result == AuthResult.Success)
                     {
                         var group = Groups.First(g => g.GroupChat.Id == result.GroupId);
                         group.Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
@@ -485,21 +485,42 @@ namespace Telegram
                             AddMessageToUI(msgToGroup.Message);
                     }
                 }
+                else if (msg is UserActionResultMessage)
+                {
+                    var result = msg as UserActionResultMessage;
+                    if (result.Result != AuthResult.Denied)
+                    {
+                        switch (result.Type)
+                        {
+                            case UserActionType.Kick:
+                                {
+                                    var group = Groups.FirstOrDefault(g => g.GroupChat.Id == result.GroupId);
+                                    if (group != null)
+                                    {
+                                        var user = group.Members.FirstOrDefault(m => m.User.Id == result.UserId);
+                                        if (user != null)
+                                            group.Members.Remove(user);
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
             });
         }
 
         private MessageItemWrap MakeMsgWrap(ChatMessage msg)
         {
             MessageItemWrap item = new MessageItemWrap(msg);
-            item.FromUser = Users.First(u => u.User.Id == msg.FromUserId);
+            item.FromUser = CachedUsers.First(u => u.User.Id == msg.FromUserId);
 
             if (msg.RespondingTo != null)
             {
                 item.RespondingTo = new MessageItemWrap(msg.RespondingTo);
-                item.RespondingTo.FromUser = Users.Find(u => u.User.Id == msg.RespondingTo.FromUserId);
+                item.RespondingTo.FromUser = CachedUsers.Find(u => u.User.Id == msg.RespondingTo.FromUserId);
             }
             if (msg.RepostUserId != -1)
-                item.RepostUser = Users.FirstOrDefault(u => u.User.Id == msg.RepostUserId);
+                item.RepostUser = CachedUsers.FirstOrDefault(u => u.User.Id == msg.RepostUserId);
 
             if (Messages.Count != 0 && Messages.Last().Message.FromUserId == msg.FromUserId)
                 Messages.Last().ShowAvatar = false;
@@ -996,6 +1017,11 @@ namespace Telegram
             Client?.SendAsync(new GroupLeaveMessage(CurGroup.GroupChat.Id));
             Groups.Remove(CurGroup);
             CurGroup = null;
+        }
+        private void CtxMenu_User_Kick_OnClick(object sender, RoutedEventArgs e)
+        {
+            var user = (sender as ListBoxItem).DataContext as UserItemWrap;
+            Client?.SendAsync(new KickUserMessage(user.User.Id, CurGroup.GroupChat.Id));
         }
     }
 

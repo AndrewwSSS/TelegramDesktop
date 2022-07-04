@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommonLibrary.Messages.Auth
 {
-    public enum AuthenticationResult
+    public enum AuthResult
     {
         Success,
         Denied

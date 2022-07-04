@@ -6,9 +6,9 @@ namespace CommonLibrary.Messages.Auth.Login
     [Serializable]
     public class FastLoginResultMessage : Message
     {
-        public AuthenticationResult Result { get; set; }
+        public AuthResult Result { get; set; }
 
-        public FastLoginResultMessage(AuthenticationResult result) => Result = result;
+        public FastLoginResultMessage(AuthResult result) => Result = result;
 
     }
 }

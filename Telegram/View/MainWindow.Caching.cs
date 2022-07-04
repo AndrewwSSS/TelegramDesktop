@@ -20,7 +20,7 @@ namespace Telegram
 
         public Dictionary<int, string> CachedImages { get; set; } = new Dictionary<int, string>();
         
-        private void LoadUsers() => Users.AddRange(CacheManager.Instance.LoadAllUsers());
+        private void LoadUsers() => CachedUsers.AddRange(CacheManager.Instance.LoadAllUsers());
         private void LoadGroups() {
             List<PublicGroupInfo> list = CacheManager.Instance.LoadAllGroups();
             foreach(var info in list)
@@ -28,7 +28,7 @@ namespace Telegram
                 GroupItemWrap item = new GroupItemWrap(info);
                 foreach(var id in info.MembersId)
                 {
-                    UserItemWrap user = Users.FirstOrDefault(u => u.User.Id == id);
+                    UserItemWrap user = CachedUsers.FirstOrDefault(u => u.User.Id == id);
                     if (user != null)
                         item.Members.Add(user);
                 }
@@ -43,7 +43,7 @@ namespace Telegram
         }
         private void SaveCache()
         {
-            foreach (var user in Users)
+            foreach (var user in CachedUsers)
                 CacheManager.Instance.SaveUser(user);
             foreach (var group in Groups)
                 CacheManager.Instance.SaveGroup(group.GroupChat);

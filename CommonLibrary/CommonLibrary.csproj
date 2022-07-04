@@ -75,6 +75,8 @@
     <Compile Include="Messages\Files\MetadataMessage.cs" />
     <Compile Include="Messages\Files\MetadataResultMessage.cs" />
     <Compile Include="Messages\Files\MetadataSyncMessage.cs" />
+    <Compile Include="Messages\Groups\KickUserMessage.cs" />
+    <Compile Include="Messages\Groups\UserActionResultMessage.cs" />
     <Compile Include="Messages\Users\FileDownload.cs" />
     <Compile Include="Messages\Users\UserDownloads.cs" />
     <Compile Include="PreparingFileData.cs" />
@@ -97,7 +99,7 @@
     <Compile Include="Messages\Groups\GroupInviteMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinMessage.cs" />
     <Compile Include="Messages\Groups\CreateGroupMessage.cs" />
-    <Compile Include="Messages\Auth\AuthenticationResult.cs" />
+    <Compile Include="Messages\Auth\AuthResult.cs" />
     <Compile Include="Messages\Groups\CreateGroupResultMessage.cs" />
     <Compile Include="Messages\Groups\GroupJoinResultMessage.cs" />
     <Compile Include="Messages\Groups\ChatLookupMessage.cs" />

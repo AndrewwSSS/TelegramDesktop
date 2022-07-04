@@ -54,12 +54,12 @@ namespace TelegramServer
                             
 
 
-                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Success));
+                            client.SendAsync(new SignUpStage1ResultMessage(AuthResult.Success));
 
                         }
                         else
                         {
-                            client.SendAsync(new SignUpStage1ResultMessage(AuthenticationResult.Denied,
+                            client.SendAsync(new SignUpStage1ResultMessage(AuthResult.Denied,
                                             "Email or login already used to create an account"));
 
                         }
@@ -91,7 +91,7 @@ namespace TelegramServer
                                 UserInfo.Login = sender.Login;
 
 
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Success, UserInfo, senderClient.Guid));
+                            client.SendAsync(new LoginResultMessage(AuthResult.Success, UserInfo, senderClient.Guid));
 
 
                             client.Disconnected += OnClientDisconnected;
@@ -142,7 +142,7 @@ namespace TelegramServer
                             //}
                         }
                         else
-                            client.SendAsync(new LoginResultMessage(AuthenticationResult.Denied,
+                            client.SendAsync(new LoginResultMessage(AuthResult.Denied,
                                                                     "wrong login/email or password"));
                         break;
                     }
@@ -160,7 +160,7 @@ namespace TelegramServer
 
                             if (userClient != null && userClient.Guid == fastLoginMessage.Guid)
                             {
-                                client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
+                                client.SendAsync(new FastLoginResultMessage(AuthResult.Success));
                                 client.Disconnected += OnClientDisconnected;
                                 ClientsOnline[client] = userClient;
 
@@ -194,7 +194,7 @@ namespace TelegramServer
                                 {
                                     //tmp
                                     userClient.MachineName = fastLoginMessage.MachineName;
-                                    client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Success));
+                                    client.SendAsync(new FastLoginResultMessage(AuthResult.Success));
                                     client.Disconnected += OnClientDisconnected;
                                     ClientsOnline[client] = userClient;
 
@@ -219,7 +219,7 @@ namespace TelegramServer
 
                                 }
                                 else
-                                    client.SendAsync(new FastLoginResultMessage(AuthenticationResult.Denied));
+                                    client.SendAsync(new FastLoginResultMessage(AuthResult.Denied));
                             }
                         }
                         break;
@@ -360,7 +360,7 @@ namespace TelegramServer
                                 => newGroupMember.BlockedUsersId.Any(blockedUserId => blockedUserId == sender.Id)))
                             {
 
-                                client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Denied,
+                                client.SendAsync(new CreateGroupResultMessage(AuthResult.Denied,
                                                  "One or more users blocked you"));
                                 break;
                             }
@@ -389,7 +389,7 @@ namespace TelegramServer
                         });
 
 
-                        client.SendAsync(new CreateGroupResultMessage(AuthenticationResult.Success, newGroup.Id));
+                        client.SendAsync(new CreateGroupResultMessage(AuthResult.Success, newGroup.Id));
 
 
                         if (newGroupMembers.Count > 0)
@@ -445,7 +445,7 @@ namespace TelegramServer
                             User test = DbTelegram.Users.FirstOrDefault(u => u.Id == sender.Id);
                             GroupChat testg = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == group.Id);
 
-                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Success, group.Id));
+                            client.SendAsync(new GroupJoinResultMessage(AuthResult.Success, group.Id));
 
                    
                             SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUserId = sender.Id },
@@ -455,7 +455,7 @@ namespace TelegramServer
 
                         }
                         else
-                            client.SendAsync(new GroupJoinResultMessage(AuthenticationResult.Denied));
+                            client.SendAsync(new GroupJoinResultMessage(AuthResult.Denied));
 
                         break;
                     }
@@ -570,10 +570,10 @@ namespace TelegramServer
                                                     group.Members.ToList());
                             }
                             else
-                                client.SendAsync(new DeleteChatMessageResultMessage(AuthenticationResult.Denied));
+                                client.SendAsync(new DeleteChatMessageResultMessage(AuthResult.Denied));
                         }
                         else
-                            client.SendAsync(new DeleteChatMessageResultMessage(AuthenticationResult.Denied));
+                            client.SendAsync(new DeleteChatMessageResultMessage(AuthResult.Denied));
 
                         break;
                     }
