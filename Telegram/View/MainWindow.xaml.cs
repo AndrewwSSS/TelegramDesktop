@@ -1022,7 +1022,7 @@ namespace Telegram
         }
         private void CtxMenu_User_Kick_OnClick(object sender, RoutedEventArgs e)
         {
-            var user = (sender as ListBoxItem).DataContext as UserItemWrap;
+            var user = (sender as FrameworkElement).DataContext as UserItemWrap;
             Client?.SendAsync(new KickUserMessage(user.User.Id, CurGroup.GroupChat.Id));
         }
     }
