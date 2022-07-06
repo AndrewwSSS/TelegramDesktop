@@ -123,9 +123,9 @@
             </Style>
 
         </ResourceDictionary>
-            
+
     </Window.Resources>
-    
+
     <Grid Margin="2">
         <Canvas x:Name="MainCanvas" Background="Black">
             <Canvas.Resources>
@@ -756,7 +756,7 @@
                         </Button>
                     </Grid>
 
-                    <Grid x:Name="RightMenu" Grid.Column="3" Visibility="Hidden" Width="280"
+                    <Grid x:Name="RightMenu"  Grid.Column="3" Visibility="Hidden" Width="280"
                           Background="{StaticResource DarkBgBrush}">
                         <Grid.Resources>
                             <entities:ObjectToVisibilityConverter x:Key="objToVis"></entities:ObjectToVisibilityConverter>
@@ -776,7 +776,18 @@
                                 ItemsSource="{Binding CurGroup.Members}">
                                 </ListBox>
                             </StackPanel>
-                            <Button Grid.Row="1" Click="B_QuitGroup_OnClick">ВЫЙТИ ИЗ ГРУППЫ</Button>
+                            <Button Grid.Row="1" Click="B_QuitGroup_OnClick">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=LB_FoundGroups, Path=Visibility}" Value="Visible">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                ВЫЙТИ ИЗ ГРУППЫ
+                            </Button>
                         </Grid>
                     </Grid>
                 </Grid >

@@ -128,9 +128,9 @@ namespace Telegram
             CloseLeftMenuAnim.EasingFunction = new CubicEase();
 
             DataContext = this;
+            Me = me;
             InitializeComponent();
             HideRightMenu();
-            Me = me;
             if(!CachedUsers.Any(wrap=>wrap.User.Id==me.Id))
                 CachedUsers.Add(new UserItemWrap(me));
 
@@ -148,12 +148,12 @@ namespace Telegram
 
 
             Messages = new ObservableCollection<MessageItemWrap>();
-            FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, Me.Id, App.MyGuid);
-            FileClient.Connected += FileClient_Connected;
-            FileClient.FileChunkReceived += FileClient_FileChunkReceived; ;
-            FileClient.ImageChunkReceived += FileClient_ImageChunkReceived; ;
-            FileClient.Disconnected += FileClient_Disconnected;
-            FileClient.ConnectAsync();
+            //FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, Me.Id, App.MyGuid);
+            //FileClient.Connected += FileClient_Connected;
+            //FileClient.FileChunkReceived += FileClient_FileChunkReceived; ;
+            //FileClient.ImageChunkReceived += FileClient_ImageChunkReceived; ;
+            //FileClient.Disconnected += FileClient_Disconnected;
+            //FileClient.ConnectAsync();
 
             if (offlineMessages != null)
                 Client_MessageReceived(Client, offlineMessages);
@@ -817,8 +817,6 @@ namespace Telegram
 
         private void B_CloseFoundLB_Click(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
-            button.IsEnabled = false;
             FoundGroups.Clear();
             TemporaryUserGroups.Clear();
             B_JoinGroup.Visibility = Visibility.Hidden;
