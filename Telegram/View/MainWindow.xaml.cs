@@ -415,6 +415,7 @@ namespace Telegram
                             group.Members.Remove(user);
                             if (user.User.Id == Me.Id)
                                 Groups.Remove(group);
+                            CurGroup = Groups.Last();
                         }
                     }
                 }
