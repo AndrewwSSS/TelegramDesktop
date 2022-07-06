@@ -369,7 +369,9 @@ namespace Telegram
                     var result = msg as GroupJoinResultMessage;
                     if (result.Result == AuthResult.Success)
                     {
-                        Groups.Add(CachedGroups.Find(g => g.GroupChat.Id == result.GroupId));
+                        var group = CachedGroups.Find(g => g.GroupChat.Id == result.GroupId);
+                        Groups.Add(group);
+                        group.Members.Add(new UserItemWrap(Me));
                         B_JoinGroup.Visibility = Visibility.Hidden;
                     }
                 }

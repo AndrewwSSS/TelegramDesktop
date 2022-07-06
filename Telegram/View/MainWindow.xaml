@@ -796,15 +796,11 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Background="#1E0096">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" Foreground="White">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}#{1}">
-                                    <Binding Path="Me.User.Name" />
-                                    <Binding Path="Me.User.Id" />
+                                    <Binding Path="Me.Name" />
+                                    <Binding Path="Me.Id" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
