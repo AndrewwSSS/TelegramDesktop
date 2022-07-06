@@ -392,12 +392,12 @@ namespace Telegram
                 else if (msg is GroupUpdateMessage)
                 {
                     var info = msg as GroupUpdateMessage;
+                    var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == info.GroupId);
+                    if (group == null)
+                        return;
                     if (info.NewUserId != -1)
                     {
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
-                        var group = Groups.FirstOrDefault(g => g.GroupChat.Id == info.GroupId);
-                        if (group == null)
-                            return;
                         if (user == null)
                         {
                             Client.SendAsync(new DataRequestMessage(info.NewUserId, DataRequestType.User));
@@ -405,6 +405,12 @@ namespace Telegram
                         }
                         else
                             group.Members.Add(user);
+                    }
+                    if (info.RemovedUserId != -1)
+                    {
+                        var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
+                        if (user != null)
+                            group.Members.Remove(user);
                     }
                 }
                 else if (msg is FirstPersonalResultMessage)
@@ -502,7 +508,7 @@ namespace Telegram
                         {
                             case UserActionType.Kick:
                                 {
-                                    var group = Groups.FirstOrDefault(g => g.GroupChat.Id == result.GroupId);
+                                    var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == result.GroupId);
                                     if (group != null)
                                     {
                                         var user = group.Members.FirstOrDefault(m => m.User.Id == result.UserId);
