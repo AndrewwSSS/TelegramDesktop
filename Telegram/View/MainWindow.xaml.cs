@@ -408,11 +408,13 @@ namespace Telegram
                     }
                     if (info.RemovedUserId != -1)
                     {
-                        var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
+                        var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.RemovedUserId);
                         if (user != null)
+                        {
                             group.Members.Remove(user);
-                        if (user.User.Id == Me.Id)
-                            Groups.Remove(group);
+                            if (user.User.Id == Me.Id)
+                                Groups.Remove(group);
+                        }
                     }
                 }
                 else if (msg is FirstPersonalResultMessage)
