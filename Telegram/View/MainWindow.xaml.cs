@@ -252,7 +252,7 @@ namespace Telegram
                                 }
                             }
 
-                            if (group.GroupChat.MembersId.Contains(user.User.Id))
+                            if (group.GroupChat.AdministratorsId.Contains(user.User.Id))
                                 group.Admins.Add(user);
                         }
                         foreach (var pair in TemporaryUserGroups)
@@ -395,10 +395,16 @@ namespace Telegram
                     if (info.NewUserId != -1)
                     {
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
+                        var group = Groups.FirstOrDefault(g => g.GroupChat.Id == info.GroupId);
+                        if (group == null)
+                            return;
                         if (user == null)
+                        {
                             Client.SendAsync(new DataRequestMessage(info.NewUserId, DataRequestType.User));
+                            group.GroupChat.MembersId.Add(info.NewUserId);
+                        }
                         else
-                            Groups.First(g => g.GroupChat.Id == info.GroupId).Members.Add(user);
+                            group.Members.Add(user);
                     }
                 }
                 else if (msg is FirstPersonalResultMessage)
