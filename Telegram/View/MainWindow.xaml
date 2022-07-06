@@ -20,9 +20,112 @@
                 <ResourceDictionary Source="BrushDictionary.xaml"/>
                 <ResourceDictionary Source="StyleDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
+            <Style BasedOn="{StaticResource LBScrollable}" TargetType="ListBox" x:Key="LBUsers">
+                <Style.Resources>
+                    <BooleanToVisibilityConverter x:Key="boolToVis"/>
+                </Style.Resources>
+                <Style.Setters>
+                    <Setter Property="Visibility" Value="{Binding HasItems, 
+                                          RelativeSource={RelativeSource Self}, 
+                                          Converter={StaticResource boolToVis}}"/>
 
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Background" Value="{StaticResource DarkBgBrush}"/>
+                    <Setter Property="ItemContainerStyle">
+                        <Setter.Value>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="ItemTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <DataTemplate.Resources>
+                                    <entities:NotNullConverter x:Key="notnull"></entities:NotNullConverter>
+                                </DataTemplate.Resources>
+                                <Grid Name="border"  Background="{StaticResource BgBrush}">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Выгнать" Click="CtxMenu_User_Kick_OnClick"></MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+                                    <!--Аватар пользователя-->
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentControl Grid.Column="0">
+                                        <ContentControl.Style>
+                                            <Style TargetType="ContentControl">
+                                                <Style.Resources>
+                                                    <entities:NotNullConverter x:Key="notnull" />
+
+                                                </Style.Resources>
+                                                <Style.Setters>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <Border Grid.Column="0" Grid.Row="1" Height="48" Width="48" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
+                                                                    <Image Source="{Binding Images[0].ImageSource}">
+                                                                        <Image.Clip>
+                                                                            <EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/>
+                                                                        </Image.Clip>
+                                                                    </Image>
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style.Setters>
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="0" Binding="{Binding Images.Count}">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate>
+                                                                    <Border 
+                                                                            Grid.Column="0" Grid.Row="1"
+                                                                            Height="48" Width="48" 
+                                                                            Margin="0,0,5,0" 
+                                                                            CornerRadius="360"
+                                                                            Background="HotPink">
+                                                                        <TextBlock 
+                                                                                VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                                Text="{Binding User.Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
+                                                                        </TextBlock>
+                                                                    </Border>
+                                                                </ControlTemplate>
+
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ContentControl.Style>
+                                    </ContentControl>
+                                    <TextBlock Grid.Column="1" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                       Text="{Binding User.Name}" 
+                                       Foreground="{StaticResource GreyBrush}" 
+                                       FontSize="20"
+                                       />
+
+
+                                </Grid>
+
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+
+                </Style.Setters>
+            </Style>
+
+        </ResourceDictionary>
+            
+    </Window.Resources>
+    
     <Grid Margin="2">
         <Canvas x:Name="MainCanvas" Background="Black">
             <Canvas.Resources>
