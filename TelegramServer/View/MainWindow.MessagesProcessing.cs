@@ -713,6 +713,7 @@ namespace TelegramServer
                                     = group.Members.FirstOrDefault(m => m.Id == kickUserMessage.UserId);
 
                                 group.Members.Remove(deletedUser);
+                                deletedUser.Chats.Remove(group);
 
                                 lock (DbTelegram) {
                                     DbTelegram.SaveChanges();
