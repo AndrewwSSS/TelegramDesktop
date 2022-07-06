@@ -411,6 +411,8 @@ namespace Telegram
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
                         if (user != null)
                             group.Members.Remove(user);
+                        if (user.User.Id == Me.Id)
+                            Groups.Remove(group);
                     }
                 }
                 else if (msg is FirstPersonalResultMessage)
