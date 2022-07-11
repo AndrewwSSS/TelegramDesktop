@@ -51,7 +51,7 @@ namespace TelegramServer
                             {
                                 DbTelegram.SaveChanges();
                             }
-                            
+
 
 
                             client.SendAsync(new SignUpStage1ResultMessage(AuthResult.Success));
@@ -105,11 +105,11 @@ namespace TelegramServer
                                 UsersOnline.Add(sender);
                             });
 
-                            lock(DbTelegram)
+                            lock (DbTelegram)
                             {
                                 DbTelegram.SaveChanges();
                             }
-                            
+
 
                             if (senderClient.MessagesToSend.Count != 0)
                             {
@@ -123,7 +123,7 @@ namespace TelegramServer
                                 client.MessageSent += onMessagesSent;
                                 client.SendAsync(new ArrayMessage<BaseMessage>(senderClient.MessagesToSend));
                             }
-                               
+
 
 
 
@@ -175,7 +175,7 @@ namespace TelegramServer
 
                                     client.MessageSent += onMessagesSent;
                                     client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
-                                    
+
                                 }
 
 
@@ -246,7 +246,7 @@ namespace TelegramServer
                             DbTelegram.SaveChanges();
                             DbTelegram.GroupChats.Load();
                         }
-                      
+
 
                         client.SendAsync(new ChatMessageSendResult(toGroupMessage.LocalMessageId, newMessage.Id));
 
@@ -315,13 +315,13 @@ namespace TelegramServer
                             {
                                 DbTelegram.GroupChats.Add(newChat);
 
-                                lock(DbTelegram)
+                                lock (DbTelegram)
                                 {
                                     DbTelegram.SaveChanges();
                                     DbTelegram.GroupChats.Load();
                                 }
-                               
-                                
+
+
                             });
 
 
@@ -381,7 +381,7 @@ namespace TelegramServer
                         Dispatcher.Invoke(() =>
                         {
                             DbTelegram.GroupChats.Add(newGroup);
-                            lock(DbTelegram)
+                            lock (DbTelegram)
                             {
                                 DbTelegram.SaveChanges();
                                 DbTelegram.GroupChats.Load();
@@ -405,7 +405,7 @@ namespace TelegramServer
                             lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
-                          
+
 
                             PublicGroupInfo GroupInfo = new PublicGroupInfo(newGroup.Name,
                                                                             newGroup.Description,
@@ -431,21 +431,21 @@ namespace TelegramServer
                         GroupChat group = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == groupJoinMessage.GroupId);
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
-      
+
 
                         if (sender != null && group != null)
                         {
                             sender.Chats.Add(group);
                             group.AddMember(sender);
 
-                            lock (DbTelegram){
+                            lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
 
-                    
+
                             client.SendAsync(new GroupJoinResultMessage(AuthResult.Success, group.Id));
 
-                   
+
                             SendMessageToUsers(new GroupUpdateMessage(group.Id) { NewUserId = sender.Id },
                                                sender.Id,
                                                senderClient.Id,
@@ -471,8 +471,8 @@ namespace TelegramServer
 
                                     foreach (var file in Files)
                                         fileClient.SendFileAsync(file);
-                                  
-                                    
+
+
                                     break;
                                 }
                             case DataRequestType.ImageData:
@@ -558,11 +558,11 @@ namespace TelegramServer
                                 {
                                     DbTelegram.SaveChanges();
                                 }
-                               
+
 
                                 client.SendAsync(new DeleteChatMessageResultMessage(group.Id, deletedMessage.Id));
 
-                                SendMessageToUsers(MsgDeleteMessage, 
+                                SendMessageToUsers(MsgDeleteMessage,
                                                     sender.Id,
                                                     senderClient.Id,
                                                     group.Members.ToList());
@@ -598,21 +598,21 @@ namespace TelegramServer
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
-                        GroupLeaveMessage 
+                        GroupLeaveMessage
                             leaveFromGroup = (GroupLeaveMessage)msg;
 
                         GroupChat group
                             = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.GroupId);
-                        
 
-                        if(group != null)
+
+                        if (group != null)
                         {
-                            
+
                             group.Members.Remove(sender);
                             lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
-                            
+
 
 
                             GroupUpdateMessage groupUpdate = new GroupUpdateMessage()
@@ -628,7 +628,7 @@ namespace TelegramServer
                                     DbTelegram.GroupChats.Remove(group);
                                     DbTelegram.GroupChats.Load();
                                 });
-                               
+
 
                                 lock (DbTelegram) {
                                     DbTelegram.SaveChanges();
@@ -654,31 +654,73 @@ namespace TelegramServer
 
                         GroupUpdateMessage messageToMembers
                             = new GroupUpdateMessage(sender.Id, groupUpdateMessage);
-                        
-                        if(updatedGroup != null)
+
+                        if (updatedGroup != null)
                         {
                             bool ChangesExists = false;
-                            if(groupUpdateMessage.NewDescription != null)
+                            if (groupUpdateMessage.NewDescription != null)
                             {
                                 updatedGroup.Description = groupUpdateMessage.NewDescription;
                                 ChangesExists = true;
                             }
-
-                            if(groupUpdateMessage.NewName != null)
+                            else
                             {
-                                updatedGroup.Name = groupUpdateMessage.NewName;
-                                ChangesExists = true;
+                                if (groupUpdateMessage.NewName != null)
+                                {
+                                    updatedGroup.Name = groupUpdateMessage.NewName;
+                                    ChangesExists = true;
+                                }
                             }
 
-                            if (ChangesExists)
-                            {
-                                lock (DbTelegram)
-                                {
+
+
+                            if (ChangesExists) {
+                                lock (DbTelegram) {
                                     DbTelegram.SaveChanges();
                                 }
                             }
-                                
+
+                            groupUpdateMessage.SenderId = sender.Id;
+
+                            SendMessageToUsers(groupUpdateMessage,
+                                               sender.Id,
+                                               senderClient.Id,
+                                               updatedGroup.Members);
+
                         }
+
+                        break;
+                    }
+                case "UserUpdateMessage":
+                    {
+                        UserUpdateMessage userUpdateMessage = (UserUpdateMessage)msg;
+                        UserClient senderClient = ClientsOnline[client];
+                        User sender = senderClient.User;
+
+
+                        bool changesExists = false;
+                        if(userUpdateMessage.NewName != null)
+                        {
+                            
+                        }
+                        else
+                        {
+                            if(userUpdateMessage.NewDescription != null)
+                            {
+
+                            }
+                            else
+                            {
+                                if(userUpdateMessage.NewLogin != null)
+                                {
+
+                                }
+                            }
+                        }
+
+
+
+
 
                         break;
                     }
@@ -721,9 +763,9 @@ namespace TelegramServer
 
                                 client.SendAsync(new UserActionResultMessage(UserActionType.Kick,
                                                                              AuthResult.Success,
-                                                                             sender.Id, group.Id));
+                                                                             deletedUser.Id, group.Id));
 
-                                SendMessageToUsers(new GroupUpdateMessage() { RemovedUserId = deletedUser.Id },
+                                SendMessageToUsers(new GroupUpdateMessage(group.Id) { RemovedUserId = deletedUser.Id },
                                                    sender.Id,
                                                    senderClient.Id,
                                                    new List<User>(group.Members) { deletedUser });
@@ -774,8 +816,7 @@ namespace TelegramServer
 
                 FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
 
-                lock (DbTelegram)
-                {
+                lock (DbTelegram) {
                     DbTelegram.Files.Add(newFile);
                     DbTelegram.SaveChanges();
                     DbTelegram.Files.Load();
