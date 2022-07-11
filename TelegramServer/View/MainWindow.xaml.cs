@@ -194,7 +194,7 @@ namespace TelegramServer
 
         #endregion WpfEvents
 
-        private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, List<User> usersToSend)
+        private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, ICollection<User> usersToSend)
         {
             bool changesExist = false;
 
