@@ -10,6 +10,7 @@ namespace CommonLibrary.Messages.Users
         public bool OnlineStatus { get; set; }
         public string NewDescription { get; set; }
         public string NewName { get; set; }
+        public string NewLogin { get; set; }
 
         public UserUpdateMessage() { }
         
