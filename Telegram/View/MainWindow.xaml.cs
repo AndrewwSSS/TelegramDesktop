@@ -43,12 +43,13 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
-        public bool EditingGroup {
+        public bool EditingGroup
+        {
             get => editingGroup;
             set
             {
                 editingGroup = value;
-                if(editingGroup)
+                if (editingGroup)
                     B_EditGroup.Content = "SAVE";
                 else
                     B_EditGroup.Content = "EDIT";
@@ -279,7 +280,10 @@ namespace Telegram
                                 group.GroupChat.Name = user.User.Name;
                                 group.GroupChat.Description = user.User.Description;
                                 group.Images = user.Images;
-                                FoundGroups.Add(group);
+                                if (LB_FoundGroups.Visibility == Visibility.Hidden)
+                                    Groups.Add(group);
+                                else
+                                    FoundGroups.Add(group);
                             }
                         }
                     }
@@ -320,7 +324,10 @@ namespace Telegram
                                         GroupType = GroupType.Personal,
                                         MembersId = new List<int> { Me.Id, user.User.Id }
                                     }
-                                    );
+                                    )
+                            {
+                                Joined = false
+                            };
                             FoundGroups.Add(tempGroup);
                             TemporaryUserGroups.Add(App.UserGroupLocalIdCounter++, tempGroup);
                         }
@@ -363,6 +370,7 @@ namespace Telegram
                                         item.Members.Add(user);
                                 }
                             }
+                            item.Joined = false;
                             FoundGroups.Add(item);
                         }
                     }
@@ -387,7 +395,7 @@ namespace Telegram
                         var group = CachedGroups.Find(g => g.GroupChat.Id == result.GroupId);
                         Groups.Add(group);
                         group.Members.Add(new UserItemWrap(Me));
-                        B_JoinGroup.Visibility = Visibility.Hidden;
+                        group.Joined = true;
                     }
                 }
                 else if (msg is ChatMessage)
@@ -435,7 +443,7 @@ namespace Telegram
                             CurGroup = FoundGroups.Count != 0 ? FoundGroups.LastOrDefault() : Groups.LastOrDefault();
                         }
                     }
-                }
+                } else if(msg is GroupUpdateMessage)
                 else if (msg is FirstPersonalResultMessage)
                 {
                     var result = msg as FirstPersonalResultMessage;
@@ -819,10 +827,6 @@ namespace Telegram
             if (lb.SelectedIndex == -1)
                 return;
             CurGroup = lb.SelectedItem as GroupItemWrap;
-            if (CurGroup.GroupChat.GroupType != GroupType.Personal && !Groups.Contains(CurGroup))
-                B_JoinGroup.Visibility = Visibility.Visible;
-            else
-                B_JoinGroup.Visibility = Visibility.Hidden;
             ShowGroupMessages(CurGroup);
         }
 
@@ -830,7 +834,6 @@ namespace Telegram
         {
             FoundGroups.Clear();
             TemporaryUserGroups.Clear();
-            B_JoinGroup.Visibility = Visibility.Hidden;
             if (LB_Groups.SelectedItem != null)
             {
                 CurGroup = LB_Groups.SelectedItem as GroupItemWrap;
@@ -859,6 +862,7 @@ namespace Telegram
             set
             {
                 curGroup = value;
+                EditingGroup = false;
                 OnPropertyChanged();
             }
         }
@@ -1054,10 +1058,25 @@ namespace Telegram
 
         private void B_EditGroup_OnClick(object sender, RoutedEventArgs e)
         {
-            if (EditingGroup)
+            Dispatcher.Invoke(() =>
             {
-            }
-            EditingGroup = !EditingGroup;
+                if (EditingGroup)
+                {
+                    if (string.IsNullOrEmpty(TB_CurGroupName.Text))
+                    {
+                        MessageBox.Show("Группу нельзя переименовать в пустую.");
+                        return;
+                    }
+                    Client.SendAsync(new GroupUpdateMessage()
+                    {
+                        NewDescription = String.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
+                        NewName = TB_CurGroupDesc.Text,
+                        GroupId = CurGroup.GroupChat.Id,
+
+                    });
+                }
+                EditingGroup = !EditingGroup;
+            });
         }
     }
 

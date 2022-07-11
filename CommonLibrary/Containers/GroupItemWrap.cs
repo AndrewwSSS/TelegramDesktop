@@ -16,6 +16,8 @@ namespace CommonLibrary.Containers
     public class GroupItemWrap : INotifyPropertyChanged
     {
         private PublicGroupInfo group;
+        private bool joined = true;
+
         public ObservableCollection<UserItemWrap> Members { get; set; } = new ObservableCollection<UserItemWrap>();
         public ObservableCollection<UserItemWrap> Admins { get; set; } = new ObservableCollection<UserItemWrap>();
         public PublicGroupInfo GroupChat
@@ -28,6 +30,16 @@ namespace CommonLibrary.Containers
                 OnPropertyChanged("LastMessage");
             }
         }
+
+        public bool Joined
+        {
+            get => joined;
+            set
+            {
+                joined = value;
+                OnPropertyChanged();
+            }
+        }
         public ObservableCollection<ImageContainer> Images { get; set; } = new ObservableCollection<ImageContainer>();
         public List<ChatMessage> Messages => GroupChat.Messages;
         public ChatMessage LastMessage => GroupChat.Messages.LastOrDefault();
@@ -35,7 +47,7 @@ namespace CommonLibrary.Containers
         {
             get
             {
-                if(Images.Count > 0)
+                if (Images.Count > 0)
                     return Images[0].ImageData.ImageSource;
                 else
                     return null;
