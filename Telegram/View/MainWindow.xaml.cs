@@ -43,7 +43,19 @@ namespace Telegram
                 OnPropertyChanged();
             }
         }
+        public bool EditingGroup {
+            get => editingGroup;
+            set
+            {
+                editingGroup = value;
+                if(editingGroup)
+                    B_EditGroup.Content = "SAVE";
+                else
+                    B_EditGroup.Content = "EDIT";
 
+                OnPropertyChanged();
+            }
+        }
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
@@ -79,6 +91,7 @@ namespace Telegram
         private TcpClientWrap client;
         private GroupItemWrap curGroup;
         private MessageItemWrap respondingTo;
+        private bool editingGroup = false;
 
         public PublicUserInfo Me { get; set; }
         public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
@@ -131,7 +144,7 @@ namespace Telegram
             Me = me;
             InitializeComponent();
             HideRightMenu();
-            if(!CachedUsers.Any(wrap=>wrap.User.Id==me.Id))
+            if (!CachedUsers.Any(wrap => wrap.User.Id == me.Id))
                 CachedUsers.Add(new UserItemWrap(me));
 
             RighMenuState = MenuState.Hidden;
@@ -211,7 +224,7 @@ namespace Telegram
                     if (result.Result == AuthResult.Success)
                     {
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-                        var info = new PublicGroupInfo(Buffers.GroupName, "", result.GroupId)
+                        var info = new PublicGroupInfo(result.GroupName, result.GroupDescription, result.GroupId)
                         {
                             MembersId = new List<int>() { Me.Id },
                             AdministratorsId = new List<int> { }
@@ -220,6 +233,7 @@ namespace Telegram
                         {
                             Members = new ObservableCollection<UserItemWrap> { CachedUsers.First(u => u.User.Id == Me.Id) }
                         };
+
                         Groups.Add(newGroup);
                         CachedGroups.Add(newGroup);
                     }
@@ -759,21 +773,14 @@ namespace Telegram
         {
             Dispatcher.Invoke(() =>
             {
-                Buffers.GroupName = TB_NewGroupName.Text;
                 AddGroupButton.IsEnabled = false;
                 HideMenus(null, null);
+                var msg = new CreateGroupMessage(TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text, Me.Id);
+                TB_NewGroupName.Text = "";
+                Client.SendAsync(msg);
             });
-            Client.MessageSent -= Client_MessageSent;
-            Client.MessageSent += Client_MessageSent;
-            var msg = new CreateGroupMessage(Buffers.GroupName, Me.Id);
-            Client.SendAsync(msg);
-
         }
 
-        private void Client_MessageSent(TcpClientWrap client, Message msg)
-        {
-
-        }
 
         private void TB_GroupName_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -1043,6 +1050,14 @@ namespace Telegram
         {
             var user = (sender as FrameworkElement).DataContext as UserItemWrap;
             Client?.SendAsync(new KickUserMessage(user.User.Id, CurGroup.GroupChat.Id));
+        }
+
+        private void B_EditGroup_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (EditingGroup)
+            {
+            }
+            EditingGroup = !EditingGroup;
         }
     }
 

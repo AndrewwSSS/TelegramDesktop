@@ -10,6 +10,5 @@ namespace Telegram.Utility
 {
     public static class Buffers
     {
-        public static string GroupName { get; set; }
     }
 }

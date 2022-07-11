@@ -380,15 +380,18 @@
                                 <ColumnDefinition  Width="200"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Orientation="Vertical" Grid.Column="0">
+                            <StackPanel Margin="10 4 4 4" Orientation="Vertical" Grid.Column="0">
 
-                                <TextBlock Margin="4"
-                                           Foreground="White"
-                                           x:Name="TBName"/>
+                                <TextBlock 
+                                           FontSize="14"
+                                           Foreground="{StaticResource GreyBrush}"
+                                           x:Name="TB_Name"
+                                           Text="{Binding CurGroup.GroupChat.Name}"/>
 
-                                <TextBlock Margin="4"
-                                           Foreground="White"
-                                           x:Name="TBDateLeft"/>
+                                <TextBlock 
+                                           Foreground="{StaticResource DarkGreyBrush}"
+                                           x:Name="TB_BottomInfo"
+                                           Text="{Binding CurGroup.Members.Count, StringFormat={}{0} участников}"/>
 
                             </StackPanel>
 
@@ -763,10 +766,21 @@
                         </Grid.Resources>
                         <Grid Background="Transparent" Visibility="{Binding CurGroup, Converter={StaticResource objToVis}}">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="40"/>
                             </Grid.RowDefinitions>
                             <StackPanel>
+                                <StackPanel.Resources>
+                                    <entities:NotConverter x:Key="not"/>
+                                </StackPanel.Resources>
+                                <TextBox IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.GroupChat.Name}" Foreground="{StaticResource GreyBrush}"></TextBox>
+                                <TextBox IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.GroupChat.Description}" Foreground="{StaticResource DarkGreyBrush}"></TextBox>
+                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick"  Style="{StaticResource BLight}" Height="30" Margin="5">
+                                    EDIT
+                                </Button>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1">
                                 <ListBox 
                                 Style="{StaticResource LBUsers}"
                                 ItemsSource="{Binding CurGroup.Admins}">
@@ -776,9 +790,9 @@
                                 ItemsSource="{Binding CurGroup.Members}">
                                 </ListBox>
                             </StackPanel>
-                            <Button Grid.Row="1" Click="B_QuitGroup_OnClick">
+                            <Button Grid.Row="2" Click="B_QuitGroup_OnClick">
                                 <Button.Style>
-                                    <Style TargetType="Button">
+                                    <Style BasedOn="{StaticResource BLight}"  TargetType="Button">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=LB_FoundGroups, Path=Visibility}" Value="Visible">
                                                 <Setter Property="Visibility" Value="Hidden" />
@@ -882,7 +896,9 @@
                     <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Имя группы</TextBlock>
                         <TextBox x:Name="TB_NewGroupName" Width="250" Style="{StaticResource TBInput}"
-                                 TextChanged="TB_GroupName_TextChanged"></TextBox>
+                                 TextChanged="TB_GroupName_TextChanged"/>
+                        <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Описание группы</TextBlock>
+                        <TextBox x:Name="TB_NewGroupDesc" Width="250" Style="{StaticResource TBInput}"/>
                         <Button x:Name="AddGroupButton" IsEnabled="False" Margin="4,0" Style="{StaticResource BLight}" Height="50" Click="B_AddGroup_OnClick">Создать группу</Button>
                     </StackPanel>
                 </Grid>

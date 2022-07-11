@@ -4,6 +4,14 @@
         <ResourceDictionary Source="BrushDictionary.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
+    <Style TargetType="TextBox">
+        <Style.Setters>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkGreyBrush}" />
+            <Setter Property="Background" Value="{StaticResource BgBrush}" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Margin" Value="5" />
+        </Style.Setters>
+    </Style>
     <Style TargetType="ContextMenu">
         <Style.Setters>
             <Setter Property="Template">
@@ -95,10 +103,10 @@
                 </Setter.Value>
             </Setter>
         </Style.Setters>
-        
+
     </Style>
     <Style BasedOn="{StaticResource LBScrollable}" TargetType="{x:Type ListBox}" x:Key="LB_Messages">
-        
+
     </Style>
 
     <LinearGradientBrush x:Key="ListBoxBackgroundBrush" StartPoint="0,0" EndPoint="1,0.001">
@@ -355,6 +363,26 @@
                                                 Property="Background"
                                                 Value="{StaticResource DarkGreyBrush}"/>
                             </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+
+                                            <ColorAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                  To="#5088C8" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+
+                                            <ColorAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                  To="#50B4FA" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
                         </ControlTemplate.Triggers>
 
                     </ControlTemplate>
@@ -405,16 +433,16 @@
                                         <Style.Setters>
                                             <Setter Property="Template">
                                                 <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <Border Grid.Column="0" Grid.Row="1" Height="48" Width="48" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
-                                                                <Image Source="{Binding Images[0].ImageSource}">
-                                                                    <Image.Clip>
-                                                                        <EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/>
-                                                                    </Image.Clip>
-                                                                </Image>
-                                                            </Border>
-                                                        </ControlTemplate>
-                                                    
+                                                    <ControlTemplate>
+                                                        <Border Grid.Column="0" Grid.Row="1" Height="48" Width="48" Margin="0,0,5,0" VerticalAlignment="Center" CornerRadius="360">
+                                                            <Image Source="{Binding Images[0].ImageSource}">
+                                                                <Image.Clip>
+                                                                    <EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/>
+                                                                </Image.Clip>
+                                                            </Image>
+                                                        </Border>
+                                                    </ControlTemplate>
+
                                                 </Setter.Value>
                                             </Setter>
                                         </Style.Setters>
@@ -474,7 +502,7 @@
         </Style.Setters>
 
     </Style>
-    
+
     <Style TargetType="TextBox" x:Key="SearchBoxStyle">
         <Style.Setters>
             <Setter Property="CaretBrush" Value="White"/>
@@ -517,7 +545,7 @@
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
-                    
+
                 </Setter.Value>
             </Setter>
         </Style.Setters>

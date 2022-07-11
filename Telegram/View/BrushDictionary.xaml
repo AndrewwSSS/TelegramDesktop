@@ -4,6 +4,7 @@
     <SolidColorBrush x:Key="GreyBrush">#f0f0f0</SolidColorBrush>
     <SolidColorBrush x:Key="BlueBrush">#50B4FA</SolidColorBrush>
     <SolidColorBrush x:Key="LightBlueBrush">#72D4FA</SolidColorBrush>
+    <SolidColorBrush x:Key="DarkBlueBrush">#5088C8</SolidColorBrush>
     <SolidColorBrush x:Key="MsgBgBrush">#285078</SolidColorBrush>
     <SolidColorBrush x:Key="MsgBgBrushLight">#4a729a</SolidColorBrush>
     <SolidColorBrush x:Key="DarkBgBrush">#19191D</SolidColorBrush>

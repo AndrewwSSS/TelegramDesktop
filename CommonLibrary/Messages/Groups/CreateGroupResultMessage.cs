@@ -11,11 +11,15 @@ namespace CommonLibrary.Messages.Groups
         public string Message { get; set; }
         public int GroupId { get; set; }
 
+        public string GroupName { get; set; }
+        public string GroupDescription { get; set; }
 
-        public CreateGroupResultMessage(AuthResult Result, int GroupId)
+        public CreateGroupResultMessage(AuthResult Result, int GroupId, string gName, string gDesc)
         {
             this.Result = Result;
             this.GroupId = GroupId;
+            GroupName = gName;
+            GroupDescription = gDesc;
         }
 
         public CreateGroupResultMessage(AuthResult Result, string Message)
