@@ -461,8 +461,7 @@ namespace Telegram
                             group.OnPropertyChanged("Description");
                         }
                     }
-                    else
-                        Buffers.EditGroupSettings.Remove(result.GroupId);
+                    Buffers.EditGroupSettings.Remove(result.GroupId);
                 }
                 else if (msg is FirstPersonalResultMessage)
                 {
@@ -804,7 +803,7 @@ namespace Telegram
                 AddGroupButton.IsEnabled = false;
                 HideMenus(null, null);
                 Buffers.NewGroupSettings.Add(
-                    App.GroupLocalIdCounter, 
+                    App.GroupLocalIdCounter,
                     new KeyValuePair<string, string>(TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text)
                     );
                 var msg = new CreateGroupMessage(App.GroupLocalIdCounter++, TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text, Me.Id);
@@ -1092,15 +1091,15 @@ namespace Telegram
                         return;
                     }
                     Buffers.EditGroupSettings.Add(
-                        CurGroup.GroupChat.Id, 
+                        CurGroup.GroupChat.Id,
                         new KeyValuePair<string, string>(
                             TB_CurGroupDesc.Text,
                             string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text)
                         );
                     Client.SendAsync(new GroupUpdateMessage()
                     {
-                        NewDescription = string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
-                        NewName = TB_CurGroupDesc.Text,
+                        NewDescription = TB_CurGroupDesc.Text ,
+                        NewName = string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
                         GroupId = CurGroup.GroupChat.Id,
                     });
                 }

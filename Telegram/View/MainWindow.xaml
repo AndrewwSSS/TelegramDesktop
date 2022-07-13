@@ -793,7 +793,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="40"/>
                             </Grid.RowDefinitions>
-                            <StackPanel Visibility="{Binding CurGroup.GroupChat.Joined, Converter={StaticResource boolToVis}}">
+                            <StackPanel Visibility="{Binding CurGroup.Joined, Converter={StaticResource boolToVis}}">
                                 <StackPanel.Resources>
                                     <entities:NotConverter x:Key="not"/>
                                 </StackPanel.Resources>
