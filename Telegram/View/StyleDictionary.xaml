@@ -557,7 +557,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border CornerRadius="5" Background="{StaticResource LightBgBrush}">
-                            <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"        Margin="9,11" BorderThickness="0"
+                            <TextBox  Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}"       
+                                       BorderThickness="0"
                                              Background="Transparent"
                                              Foreground="{StaticResource GreyBrush}"
                                              VerticalContentAlignment="Center"
