@@ -33,13 +33,13 @@ namespace Telegram
                         item.Members.Add(user);
                 }
                 Groups.Add(item);
+                CachedGroups.Add(item);
             }
         }
         private void LoadCache()
         {
             LoadUsers();
             LoadGroups();
-            CacheManager.Instance.LoadAllGroups();
         }
         private void SaveCache()
         {
