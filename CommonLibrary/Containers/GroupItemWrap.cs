@@ -43,16 +43,10 @@ namespace CommonLibrary.Containers
         public ObservableCollection<ImageContainer> Images { get; set; } = new ObservableCollection<ImageContainer>();
         public List<ChatMessage> Messages => GroupChat.Messages;
         public ChatMessage LastMessage => GroupChat.Messages.LastOrDefault();
-        public ImageSource Avatar
-        {
-            get
-            {
-                if (Images.Count > 0)
-                    return Images[0].ImageData.ImageSource;
-                else
-                    return null;
-            }
-        }
+        public ImageSource Avatar => Images.Count > 0 ? Images[0].ImageData.ImageSource : null;
+
+        public string Name => GroupChat.Name;
+        public string Description => GroupChat.Description;
 
         public GroupItemWrap(PublicGroupInfo group) => GroupChat = group;
 

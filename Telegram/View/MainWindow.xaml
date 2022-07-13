@@ -128,7 +128,11 @@
     </Window.Resources>
 
     <Grid Margin="2">
-        <Canvas x:Name="MainCanvas" Background="Black">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="86*"/>
+        </Grid.RowDefinitions>
+        <Canvas x:Name="MainCanvas" Background="Black" Grid.RowSpan="2">
             <Canvas.Resources>
                 <ControlTemplate TargetType="Button" x:Key="BTNClose">
 
@@ -301,35 +305,38 @@
                       MaxWidth="250">
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="45"/>
+                            <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="19"/>
+                            <ColumnDefinition Width="19"/>
                         </Grid.ColumnDefinitions>
                         <Grid.Resources>
                             <BooleanToVisibilityConverter x:Key="boolToVis"/>
                         </Grid.Resources>
 
-                        <Grid Grid.Row="0"
-                              Grid.Column="0"
-                              Margin="3">
 
-                            <TextBox KeyDown="TB_GroupLookUp_OnEnter" Margin="2"
-                                     Style="{StaticResource SearchBoxStyle}"/>
-                        </Grid>
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="0"
+                                 Margin="5"
+                                 KeyDown="TB_GroupLookUp_OnEnter"
+                                 Style="{StaticResource SearchBoxStyle}"/>
+
                         <Button x:Name="B_CloseFoundLB"
                                 Click="B_CloseFoundLB_Click"
                                 Grid.Row="0" Grid.Column="1" 
-                                Width="32" Height="32" 
+                                Width="32" 
+                                Height="32"
+                                Margin="3"
                                 Content="X"
                                 IsEnabled="{Binding ElementName=LB_FoundGroups, Path=HasItems}"
-                                Style="{StaticResource BLight}">
+                                Style="{StaticResource BLight}" Grid.ColumnSpan="2">
                         </Button>
 
                         <ListBox x:Name="LB_Groups" 
-                                 Grid.Row="1" Grid.ColumnSpan="2"
+                                 Grid.Row="1" Grid.ColumnSpan="3"
                                  ItemsSource="{Binding Groups}"
                                  SelectionChanged="GroupSelected"
                                  Style="{StaticResource LBGroup}">
@@ -337,14 +344,14 @@
 
                         <ListBox x:Name="LB_FoundGroups"
                                 Grid.Row="1"
-                                 Grid.ColumnSpan="2"
+                                 Grid.ColumnSpan="3"
                                 Background="{StaticResource DarkBgBrush}"
                                 ItemsSource="{Binding FoundGroups}"
                                 SelectionChanged="FoundGroupSelected"
                                 Style="{StaticResource LBGroup}">
 
                         </ListBox>
-                        <TextBlock  Grid.Row="1" Margin="15"
+                        <TextBlock  Grid.Row="1" Margin="15,236,14,236"
                                 x:Name="TB_GroupsNotFound"   
                                 Visibility="Hidden"
                                 Foreground="{StaticResource GreyBrush}"
@@ -902,7 +909,7 @@
 
         </Canvas>
 
-        <Grid>
+        <Grid Grid.RowSpan="2">
             <Border x:Name="AddGroupMenu"
                     Visibility="Hidden"
                 CornerRadius="5"
@@ -916,7 +923,7 @@
                     <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Имя группы</TextBlock>
                         <TextBox x:Name="TB_NewGroupName" Width="250" Style="{StaticResource TBInput}"
-                                 TextChanged="TB_GroupName_TextChanged"/>
+                                 TextChanged="TB_NewGroupName_TextChanged"/>
                         <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Описание группы</TextBlock>
                         <TextBox x:Name="TB_NewGroupDesc" Width="250" Style="{StaticResource TBInput}"/>
                         <Button x:Name="AddGroupButton" IsEnabled="False" Margin="4,0" Style="{StaticResource BLight}" Height="50" Click="B_AddGroup_OnClick">Создать группу</Button>
