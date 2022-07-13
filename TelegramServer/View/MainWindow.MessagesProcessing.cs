@@ -654,7 +654,7 @@ namespace TelegramServer
 
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
-                        GroupChat updatedGroup = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == groupUpdateMessage.Id);
+                        GroupChat updatedGroup = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == groupUpdateMessage.GroupId);
 
                         if (updatedGroup != null)
                         {
