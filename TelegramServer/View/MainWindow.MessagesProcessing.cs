@@ -392,7 +392,9 @@ namespace TelegramServer
                         });
 
 
-                        client.SendAsync(new CreateGroupResultMessage(AuthResult.Success, newGroup.Id));
+                        client.SendAsync(new CreateGroupResultMessage(AuthResult.Success,
+                                                                      newGroup.Id,
+                                                                      createNewGroupMessage.LocalId));
 
 
                         if (newGroupMembers.Count > 0)
