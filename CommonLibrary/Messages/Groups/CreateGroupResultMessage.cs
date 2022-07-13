@@ -10,16 +10,13 @@ namespace CommonLibrary.Messages.Groups
         public AuthResult Result { get; set; }
         public string Message { get; set; }
         public int GroupId { get; set; }
-
-        public string GroupName { get; set; }
-        public string GroupDescription { get; set; }
-
-        public CreateGroupResultMessage(AuthResult Result, int GroupId, string gName, string gDesc)
+        public int GroupLocalId { get; set; }
+        
+        public CreateGroupResultMessage(AuthResult Result, int gId, int gLocalId)
         {
             this.Result = Result;
-            this.GroupId = GroupId;
-            GroupName = gName;
-            GroupDescription = gDesc;
+            this.GroupId = gId;
+            GroupLocalId = gLocalId;
         }
 
         public CreateGroupResultMessage(AuthResult Result, string Message)

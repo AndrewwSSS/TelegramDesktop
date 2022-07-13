@@ -225,7 +225,10 @@ namespace Telegram
                     if (result.Result == AuthResult.Success)
                     {
                         MessageBox.Show("Создана группа с ID " + result.GroupId.ToString());
-                        var info = new PublicGroupInfo(result.GroupName, result.GroupDescription, result.GroupId)
+                        if (!Buffers.NewGroupSettings.ContainsKey(result.GroupLocalId))
+                            return;
+                        var pair = Buffers.NewGroupSettings[result.GroupLocalId];
+                        var info = new PublicGroupInfo(pair.Key, pair.Value, result.GroupId)
                         {
                             MembersId = new List<int>() { Me.Id },
                             AdministratorsId = new List<int> { }
@@ -288,24 +291,24 @@ namespace Telegram
                         }
                     }
                 }
-                else if (msg is DataRequestResultMessage<FileMetadata>)
-                {
-                    var result = msg as DataRequestResultMessage<FileMetadata>;
-                    foreach (var md in result.Result)
-                    {
-                        AddMetadataToMessages(md);
-                        CachedFilesMetadata.Add(md);
-                    }
-                }
-                else if (msg is DataRequestResultMessage<ImageMetadata>)
-                {
-                    var result = msg as DataRequestResultMessage<ImageMetadata>;
-                    foreach (var md in result.Result)
-                    {
-                        CachedImagesMetadata.Add(md);
-                        Client.SendAsync(new DataRequestMessage(md.Id, DataRequestType.ImageData));
-                    }
-                }
+                //else if (msg is DataRequestResultMessage<FileMetadata>)
+                //{
+                //    var result = msg as DataRequestResultMessage<FileMetadata>;
+                //    foreach (var md in result.Result)
+                //    {
+                //        AddMetadataToMessages(md);
+                //        CachedFilesMetadata.Add(md);
+                //    }
+                //}
+                //else if (msg is DataRequestResultMessage<ImageMetadata>)
+                //{
+                //    var result = msg as DataRequestResultMessage<ImageMetadata>;
+                //    foreach (var md in result.Result)
+                //    {
+                //        CachedImagesMetadata.Add(md);
+                //        Client.SendAsync(new DataRequestMessage(md.Id, DataRequestType.ImageData));
+                //    }
+                //}
                 else if (msg is ChatLookupResultMessage)
                 {
                     var result = msg as ChatLookupResultMessage;
@@ -443,7 +446,24 @@ namespace Telegram
                             CurGroup = FoundGroups.Count != 0 ? FoundGroups.LastOrDefault() : Groups.LastOrDefault();
                         }
                     }
-                } else if(msg is GroupUpdateMessage)
+                }
+                else if (msg is GroupUpdateResultMessage)
+                {
+                    var result = msg as GroupUpdateResultMessage;
+                    if (result.Result == AuthResult.Success)
+                    {
+                        var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == result.GroupId);
+                        if (group != null)
+                        {
+                            group.GroupChat.Name = Buffers.EditGroupSettings[result.GroupId].Key;
+                            group.GroupChat.Description = Buffers.EditGroupSettings[result.GroupId].Value;
+                            group.OnPropertyChanged("Name");
+                            group.OnPropertyChanged("Description");
+                        }
+                    }
+                    else
+                        Buffers.EditGroupSettings.Remove(result.GroupId);
+                }
                 else if (msg is FirstPersonalResultMessage)
                 {
                     var result = msg as FirstPersonalResultMessage;
@@ -783,14 +803,18 @@ namespace Telegram
             {
                 AddGroupButton.IsEnabled = false;
                 HideMenus(null, null);
-                var msg = new CreateGroupMessage(TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text, Me.Id);
+                Buffers.NewGroupSettings.Add(
+                    App.GroupLocalIdCounter, 
+                    new KeyValuePair<string, string>(TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text)
+                    );
+                var msg = new CreateGroupMessage(App.GroupLocalIdCounter++, TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text, Me.Id);
                 TB_NewGroupName.Text = "";
                 Client.SendAsync(msg);
             });
         }
 
 
-        private void TB_GroupName_TextChanged(object sender, TextChangedEventArgs e)
+        private void TB_NewGroupName_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
             AddGroupButton.IsEnabled = !string.IsNullOrEmpty(textBox.Text);
@@ -1067,12 +1091,17 @@ namespace Telegram
                         MessageBox.Show("Группу нельзя переименовать в пустую.");
                         return;
                     }
+                    Buffers.EditGroupSettings.Add(
+                        CurGroup.GroupChat.Id, 
+                        new KeyValuePair<string, string>(
+                            TB_CurGroupDesc.Text,
+                            string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text)
+                        );
                     Client.SendAsync(new GroupUpdateMessage()
                     {
-                        NewDescription = String.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
+                        NewDescription = string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
                         NewName = TB_CurGroupDesc.Text,
                         GroupId = CurGroup.GroupChat.Id,
-
                     });
                 }
                 EditingGroup = !EditingGroup;
