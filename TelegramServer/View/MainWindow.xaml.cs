@@ -226,6 +226,9 @@ namespace TelegramServer
                 lock (DbTelegram) {
                     DbTelegram.SaveChanges();
                 }
+                
+             
+
             }
                
         }

@@ -370,12 +370,15 @@ namespace TelegramServer
                         GroupChat newGroup = new GroupChat()
                         {
                             Name = createNewGroupMessage.Name,
+                            Description = createNewGroupMessage.Description,
                             DateCreated = DateTime.UtcNow,
                             Type = GroupType.Public
                         };
 
                         newGroup.Members.Add(sender);
                         newGroup.Administrators.Add(sender);
+
+
                         sender.Chats.Add(newGroup);
 
                         Dispatcher.Invoke(() =>
@@ -389,7 +392,9 @@ namespace TelegramServer
                         });
 
 
-                        client.SendAsync(new CreateGroupResultMessage(AuthResult.Success, newGroup.Id));
+                        client.SendAsync(new CreateGroupResultMessage(AuthResult.Success,
+                                                                      newGroup.Id,
+                                                                      createNewGroupMessage.LocalId));
 
 
                         if (newGroupMembers.Count > 0)
@@ -651,10 +656,6 @@ namespace TelegramServer
                         User sender = senderClient.User;
                         GroupChat updatedGroup = DbTelegram.GroupChats.FirstOrDefault(g => g.Id == groupUpdateMessage.Id);
 
-
-                        GroupUpdateMessage messageToMembers
-                            = new GroupUpdateMessage(sender.Id, groupUpdateMessage);
-
                         if (updatedGroup != null)
                         {
                             bool ChangesExists = false;
@@ -663,17 +664,13 @@ namespace TelegramServer
                                 updatedGroup.Description = groupUpdateMessage.NewDescription;
                                 ChangesExists = true;
                             }
-                            else
+                         
+                            if (groupUpdateMessage.NewName != null)
                             {
-                                if (groupUpdateMessage.NewName != null)
-                                {
-                                    updatedGroup.Name = groupUpdateMessage.NewName;
-                                    ChangesExists = true;
-                                }
+                                updatedGroup.Name = groupUpdateMessage.NewName;
+                                ChangesExists = true;
                             }
-
-
-
+                            
                             if (ChangesExists) {
                                 lock (DbTelegram) {
                                     DbTelegram.SaveChanges();
@@ -697,31 +694,56 @@ namespace TelegramServer
                         UserClient senderClient = ClientsOnline[client];
                         User sender = senderClient.User;
 
-
                         bool changesExists = false;
-                        if(userUpdateMessage.NewName != null)
-                        {
-                            
-                        }
-                        else
-                        {
-                            if(userUpdateMessage.NewDescription != null)
-                            {
 
+                        if (userUpdateMessage.NewLogin != null)
+                        {
+                            if(!DbTelegram.Users.Any(u => u.Login == userUpdateMessage.NewLogin))
+                            {
+                                sender.Login = userUpdateMessage.NewLogin;
+                                changesExists = true;
                             }
                             else
                             {
-                                if(userUpdateMessage.NewLogin != null)
-                                {
-
-                                }
+                                client.SendAsync(new UserUpdateResultMessage(AuthResult.Denied));
+                                return;
                             }
                         }
 
+                        if (userUpdateMessage.NewName != null)
+                        {
+                            sender.Name = userUpdateMessage.NewName;
+                            changesExists = true;
+                        }
+                     
+                        if(userUpdateMessage.NewDescription != null)
+                        {
+                            sender.Description = userUpdateMessage.NewDescription;
+                            changesExists = true;
+                        }
+                           
 
 
+                        if (changesExists) {
+                            lock (DbTelegram) {
+                                DbTelegram.SaveChanges();
+                            }
 
+                            client.SendAsync(new UserUpdateResultMessage(AuthResult.Success));
 
+                            var MembersCollections = sender.Chats.Select(c => c.Members);
+                            List<User> members = new List<User>();
+
+                            foreach (var memberCollection in MembersCollections)
+                                foreach (var member in memberCollection)
+                                    members.Add(member);
+
+                            var usersToSend = members.Distinct().ToList();
+
+                            userUpdateMessage.UserId = sender.Id;
+                            SendMessageToUsers(userUpdateMessage, sender.Id, senderClient.Id, usersToSend);
+                        }
+                                         
                         break;
                     }
                 case "MetadataMessage":
