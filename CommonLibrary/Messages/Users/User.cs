@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace CommonLibrary.Messages.Users
 {
@@ -29,7 +30,18 @@ namespace CommonLibrary.Messages.Users
         public DateTime LocalRegistrationDate => RegistrationDate.ToLocalTime();
         [NotMapped]
         public DateTime LocalVistDate => VisitDate.ToLocalTime();
+        [NotMapped]
+        public List<User> UniqueRelations
+        {
+            get
+            {
+                List<User> tmp = new List<User>();
+                foreach (GroupChat chat in Chats)
+                    tmp.AddRange(chat.Members);
 
+                return tmp.Distinct().ToList();
+            }
+        }
 
         public User()
         {

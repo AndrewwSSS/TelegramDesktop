@@ -59,7 +59,6 @@ namespace TelegramServer
 
             DbTelegram.GroupChats.Load();
             
-
             Server.Started += OnServerStarted;
             Server.Stopped += OnServerStopped;
             Server.MessageReceived += ClientMessageRecived;
@@ -118,18 +117,27 @@ namespace TelegramServer
 
         private void OnClientDisconnected(TcpClientWrap client)
         {
-            UserClient DisconnectedClient
+            UserClient disconnectedClient
                 = ClientsOnline[client];
 
-            DisconnectedClient.User.VisitDate = DateTime.UtcNow;
+            User disconnectedUser = disconnectedClient.User;
+
+            disconnectedClient.User.VisitDate = DateTime.UtcNow;
 
             Dispatcher.Invoke(() =>
             {
-                UsersOnline.Remove(DisconnectedClient.User);
-                UsersOffline.Add(DisconnectedClient.User);
+                UsersOnline.Remove(disconnectedClient.User);
+                UsersOffline.Add(disconnectedClient.User);
                 ClientsOnline.Remove(client);
-                FileClientsOnline.Remove(DisconnectedClient);
+                FileClientsOnline.Remove(disconnectedClient);
             });
+
+        
+
+            SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = false },
+                                disconnectedUser.Id,
+                                disconnectedClient.Id,
+                                disconnectedUser.UniqueRelations);
 
             lock (DbTelegram) {
                 DbTelegram.SaveChanges();

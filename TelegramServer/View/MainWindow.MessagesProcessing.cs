@@ -10,7 +10,6 @@ using MessageLibrary;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -47,8 +46,8 @@ namespace TelegramServer
 
                             DbTelegram.Users.Add(newUser);
                             Dispatcher.Invoke(() => UsersOffline.Add(newUser));
-                            lock (DbTelegram)
-                            {
+
+                            lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
 
@@ -105,8 +104,7 @@ namespace TelegramServer
                                 UsersOnline.Add(sender);
                             });
 
-                            lock (DbTelegram)
-                            {
+                            lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
 
@@ -124,7 +122,10 @@ namespace TelegramServer
                                 client.SendAsync(new ArrayMessage<BaseMessage>(senderClient.MessagesToSend));
                             }
 
-
+                            SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = true },
+                                               sender.Id,
+                                               senderClient.Id,
+                                               sender.UniqueRelations);
 
 
                             //if (sender.MessagesToSend.Count > 0)
@@ -674,7 +675,12 @@ namespace TelegramServer
                             if (ChangesExists) {
                                 lock (DbTelegram) {
                                     DbTelegram.SaveChanges();
+                                    DbTelegram.GroupChats.Load();
                                 }
+
+                                client.SendAsync(new GroupUpdateResultMessage(AuthResult.Success,
+                                                                              updatedGroup.Id));
+
                             }
 
                             groupUpdateMessage.SenderId = sender.Id;
@@ -807,46 +813,46 @@ namespace TelegramServer
             }
         }
 
-        private void FileServer_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
-        {
-            UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
-            UserDownloads downloads = UsersDownloads[senderClient];
+        //private void FileServer_FileChunkReceived(TcpFileClientWrap client, FileChunk chunk)
+        //{
+        //    UserClient senderClient = FileClientsOnline.First(fc => fc.Value == client).Key;
+        //    UserDownloads downloads = UsersDownloads[senderClient];
 
-            KeyValuePair<int, FileDownload> ChunksInfo;
+        //    KeyValuePair<int, FileDownload> ChunksInfo;
 
-            if (downloads.FilesInProcess.Any(kv => kv.Key == chunk.FileId))
-                ChunksInfo = downloads.FilesInProcess.First(kv => kv.Key == chunk.FileId);
-            else
-            {
-                ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
-                downloads.FilesInProcess.Add(ChunksInfo);
-            }
+        //    if (downloads.FilesInProcess.Any(kv => kv.Key == chunk.FileId))
+        //        ChunksInfo = downloads.FilesInProcess.First(kv => kv.Key == chunk.FileId);
+        //    else
+        //    {
+        //        ChunksInfo = new KeyValuePair<int, FileDownload>(chunk.FileId, new FileDownload());
+        //        downloads.FilesInProcess.Add(ChunksInfo);
+        //    }
 
-            FileDownload fileDownload = ChunksInfo.Value;
-
-
-            fileDownload.AddChunk(chunk);
-
-            if (chunk.IsLast)
-            {
-                KeyValuePair<int, FileMetadata> metadataInfo = downloads.RemainingFiles.FirstOrDefault(ri => ri.Key == chunk.FileId);
-                FileMetadata metaData = metadataInfo.Value;
-
-                MemoryStream stream = new MemoryStream();
-                foreach (var fileChunk in fileDownload.Chunks)
-                    stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
-
-                FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
-
-                lock (DbTelegram) {
-                    DbTelegram.Files.Add(newFile);
-                    DbTelegram.SaveChanges();
-                    DbTelegram.Files.Load();
-                }
+        //    FileDownload fileDownload = ChunksInfo.Value;
 
 
-                downloads.FileFinished(chunk.FileId, newFile.Id);
-            }
+        //    fileDownload.AddChunk(chunk);
+
+        //    if (chunk.IsLast)
+        //    {
+        //        KeyValuePair<int, FileMetadata> metadataInfo = downloads.RemainingFiles.FirstOrDefault(ri => ri.Key == chunk.FileId);
+        //        FileMetadata metaData = metadataInfo.Value;
+
+        //        MemoryStream stream = new MemoryStream();
+        //        foreach (var fileChunk in fileDownload.Chunks)
+        //            stream.Write(fileChunk.Data, 0, fileChunk.Data.Length);
+
+        //        FileContainer newFile = new FileContainer(metaData.Name, stream.ToArray());
+
+        //        lock (DbTelegram) {
+        //            DbTelegram.Files.Add(newFile);
+        //            DbTelegram.SaveChanges();
+        //            DbTelegram.Files.Load();
+        //        }
+
+
+        //        downloads.FileFinished(chunk.FileId, newFile.Id);
+        //    }
 
             //if (fileDownload.isCompleted)
             //{
@@ -870,18 +876,18 @@ namespace TelegramServer
             //    downloads.FileFinished(chunk.FileId, newFile.Id);
             //}
 
-            if (downloads.IsCompleted)
-            {
-                MetadataResultMessage resultMessage
-                    = new MetadataResultMessage(downloads.ForMessageId,
-                                                downloads.FinishedImages,
-                                                downloads.FinishedFiles);
+        //    if (downloads.IsCompleted)
+        //    {
+        //        MetadataResultMessage resultMessage
+        //            = new MetadataResultMessage(downloads.ForMessageId,
+        //                                        downloads.FinishedImages,
+        //                                        downloads.FinishedFiles);
 
-                TcpClientWrap TcpClient = ClientsOnline.FirstOrDefault(co => co.Value == senderClient).Key;
+        //        TcpClientWrap TcpClient = ClientsOnline.FirstOrDefault(co => co.Value == senderClient).Key;
 
-                TcpClient.SendAsync(resultMessage);
-            }
-        }
+        //        TcpClient.SendAsync(resultMessage);
+        //    }
+        //}
 
         //private void FileServer_ImageChunkReceived(TcpFileClientWrap client, FileChunk chunk)
         //{
