@@ -797,8 +797,8 @@
                                 <StackPanel.Resources>
                                     <entities:NotConverter x:Key="not"/>
                                 </StackPanel.Resources>
-                                <TextBox x:Name="TB_CurGroupName" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.GroupChat.Name}" Foreground="{StaticResource GreyBrush}"></TextBox>
-                                <TextBox x:Name="TB_CurGroupDesc" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.GroupChat.Description}" Foreground="{StaticResource DarkGreyBrush}"></TextBox>
+                                <TextBox x:Name="TB_CurGroupName" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.GroupChat.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"></TextBox>
+                                <TextBox x:Name="TB_CurGroupDesc" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.GroupChat.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"></TextBox>
                                 <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick"  Style="{StaticResource BLight}" Height="30" Margin="5">
                                     EDIT
                                 </Button>

@@ -66,9 +66,7 @@ namespace CacheLibrary
         {
             var result = new List<PublicGroupInfo>();
             foreach (var fileName in Directory.GetFiles(Path.Combine(CachePath, DIR_GROUPS), "*.bin"))
-            {
                 result.Add(LoadGroup(Path.GetFileName(fileName)));
-            };
             return result;
         }
         #endregion

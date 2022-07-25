@@ -450,17 +450,18 @@ namespace Telegram
                 else if (msg is GroupUpdateResultMessage)
                 {
                     var result = msg as GroupUpdateResultMessage;
-                    if (result.Result == AuthResult.Success)
+                    var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == result.GroupId);
+                    if (group != null)
                     {
-                        var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == result.GroupId);
-                        if (group != null)
+                        if (result.Result == AuthResult.Success)
                         {
                             group.GroupChat.Name = Buffers.EditGroupSettings[result.GroupId].Key;
                             group.GroupChat.Description = Buffers.EditGroupSettings[result.GroupId].Value;
-                            group.OnPropertyChanged("Name");
-                            group.OnPropertyChanged("Description");
                         }
+                        group.OnPropertyChanged("Name");
+                        group.OnPropertyChanged("Description");
                     }
+
                     Buffers.EditGroupSettings.Remove(result.GroupId);
                 }
                 else if (msg is FirstPersonalResultMessage)
@@ -1098,7 +1099,7 @@ namespace Telegram
                         );
                     Client.SendAsync(new GroupUpdateMessage()
                     {
-                        NewDescription = TB_CurGroupDesc.Text ,
+                        NewDescription = TB_CurGroupDesc.Text,
                         NewName = string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
                         GroupId = CurGroup.GroupChat.Id,
                     });
