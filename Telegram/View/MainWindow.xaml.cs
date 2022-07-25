@@ -1141,9 +1141,10 @@ namespace Telegram
                 NewLogin = TB_NewUserLogin.Text == Me.Login ? null : TB_NewUserLogin.Text,
                 NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) || TB_NewUserDesc.Text == Me.Description ? null : TB_NewUserDesc.Text
             };
-            Me.Name = msg.NewName;
-            Me.Description = msg.NewDescription;
-            Me.Login = msg.NewLogin;
+            Me.Name = msg.NewName ?? Me.Name;
+            Me.Description = TB_NewUserDesc.Text == Me.Description ? Me.Description :
+                (string.IsNullOrEmpty(TB_NewUserDesc.Text) ? null : TB_NewUserDesc.Text);
+            Me.Login = msg.NewLogin ?? Me.Login;
             Client.SendAsync(msg);
             HideMenus(null, null);
         }
