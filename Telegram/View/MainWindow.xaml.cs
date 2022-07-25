@@ -312,6 +312,18 @@ namespace Telegram
                 //        Client.SendAsync(new DataRequestMessage(md.Id, DataRequestType.ImageData));
                 //    }
                 //}
+                else if(msg is UserUpdateMessage)
+                {
+                    var upd = msg as UserUpdateMessage;
+                    var user = CachedUsers.FirstOrDefault(u => u.User.Id == upd.UserId);
+                    if(user != null)
+                    {
+                        user.User.Name = upd.NewName;
+                        user.User.Login = upd.NewLogin;
+                        user.User.Description = upd.NewDescription;
+                        user.OnPropertyChanged("User");
+                    }
+                }
                 else if (msg is ChatLookupResultMessage)
                 {
                     var result = msg as ChatLookupResultMessage;

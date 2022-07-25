@@ -423,7 +423,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <ContentControl Grid.Column="0">
+                            <ContentControl Grid.Column="0"  Margin="5">
                                 <ContentControl.Style>
                                     <Style TargetType="ContentControl">
                                         <Style.Resources>

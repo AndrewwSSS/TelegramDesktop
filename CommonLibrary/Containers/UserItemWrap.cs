@@ -10,10 +10,19 @@ namespace CommonLibrary.Containers
     public class UserItemWrap : INotifyPropertyChanged
     {
         private ObservableCollection<ImageContainer> images = new ObservableCollection<ImageContainer>();
-        public PublicUserInfo User { get; set; }
+        private PublicUserInfo user;
 
-        public ObservableCollection<ImageContainer> Images 
-        { 
+        public PublicUserInfo User
+        {
+            get => user;
+            set {
+                user = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<ImageContainer> Images
+        {
             get => images;
             set
             {
