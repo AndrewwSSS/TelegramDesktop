@@ -324,6 +324,10 @@ namespace Telegram
                         user.OnPropertyChanged("User");
                     }
                 }
+                else if(msg is UserUpdateResultMessage)
+                {
+                    var result = msg as UserUpdateResultMessage;
+                }
                 else if (msg is ChatLookupResultMessage)
                 {
                     var result = msg as ChatLookupResultMessage;
@@ -1137,10 +1141,11 @@ namespace Telegram
                 NewLogin = TB_NewUserLogin.Text,
                 NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) ? null : TB_NewUserDesc.Text
             };
-            Client.SendAsync(msg);
             Me.Name = msg.NewName;
             Me.Description = msg.NewDescription;
             Me.Login = msg.NewLogin;
+            Client.SendAsync(msg);
+            HideMenus(null, null);
         }
 
         private void B_EditUserInfo_Click(object sender, RoutedEventArgs e)

@@ -7,9 +7,9 @@ namespace CommonLibrary.Messages.Users
     [Serializable]
     public class UserUpdateResultMessage : Message
     {
-        public AuthResult result { get; set; }
+        public AuthResult Result { get; set; }
 
-        public UserUpdateResultMessage(AuthResult res) => result = res;
+        public UserUpdateResultMessage(AuthResult res) => Result = res;
 
         public UserUpdateResultMessage() { }
     }
