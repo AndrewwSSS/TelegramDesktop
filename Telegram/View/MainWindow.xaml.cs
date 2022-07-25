@@ -76,8 +76,9 @@ namespace Telegram
             }
         }
         public const int LeftMenuWidth = 290;
-        public MenuState RighMenuState { get; set; }
+        public MenuState RightMenuState { get; set; }
         public MenuState LeftMenuState { get; set; }
+        public MenuState EditUserMenuState { get; set; }
         public MenuState AddGroupMenuState { get; set; }
 
         public static DoubleAnimation MakeDoubleAnim(double value, double seconds) => new DoubleAnimation(value, new Duration(TimeSpan.FromSeconds(seconds)));
@@ -143,13 +144,15 @@ namespace Telegram
 
             DataContext = this;
             Me = me;
-            InitializeComponent();
-            HideRightMenu();
             if (!CachedUsers.Any(wrap => wrap.User.Id == me.Id))
                 CachedUsers.Add(new UserItemWrap(me));
+            InitializeComponent();
+            HideRightMenu();
 
-            RighMenuState = MenuState.Hidden;
+            RightMenuState = MenuState.Hidden;
             LeftMenuState = MenuState.Hidden;
+            AddGroupMenuState = MenuState.Hidden;
+            EditUserMenuState = MenuState.Hidden;
 
             OpenLeftMenuAnim.From = new Thickness(-LeftMenuWidth, 0, 0, 0);
             OpenLeftMenuAnim.To = new Thickness(0, 0, 0, 0);
@@ -684,7 +687,7 @@ namespace Telegram
 
         private void ShowOrOpenRightMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (RighMenuState == MenuState.Open)
+            if (RightMenuState == MenuState.Open)
                 HideRightMenu();
             else
                 OpenRightMenu();
@@ -698,7 +701,7 @@ namespace Telegram
             RightMenu.Visibility = Visibility.Collapsed;
 
 
-            RighMenuState = MenuState.Hidden;
+            RightMenuState = MenuState.Hidden;
         }
 
         public void OpenRightMenu()
@@ -706,7 +709,7 @@ namespace Telegram
             this.Width += 280;
             //Spliter.Visibility = Visibility.Visible;
             RightMenu.Visibility = Visibility.Visible;
-            RighMenuState = MenuState.Open;
+            RightMenuState = MenuState.Open;
         }
 
         private void TopPanel_MouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
@@ -728,7 +731,7 @@ namespace Telegram
         private void MainContent_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (MainContent.MinWidth == e.NewSize.Width)
-                if (RighMenuState != MenuState.Hidden)
+                if (RightMenuState != MenuState.Hidden)
                     HideRightMenu();
         }
 
@@ -739,36 +742,37 @@ namespace Telegram
             LeftMenuState = MenuState.Open;
         }
 
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ConsequentFadeAway(UIElement elem, UIElement bg)
         {
-            LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftMenuAnim);
-            MainGrid.BeginAnimation(Border.OpacityProperty, MainGridDarkReverse);
+            var fadeAway = MakeDoubleAnim(0, 0.1);
+            fadeAway.Completed += (v1, v2) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    bg.BeginAnimation(OpacityProperty, MainGridDarkReverse);
+                    elem.Visibility = Visibility.Hidden;
+                });
+            };
+            elem.BeginAnimation(OpacityProperty, fadeAway);
         }
 
         private void HideMenus(object sender, MouseButtonEventArgs e)
         {
             if (LeftMenuState == MenuState.Open)
             {
-                LeftMenu.BeginAnimation(Border.MarginProperty, CloseLeftMenuAnim);
-                MainGrid.BeginAnimation(Border.OpacityProperty, MainGridDarkReverse);
+                LeftMenu.BeginAnimation(MarginProperty, CloseLeftMenuAnim);
+                MainGrid.BeginAnimation(OpacityProperty, MainGridDarkReverse);
                 LeftMenuState = MenuState.Hidden;
+            }
+            if (EditUserMenuState == MenuState.Open)
+            {
+                EditUserMenuState = MenuState.Hidden;
+                ConsequentFadeAway(EditUserMenu, MainGrid);
             }
             if (AddGroupMenuState == MenuState.Open)
             {
-
-                var fadeAway = MakeDoubleAnim(0, 0.1);
-                fadeAway.Completed += (v1, v2) =>
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        MainGrid.BeginAnimation(OpacityProperty, MainGridDarkReverse);
-                        AddGroupMenu.Visibility = Visibility.Hidden;
-                    });
-                };
                 AddGroupMenuState = MenuState.Hidden;
-                AddGroupMenu.BeginAnimation(OpacityProperty, fadeAway);
-
+                ConsequentFadeAway(EditUserMenu, MainGrid);
             }
         }
 
@@ -1106,6 +1110,37 @@ namespace Telegram
                 }
                 EditingGroup = !EditingGroup;
             });
+        }
+
+        private void TB_NewUserInfo_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            B_FinishUserEdit.IsEnabled = !string.IsNullOrEmpty(TB_NewUserLogin.Text) && !string.IsNullOrEmpty(TB_NewUserName.Text);
+        }
+
+        private void B_FinishUserEdit_Click(object sender, RoutedEventArgs e)
+        {
+            var msg = new UserUpdateMessage()
+            {
+                NewName = TB_NewUserName.Text,
+                NewLogin = TB_NewUserLogin.Text,
+                NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) ? null : TB_NewUserDesc.Text
+            };
+            Client.SendAsync(msg);
+            Me.Name = msg.NewName;
+            Me.Description = msg.NewDescription;
+            Me.Login = msg.NewLogin;
+        }
+
+        private void B_EditUserInfo_Click(object sender, RoutedEventArgs e)
+        {
+            HideMenus(null, null);
+            EditUserMenuState = MenuState.Open;
+            EditUserMenu.Visibility = Visibility.Visible;
+            MainGrid.BeginAnimation(OpacityProperty, MainGridDark);
+            TB_NewUserLogin.Text = Me.Login;
+            TB_NewUserName.Text = Me.Name;
+            TB_NewUserDesc.Text = Me.Description;
+            EditUserMenu.BeginAnimation(OpacityProperty, MakeDoubleAnim(1, 0.1));
         }
     }
 

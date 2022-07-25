@@ -847,6 +847,10 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Background="#1E0096">
+                        <Button x:Name="B_EditUserInfo" Click="B_EditUserInfo_Click" Margin="5" Width="40" FontWeight="Bold" Style="{StaticResource BLight}"
+                                HorizontalAlignment="Left" VerticalAlignment="Top">
+                            EDIT
+                        </Button>
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}&#x0d;&#x0a;{2}#{1}">
@@ -927,6 +931,30 @@
                         <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Описание группы</TextBlock>
                         <TextBox x:Name="TB_NewGroupDesc" Width="250" Style="{StaticResource TBInput}"/>
                         <Button x:Name="AddGroupButton" IsEnabled="False" Margin="4,0" Style="{StaticResource BLight}" Height="50" Click="B_AddGroup_OnClick">Создать группу</Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+        <Grid Grid.RowSpan="2">
+            <Border x:Name="EditUserMenu"
+                    Visibility="Hidden"
+                    CornerRadius="5"
+                    Background="{StaticResource BgBrush}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Margin="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Имя пользователя</TextBlock>
+                        <TextBox x:Name="TB_NewUserName" Width="250" Style="{StaticResource TBInput}"
+                                 TextChanged="TB_NewUserInfo_TextChanged"/>
+                        <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Логин</TextBlock>
+                        <TextBox x:Name="TB_NewUserLogin" TextChanged="TB_NewUserInfo_TextChanged" Width="250" Style="{StaticResource TBInput}"/>
+                        <TextBlock Margin="4,0,0,0" Foreground="{StaticResource GreyBrush}">Описание профиля</TextBlock>
+                        <TextBox x:Name="TB_NewUserDesc" Width="250" Style="{StaticResource TBInput}"/>
+                        <Button x:Name="B_FinishUserEdit" IsEnabled="False" Margin="4,0" Style="{StaticResource BLight}" Height="50" Click="B_FinishUserEdit_Click">Сохранить</Button>
                     </StackPanel>
                 </Grid>
             </Border>
