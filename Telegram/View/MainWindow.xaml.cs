@@ -784,7 +784,7 @@ namespace Telegram
             if (AddGroupMenuState == MenuState.Open)
             {
                 AddGroupMenuState = MenuState.Hidden;
-                ConsequentFadeAway(EditUserMenu, MainGrid);
+                ConsequentFadeAway(AddGroupMenu, MainGrid);
             }
         }
 
