@@ -702,7 +702,7 @@
                                  Background="#282E33"
                                  TextAlignment="Left"
                                  VerticalAlignment="Center"
-                                 FontSize="20"
+                                 Padding="3"
                                  Foreground="White"
                                  BorderThickness="0"
                                      x:Name="TB_Message"
