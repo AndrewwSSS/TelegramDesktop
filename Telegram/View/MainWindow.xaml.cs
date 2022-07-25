@@ -312,11 +312,11 @@ namespace Telegram
                 //        Client.SendAsync(new DataRequestMessage(md.Id, DataRequestType.ImageData));
                 //    }
                 //}
-                else if(msg is UserUpdateMessage)
+                else if (msg is UserUpdateMessage)
                 {
                     var upd = msg as UserUpdateMessage;
                     var user = CachedUsers.FirstOrDefault(u => u.User.Id == upd.UserId);
-                    if(user != null)
+                    if (user != null)
                     {
                         user.User.Name = upd.NewName;
                         user.User.Login = upd.NewLogin;
@@ -324,7 +324,7 @@ namespace Telegram
                         user.OnPropertyChanged("User");
                     }
                 }
-                else if(msg is UserUpdateResultMessage)
+                else if (msg is UserUpdateResultMessage)
                 {
                     var result = msg as UserUpdateResultMessage;
                 }
@@ -1137,9 +1137,9 @@ namespace Telegram
         {
             var msg = new UserUpdateMessage()
             {
-                NewName = TB_NewUserName.Text,
-                NewLogin = TB_NewUserLogin.Text,
-                NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) ? null : TB_NewUserDesc.Text
+                NewName = TB_NewUserName.Text == Me.Name ? null : TB_NewUserName.Text,
+                NewLogin = TB_NewUserLogin.Text == Me.Login ? null : TB_NewUserLogin.Text,
+                NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) || TB_NewUserDesc.Text == Me.Description ? null : TB_NewUserDesc.Text
             };
             Me.Name = msg.NewName;
             Me.Description = msg.NewDescription;
