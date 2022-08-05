@@ -1187,6 +1187,8 @@ namespace Telegram
             Me.Description = TB_NewUserDesc.Text == Me.Description ? Me.Description :
                 (string.IsNullOrEmpty(TB_NewUserDesc.Text) ? null : TB_NewUserDesc.Text);
             Me.Login = msg.NewLogin ?? Me.Login;
+            OnPropertyChanged("Me");
+            MeWrap.OnPropertyChanged("User");
             Client.SendAsync(msg);
             HideMenus(null, null);
         }
