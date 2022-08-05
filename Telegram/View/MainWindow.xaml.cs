@@ -446,8 +446,9 @@ namespace Telegram
                 else if (msg is ChatMessage)
                 {
                     var chatMsg = msg as ChatMessage;
-                    var group = Groups.First(g => g.GroupChat.Id == chatMsg.GroupId);
-
+                    var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == chatMsg.GroupId);
+                    if (group == null)
+                        return;
                     if (group.GroupChat.Messages == null)
                         group.GroupChat.Messages = new List<ChatMessage>();
                     group.GroupChat.Messages.Add(chatMsg);
