@@ -345,7 +345,6 @@ namespace Telegram
                     var result = msg as UserUpdateResultMessage;
                     if (result.Result == AuthResult.Success)
                     {
-                        
                         Me.Login = result.NewLogin ?? Me.Login;
                         Me.Description = result.NewDescription ?? Me.Description;
                         Me.Name = result.NewName ?? Me.Name;
@@ -496,6 +495,7 @@ namespace Telegram
                             group.Members.Remove(user);
                             if (user.User.Id == Me.Id)
                             {
+                                group.Joined = false;
                                 Groups.Remove(group);
                                 FoundGroups.Remove(group);
                             }
@@ -572,41 +572,41 @@ namespace Telegram
                     Groups.First(g => g.GroupChat.Id == msgDel.GroupId).Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
                     Messages.Remove(Messages.First(m => m.Message.Id == msgDel.DeletedMessageId));
                 }
-                else if (msg is MetadataResultMessage)
-                {
-                    var result = msg as MetadataResultMessage;
-                    foreach (var pair in result.Files)
-                    {
-                        var file = PendingFiles[pair.Key];
-                        PendingFiles.Remove(pair.Key);
-                        file.Id = pair.Value;
-                        CachedFilesMetadata.Add(file);
-                    }
-                    foreach (var pair in result.Images)
-                    {
-                        var img = PendingImages[pair.Key];
-                        PendingImages.Remove(pair.Key);
-                        CachedImages[pair.Value] = img;
-                    }
-                    MessageToGroupMessage msgToGroup = PendingMsgWithAttachments[result.LocalMessageId];
-                    msgToGroup.FilesId = result.Files.Select(p => p.Value).ToList();
-                    msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
-                    PendingMsgWithAttachments.Remove(result.LocalMessageId);
+                //else if (msg is MetadataResultMessage)
+                //{
+                //    var result = msg as MetadataResultMessage;
+                //    foreach (var pair in result.Files)
+                //    {
+                //        var file = PendingFiles[pair.Key];
+                //        PendingFiles.Remove(pair.Key);
+                //        file.Id = pair.Value;
+                //        CachedFilesMetadata.Add(file);
+                //    }
+                //    foreach (var pair in result.Images)
+                //    {
+                //        var img = PendingImages[pair.Key];
+                //        PendingImages.Remove(pair.Key);
+                //        CachedImages[pair.Value] = img;
+                //    }
+                //    MessageToGroupMessage msgToGroup = PendingMsgWithAttachments[result.LocalMessageId];
+                //    msgToGroup.FilesId = result.Files.Select(p => p.Value).ToList();
+                //    msgToGroup.ImagesId = result.Images.Select(p => p.Value).ToList();
+                //    PendingMsgWithAttachments.Remove(result.LocalMessageId);
 
 
-                    Client.SendAsync(msgToGroup);
+                //    Client.SendAsync(msgToGroup);
 
-                    var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msgToGroup.Message.GroupId);
-                    if (group != null)
-                    {
-                        group.GroupChat.Messages.Add(msgToGroup.Message);
-                        group.OnPropertyChanged("Messages");
-                        group.OnPropertyChanged("LastMessage");
+                //    var group = Groups.FirstOrDefault(g => g.GroupChat.Id == msgToGroup.Message.GroupId);
+                //    if (group != null)
+                //    {
+                //        group.GroupChat.Messages.Add(msgToGroup.Message);
+                //        group.OnPropertyChanged("Messages");
+                //        group.OnPropertyChanged("LastMessage");
 
-                        if (CurGroup == group)
-                            AddMessageToUI(msgToGroup.Message);
-                    }
-                }
+                //        if (CurGroup == group)
+                //            AddMessageToUI(msgToGroup.Message);
+                //    }
+                //}
                 else if (msg is UserActionResultMessage)
                 {
                     var result = msg as UserActionResultMessage;
