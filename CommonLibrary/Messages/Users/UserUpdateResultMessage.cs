@@ -8,6 +8,9 @@ namespace CommonLibrary.Messages.Users
     public class UserUpdateResultMessage : Message
     {
         public AuthResult Result { get; set; }
+        public string NewDescription { get; set; }
+        public string NewName { get; set; }
+        public string NewLogin { get; set; }
 
         public UserUpdateResultMessage(AuthResult res) => Result = res;
 

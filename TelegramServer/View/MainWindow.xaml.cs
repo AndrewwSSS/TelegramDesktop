@@ -63,8 +63,8 @@ namespace TelegramServer
             Server.Stopped += OnServerStopped;
             Server.MessageReceived += ClientMessageRecived;
 
-            FileServer.UserSynchronized += UserSynchronized;
-            FileServer.FileChunkReceived += FileServer_FileChunkReceived;
+            //FileServer.UserSynchronized += UserSynchronized;
+            //FileServer.FileChunkReceived += FileServer_FileChunkReceived;
             //FileServer.ImageChunkReceived += FileServer_ImageChunkReceived;
 
             LB_UsersOffline.ItemsSource = UsersOffline;
@@ -146,13 +146,13 @@ namespace TelegramServer
 
         }
 
-        private void UserSynchronized(TcpFileClientWrap client)
-        {
-            User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
-            UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
+        //private void UserSynchronized(TcpFileClientWrap client)
+        //{
+        //    User sender = DbTelegram.Users.FirstOrDefault(u => client.UserId == u.Id);
+        //    UserClient senderClient = sender.Clients.FirstOrDefault(c => c.Guid == client.Guid);
 
-            FileClientsOnline[senderClient] = client;
-        }
+        //    FileClientsOnline[senderClient] = client;
+        //}
 
         #endregion ServerEvents
 

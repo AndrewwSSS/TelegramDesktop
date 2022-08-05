@@ -22,7 +22,7 @@ namespace TelegramServer
     {
         private void ClientMessageRecived(TcpClientWrap client, Message msg)
         {
-            //DEBUG
+            //DEBUG     
             Console.WriteLine($"Message recieved. Type {msg.GetType().Name}");
 
             switch (msg.GetType().Name)
@@ -611,15 +611,12 @@ namespace TelegramServer
                             = DbTelegram.GroupChats.FirstOrDefault(gc => gc.Id == leaveFromGroup.GroupId);
 
 
-                        if (group != null)
-                        {
+                        if (group != null) {
 
                             group.Members.Remove(sender);
                             lock (DbTelegram) {
                                 DbTelegram.SaveChanges();
                             }
-
-
 
                             GroupUpdateMessage groupUpdate = new GroupUpdateMessage()
                             {
@@ -735,19 +732,16 @@ namespace TelegramServer
                                 DbTelegram.SaveChanges();
                             }
 
-                            client.SendAsync(new UserUpdateResultMessage(AuthResult.Success));
+                            client.SendAsync(new UserUpdateResultMessage(AuthResult.Success)
+                            {
+                                NewDescription = userUpdateMessage.NewDescription,
+                                NewName = userUpdateMessage.NewName,
+                                NewLogin = userUpdateMessage.NewLogin
+                            });
 
-                            var MembersCollections = sender.Chats.Select(c => c.Members);
-                            List<User> members = new List<User>();
-
-                            foreach (var memberCollection in MembersCollections)
-                                foreach (var member in memberCollection)
-                                    members.Add(member);
-
-                            var usersToSend = members.Distinct().ToList();
-
+   
                             userUpdateMessage.UserId = sender.Id;
-                            SendMessageToUsers(userUpdateMessage, sender.Id, senderClient.Id, usersToSend);
+                            SendMessageToUsers(userUpdateMessage, sender.Id, senderClient.Id, sender.UniqueRelations);
                         }
                                          
                         break;
