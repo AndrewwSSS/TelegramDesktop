@@ -348,6 +348,7 @@ namespace Telegram
                         Me.Login = result.NewLogin;
                         Me.Description = result.NewDescription;
                         OnPropertyChanged("Me");
+                        MeWrap.OnPropertyChanged("User");
                     }
 
                 }
