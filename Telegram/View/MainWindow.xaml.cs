@@ -96,8 +96,6 @@ namespace Telegram
         private bool editingGroup = false;
 
         public PublicUserInfo Me { get; set; }
-        public static PublicUserInfo ivan { get; set; } = new PublicUserInfo(-2, "ivandovg", "Ivan Dovgolutsky", "");
-
         public ObservableCollection<MessageItemWrap> Messages
         {
             get => messages;
@@ -327,6 +325,7 @@ namespace Telegram
                 else if (msg is UserUpdateResultMessage)
                 {
                     var result = msg as UserUpdateResultMessage;
+                    
                 }
                 else if (msg is ChatLookupResultMessage)
                 {
