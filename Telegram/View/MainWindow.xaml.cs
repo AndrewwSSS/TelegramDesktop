@@ -96,7 +96,6 @@ namespace Telegram
         private bool editingGroup = false;
 
         public UserItemWrap MeWrap { get; set; }
-        public PublicUserInfo Me { get; set; }
         public ObservableCollection<MessageItemWrap> Messages
         {
             get => messages;
@@ -142,7 +141,6 @@ namespace Telegram
             CloseLeftMenuAnim.EasingFunction = new CubicEase();
 
             DataContext = this;
-            Me = me;
             MeWrap = CachedUsers.FirstOrDefault(wrap => wrap.User.Id == me.Id);
             if (MeWrap == null)
             {
@@ -169,7 +167,7 @@ namespace Telegram
 
 
             Messages = new ObservableCollection<MessageItemWrap>();
-            //FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, Me.Id, App.MyGuid);
+            //FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, MeWrap.User.Id, App.MyGuid);
             //FileClient.Connected += FileClient_Connected;
             //FileClient.FileChunkReceived += FileClient_FileChunkReceived; ;
             //FileClient.ImageChunkReceived += FileClient_ImageChunkReceived; ;
@@ -238,12 +236,12 @@ namespace Telegram
                         var info = new PublicGroupInfo(pair.Key, pair.Value, result.GroupId)
                         {
                             GroupType = GroupType.Public, 
-                            MembersId = new List<int>() { Me.Id },
+                            MembersId = new List<int>() { MeWrap.User.Id },
                             AdministratorsId = new List<int> { }
                         };
                         var newGroup = new GroupItemWrap(info)
                         {
-                            Members = new ObservableCollection<UserItemWrap> { CachedUsers.First(u => u.User.Id == Me.Id) }
+                            Members = new ObservableCollection<UserItemWrap> { CachedUsers.First(u => u.User.Id == MeWrap.User.Id) }
                         };
 
                         Groups.Add(newGroup);
@@ -345,10 +343,10 @@ namespace Telegram
                     var result = msg as UserUpdateResultMessage;
                     if (result.Result == AuthResult.Success)
                     {
-                        Me.Login = result.NewLogin ?? Me.Login;
-                        Me.Description = result.NewDescription ?? Me.Description;
-                        Me.Name = result.NewName ?? Me.Name;
-                        OnPropertyChanged("Me");
+                        MeWrap.User.Login = result.NewLogin ?? MeWrap.User.Login;
+                        MeWrap.User.Description = result.NewDescription ?? MeWrap.User.Description;
+                        MeWrap.User.Name = result.NewName ?? MeWrap.User.Name;
+                        OnPropertyChanged("MeWrap.User");
                         MeWrap.OnPropertyChanged("User");
                     }
 
@@ -369,7 +367,7 @@ namespace Telegram
                                     new PublicGroupInfo(user.User.Name, user.User.Description, -1)
                                     {
                                         GroupType = GroupType.Personal,
-                                        MembersId = new List<int> { Me.Id, user.User.Id }
+                                        MembersId = new List<int> { MeWrap.User.Id, user.User.Id }
                                     }
                                     )
                             {
@@ -383,7 +381,7 @@ namespace Telegram
                             TemporaryUserGroups.Add(App.UserGroupLocalIdCounter++, new GroupItemWrap(new PublicGroupInfo()
                             {
                                 Id = -1,
-                                MembersId = new List<int> { Me.Id, userId }
+                                MembersId = new List<int> { MeWrap.User.Id, userId }
                             }));
                             Client.SendAsync(new DataRequestMessage(userId, DataRequestType.User));
                         }
@@ -493,7 +491,7 @@ namespace Telegram
                         if (user != null)
                         {
                             group.Members.Remove(user);
-                            if (user.User.Id == Me.Id)
+                            if (user.User.Id == MeWrap.User.Id)
                             {
                                 group.Joined = false;
                                 Groups.Remove(group);
@@ -649,7 +647,7 @@ namespace Telegram
             else
                 item.ShowUsername = true;
 
-            if (item.Message.FromUserId == Me.Id)
+            if (item.Message.FromUserId == MeWrap.User.Id)
                 item.ShowUsername = false;
             item.ShowAvatar = true;
             {
@@ -865,7 +863,7 @@ namespace Telegram
                     App.GroupLocalIdCounter,
                     new KeyValuePair<string, string>(TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text)
                     );
-                var msg = new CreateGroupMessage(App.GroupLocalIdCounter++, TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text, Me.Id);
+                var msg = new CreateGroupMessage(App.GroupLocalIdCounter++, TB_NewGroupName.Text, string.IsNullOrEmpty(TB_NewGroupDesc.Text) ? null : TB_NewGroupDesc.Text, MeWrap.User.Id);
                 TB_NewGroupName.Text = "";
                 Client.SendAsync(msg);
             });
@@ -957,12 +955,12 @@ namespace Telegram
                 if (CurGroup != null && e.Key == Key.Enter && !String.IsNullOrEmpty(textBox.Text))
                 {
                     ChatMessage msg = new ChatMessage(textBox.Text)
-                    .SetFrom(Me)
+                    .SetFrom(MeWrap.User)
                     .SetGroupId(CurGroup.GroupChat.Id);
 
                     if (RespondingTo != null)
                         msg.SetRespondingTo(RespondingTo.Message);
-                    if (msg.FromUserId == Me.Id)
+                    if (msg.FromUserId == MeWrap.User.Id)
                         if (!PendingMessages.ContainsKey(App.MessageLocalIdCounter))
                             PendingMessages.Add(App.MessageLocalIdCounter, msg);
 
@@ -970,7 +968,7 @@ namespace Telegram
                     {
                         FirstPersonalMessage fpMsg
                         = new FirstPersonalMessage(msg,
-                        CurGroup.GroupChat.MembersId.First(m => m != Me.Id),
+                        CurGroup.GroupChat.MembersId.First(m => m != MeWrap.User.Id),
                         TemporaryUserGroups.First(p => p.Value == CurGroup).Key);
                         Client.SendAsync(fpMsg);
                     }
@@ -1084,7 +1082,7 @@ namespace Telegram
         {
             var menuItem = (MenuItem)sender;
             var msg = (MessageItemWrap)menuItem.DataContext;
-            Client.SendAsync(new ChatMessageDeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, Me.Id));
+            Client.SendAsync(new ChatMessageDeleteMessage(msg.Message.Id, CurGroup.GroupChat.Id, MeWrap.User.Id));
         }
 
 
@@ -1181,9 +1179,9 @@ namespace Telegram
         {
             var msg = new UserUpdateMessage()
             {
-                NewName = TB_NewUserName.Text == Me.Name ? null : TB_NewUserName.Text,
-                NewLogin = TB_NewUserLogin.Text == Me.Login ? null : TB_NewUserLogin.Text,
-                NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) || TB_NewUserDesc.Text == Me.Description ? null : TB_NewUserDesc.Text
+                NewName = TB_NewUserName.Text == MeWrap.User.Name ? null : TB_NewUserName.Text,
+                NewLogin = TB_NewUserLogin.Text == MeWrap.User.Login ? null : TB_NewUserLogin.Text,
+                NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) || TB_NewUserDesc.Text == MeWrap.User.Description ? null : TB_NewUserDesc.Text
             };
             Client.SendAsync(msg);
             HideMenus(null, null);
@@ -1195,9 +1193,9 @@ namespace Telegram
             EditUserMenuState = MenuState.Open;
             EditUserMenu.Visibility = Visibility.Visible;
             MainGrid.BeginAnimation(OpacityProperty, MainGridDark);
-            TB_NewUserLogin.Text = Me.Login;
-            TB_NewUserName.Text = Me.Name;
-            TB_NewUserDesc.Text = Me.Description;
+            TB_NewUserLogin.Text = MeWrap.User.Login;
+            TB_NewUserName.Text = MeWrap.User.Name;
+            TB_NewUserDesc.Text = MeWrap.User.Description;
             EditUserMenu.BeginAnimation(OpacityProperty, MakeDoubleAnim(1, 0.1));
         }
     }

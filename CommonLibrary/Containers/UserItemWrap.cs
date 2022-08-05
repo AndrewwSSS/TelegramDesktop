@@ -21,6 +21,8 @@ namespace CommonLibrary.Containers
             }
         }
 
+        public string Name => user.Name;
+
         public ObservableCollection<ImageContainer> Images
         {
             get => images;

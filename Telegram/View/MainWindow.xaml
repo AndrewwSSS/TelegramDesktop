@@ -863,9 +863,9 @@
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}&#x0d;&#x0a;{2}#{1}">
-                                    <Binding Path="Me.Name" />
-                                    <Binding Path="Me.Id" />
-                                    <Binding Path="Me.Login" />
+                                    <Binding Path="MeWrap.User.Name" />
+                                    <Binding Path="MeWrap.User.Id" />
+                                    <Binding Path="MeWrap.User.Login" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
