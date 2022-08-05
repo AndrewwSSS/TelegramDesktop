@@ -506,6 +506,7 @@ namespace Telegram
                     var result = msg as FirstPersonalResultMessage;
                     var group = TemporaryUserGroups[result.LocalId];
                     group.GroupChat.Id = result.GroupId;
+                    group.Members.Add(MeWrap);
                     TemporaryUserGroups.Remove(result.LocalId);
                     Groups.Add(group);
                     ShowGroupMessages(CurGroup);
