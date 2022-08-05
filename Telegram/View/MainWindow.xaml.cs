@@ -273,7 +273,8 @@ namespace Telegram
                                 {
                                     group.GroupChat.Name = user.User.Name;
                                     group.GroupChat.Description = user.User.Description;
-                                    group.OnPropertyChanged("GroupChat");
+                                    group.OnPropertyChanged("Name");
+                                    group.OnPropertyChanged("Description");
                                     //group.Images = user.Images;
                                 }
                             }
@@ -289,7 +290,8 @@ namespace Telegram
                                 group.Members.Add(user);
                                 group.GroupChat.Name = user.User.Name;
                                 group.GroupChat.Description = user.User.Description;
-                                group.OnPropertyChanged("GroupChat");
+                                group.OnPropertyChanged("Name");
+                                group.OnPropertyChanged("Description");
                                 //group.Images = user.Images;
                                 if (LB_FoundGroups.Visibility == Visibility.Hidden)
                                     Groups.Add(group);
