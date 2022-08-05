@@ -345,8 +345,10 @@ namespace Telegram
                     var result = msg as UserUpdateResultMessage;
                     if (result.Result == AuthResult.Success)
                     {
-                        Me.Login = result.NewLogin;
-                        Me.Description = result.NewDescription;
+                        
+                        Me.Login = result.NewLogin ?? Me.Login;
+                        Me.Description = result.NewDescription ?? Me.Description;
+                        Me.Name = result.NewName ?? Me.Name;
                         OnPropertyChanged("Me");
                         MeWrap.OnPropertyChanged("User");
                     }
@@ -1183,12 +1185,6 @@ namespace Telegram
                 NewLogin = TB_NewUserLogin.Text == Me.Login ? null : TB_NewUserLogin.Text,
                 NewDescription = string.IsNullOrEmpty(TB_NewUserDesc.Text) || TB_NewUserDesc.Text == Me.Description ? null : TB_NewUserDesc.Text
             };
-            Me.Name = msg.NewName ?? Me.Name;
-            Me.Description = TB_NewUserDesc.Text == Me.Description ? Me.Description :
-                (string.IsNullOrEmpty(TB_NewUserDesc.Text) ? null : TB_NewUserDesc.Text);
-            Me.Login = msg.NewLogin ?? Me.Login;
-            OnPropertyChanged("Me");
-            MeWrap.OnPropertyChanged("User");
             Client.SendAsync(msg);
             HideMenus(null, null);
         }
