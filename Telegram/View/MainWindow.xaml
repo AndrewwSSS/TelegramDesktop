@@ -798,7 +798,7 @@
                                 </StackPanel.Resources>
                                 <TextBox x:Name="TB_CurGroupName" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.GroupChat.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"></TextBox>
                                 <TextBox x:Name="TB_CurGroupDesc" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.GroupChat.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"></TextBox>
-                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick"  Style="{StaticResource BLight}" Height="30" Margin="5">
+                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick" Style="{StaticResource BLight}" Height="30" Margin="5">
                                     EDIT
                                 </Button>
                             </StackPanel>
@@ -822,7 +822,7 @@
                                             <DataTrigger Binding="{Binding CurGroup.Joined}" Value="False">
                                                 <Setter Property="Visibility" Value="Hidden" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding CurGroup.Group.GroupType}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
+                                            <DataTrigger Binding="{Binding CurGroup.GroupChat.GroupType}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
                                                 <Setter Property="Visibility" Value="Hidden" />
                                             </DataTrigger>
                                         </Style.Triggers>

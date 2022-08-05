@@ -396,6 +396,7 @@
             <BooleanToVisibilityConverter x:Key="boolToVis"/>
         </Style.Resources>
         <Style.Setters>
+            <Setter Property="Padding" Value="0" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
             <Setter Property="Visibility" Value="{Binding HasItems, 
                                           RelativeSource={RelativeSource Self}, 
@@ -431,6 +432,7 @@
 
                                         </Style.Resources>
                                         <Style.Setters>
+                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate>
