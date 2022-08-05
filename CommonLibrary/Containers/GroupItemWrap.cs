@@ -57,9 +57,9 @@ namespace CommonLibrary.Containers
         private void Members_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems.Count > 0)
-                foreach (var item in (IList<UserItemWrap>)e.NewItems)
-                    if (!GroupChat.MembersId.Contains(item.User.Id))
-                        GroupChat.MembersId.Add(item.User.Id);
+                foreach (var item in e.NewItems)
+                    if (!GroupChat.MembersId.Contains((item as UserItemWrap).User.Id))
+                        GroupChat.MembersId.Add((item as UserItemWrap).User.Id);
         }
 
         [field: NonSerialized]
