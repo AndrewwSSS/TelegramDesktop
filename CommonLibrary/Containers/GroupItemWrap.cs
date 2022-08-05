@@ -48,7 +48,19 @@ namespace CommonLibrary.Containers
         public string Name => GroupChat.Name;
         public string Description => GroupChat.Description;
 
-        public GroupItemWrap(PublicGroupInfo group) => GroupChat = group;
+        public GroupItemWrap(PublicGroupInfo group)
+        {
+            GroupChat = group;
+            Members.CollectionChanged += Members_CollectionChanged;
+        }
+
+        private void Members_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems.Count > 0)
+                foreach (var item in (List<UserItemWrap>)e.NewItems)
+                    if (!GroupChat.MembersId.Contains(item.User.Id))
+                        GroupChat.MembersId.Add(item.User.Id);
+        }
 
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
