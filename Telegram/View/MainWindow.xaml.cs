@@ -146,7 +146,7 @@ namespace Telegram
             MeWrap = CachedUsers.FirstOrDefault(wrap => wrap.User.Id == me.Id);
             if (MeWrap == null)
             {
-                MeWrap = new UserItemWrap(me);
+                MeWrap = MeWrap;
                 CachedUsers.Add(MeWrap);
             } 
                 InitializeComponent();
@@ -327,6 +327,15 @@ namespace Telegram
                         user.User.Login = upd.NewLogin;
                         user.User.Description = upd.NewDescription;
                         user.OnPropertyChanged("User");
+
+                        var userGroup = CachedGroups.FirstOrDefault(g => g.GroupChat.MembersId.Contains(user.User.Id) && g.GroupChat.GroupType == GroupType.Personal);
+                        if(userGroup != null)
+                        {
+                            userGroup.GroupChat.Name = user.User.Name;
+                            userGroup.GroupChat.Description = user.User.Description;
+                            userGroup.OnPropertyChanged("Name");
+                            userGroup.OnPropertyChanged("Description");
+                        }
                     }
                 }
                 else if (msg is UserUpdateResultMessage)
@@ -336,7 +345,7 @@ namespace Telegram
                     {
                         Me.Login = result.NewLogin;
                         Me.Description = result.NewDescription;
-                        MeWrap.OnPropertyChanged("User");
+                        OnPropertyChanged("Me");
                     }
                     
                 }
@@ -428,7 +437,7 @@ namespace Telegram
                     {
                         var group = CachedGroups.Find(g => g.GroupChat.Id == result.GroupId);
                         Groups.Add(group);
-                        group.Members.Add(new UserItemWrap(Me));
+                        group.Members.Add(MeWrap);
                         group.Joined = true;
                     }
                 }

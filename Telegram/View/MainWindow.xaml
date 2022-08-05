@@ -796,10 +796,20 @@
                                 <StackPanel.Resources>
                                     <entities:NotConverter x:Key="not"/>
                                 </StackPanel.Resources>
-                                <TextBox x:Name="TB_CurGroupName" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.GroupChat.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"></TextBox>
-                                <TextBox x:Name="TB_CurGroupDesc" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.GroupChat.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"></TextBox>
-                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick" Style="{StaticResource BLight}" Height="30" Margin="5">
+                                <TextBox x:Name="TB_CurGroupName" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.GroupChat.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"/>
+                                <TextBox x:Name="TB_CurGroupDesc" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.GroupChat.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"/>
+
+                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick"  Height="30" Margin="5">
                                     EDIT
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource BLight}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CurGroup.GroupChat.Type}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
+                                                    <Setter Property="Visibility" Value="Hidden" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
                                 </Button>
                             </StackPanel>
                             <StackPanel Grid.Row="1">
