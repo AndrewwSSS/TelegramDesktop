@@ -114,7 +114,7 @@ namespace Telegram
                 null,
                 null)
         { }
-        
+
         TcpFileClientWrap FileClient { get; set; }
 
         public UICommand MsgFileClick { get; set; }
@@ -149,7 +149,7 @@ namespace Telegram
                 MeWrap = new UserItemWrap(me);
                 CachedUsers.Add(MeWrap);
             }
-            
+
             InitializeComponent();
             HideRightMenu();
 
@@ -330,7 +330,7 @@ namespace Telegram
                         user.OnPropertyChanged("User");
 
                         var userGroup = CachedGroups.FirstOrDefault(g => g.GroupChat.MembersId.Contains(user.User.Id) && g.GroupChat.GroupType == GroupType.Personal);
-                        if(userGroup != null)
+                        if (userGroup != null)
                         {
                             userGroup.GroupChat.Name = user.User.Name;
                             userGroup.GroupChat.Description = user.User.Description;
@@ -342,13 +342,13 @@ namespace Telegram
                 else if (msg is UserUpdateResultMessage)
                 {
                     var result = msg as UserUpdateResultMessage;
-                    if(result.Result == AuthResult.Success)
+                    if (result.Result == AuthResult.Success)
                     {
                         Me.Login = result.NewLogin;
                         Me.Description = result.NewDescription;
                         OnPropertyChanged("Me");
                     }
-                    
+
                 }
                 else if (msg is ChatLookupResultMessage)
                 {
@@ -463,11 +463,16 @@ namespace Telegram
                     if (group == null)
                         return;
                     if (!string.IsNullOrEmpty(info.NewName))
-                        group.GroupChat.Name= info.NewName;
-
+                    {
+                        group.GroupChat.Name = info.NewName;
+                        group.OnPropertyChanged("Name");
+                    }
                     if (!string.IsNullOrEmpty(info.NewDescription))
+                    {
                         group.GroupChat.Description = info.NewDescription;
-                    
+                        group.OnPropertyChanged("Description");
+                    }
+
                     if (info.NewUserId != -1)
                     {
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);

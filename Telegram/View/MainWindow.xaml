@@ -804,7 +804,7 @@
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource BLight}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding CurGroup.GroupChat.Type}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
+                                                <DataTrigger Binding="{Binding CurGroup.GroupChat.GroupType}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
                                                     <Setter Property="Visibility" Value="Hidden" />
                                                 </DataTrigger>
                                             </Style.Triggers>
