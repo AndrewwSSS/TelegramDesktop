@@ -826,9 +826,6 @@
                                 <Button.Style>
                                     <Style BasedOn="{StaticResource BLight}"  TargetType="Button">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=LB_FoundGroups, Path=Visibility}" Value="Visible">
-                                                <Setter Property="Visibility" Value="Hidden" />
-                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding CurGroup.Joined}" Value="False">
                                                 <Setter Property="Visibility" Value="Hidden" />
                                             </DataTrigger>
