@@ -95,6 +95,7 @@ namespace Telegram
         private MessageItemWrap respondingTo;
         private bool editingGroup = false;
 
+        public UserItemWrap MeWrap { get; set; }
         public PublicUserInfo Me { get; set; }
         public ObservableCollection<MessageItemWrap> Messages
         {
@@ -113,7 +114,7 @@ namespace Telegram
                 null,
                 null)
         { }
-
+        
         TcpFileClientWrap FileClient { get; set; }
 
         public UICommand MsgFileClick { get; set; }
@@ -142,9 +143,13 @@ namespace Telegram
 
             DataContext = this;
             Me = me;
-            if (!CachedUsers.Any(wrap => wrap.User.Id == me.Id))
-                CachedUsers.Add(new UserItemWrap(me));
-            InitializeComponent();
+            MeWrap = CachedUsers.FirstOrDefault(wrap => wrap.User.Id == me.Id);
+            if (MeWrap == null)
+            {
+                MeWrap = new UserItemWrap(me);
+                CachedUsers.Add(MeWrap);
+            } 
+                InitializeComponent();
             HideRightMenu();
 
             RightMenuState = MenuState.Hidden;
@@ -268,7 +273,7 @@ namespace Telegram
                                 {
                                     group.GroupChat.Name = user.User.Name;
                                     group.GroupChat.Description = user.User.Description;
-                                    group.Images = user.Images;
+                                    //group.Images = user.Images;
                                 }
                             }
 
@@ -283,7 +288,7 @@ namespace Telegram
                                 group.Members.Add(user);
                                 group.GroupChat.Name = user.User.Name;
                                 group.GroupChat.Description = user.User.Description;
-                                group.Images = user.Images;
+                                //group.Images = user.Images;
                                 if (LB_FoundGroups.Visibility == Visibility.Hidden)
                                     Groups.Add(group);
                                 else
@@ -325,6 +330,12 @@ namespace Telegram
                 else if (msg is UserUpdateResultMessage)
                 {
                     var result = msg as UserUpdateResultMessage;
+                    if(result.Result == AuthResult.Success)
+                    {
+                        Me.Login = result.NewLogin;
+                        Me.Description = result.NewDescription;
+                        MeWrap.OnPropertyChanged("User");
+                    }
                     
                 }
                 else if (msg is ChatLookupResultMessage)
