@@ -452,6 +452,12 @@ namespace Telegram
                     var group = CachedGroups.FirstOrDefault(g => g.GroupChat.Id == info.GroupId);
                     if (group == null)
                         return;
+                    if (!string.IsNullOrEmpty(info.NewName))
+                        group.GroupChat.Name= info.NewName;
+
+                    if (!string.IsNullOrEmpty(info.NewDescription))
+                        group.GroupChat.Description = info.NewDescription;
+                    
                     if (info.NewUserId != -1)
                     {
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
