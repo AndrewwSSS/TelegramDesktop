@@ -40,7 +40,7 @@ namespace CommonLibrary.Messages.Groups
             get
             {
                 if (Type == GroupType.Personal)
-                    return Members.ElementAt(0).Login + " - " + Members.ElementAt(0).Login;
+                    return Members.ElementAt(0).Login + " - " + Members.ElementAt(1).Login;
                 else
                     return Name;
             }
