@@ -475,7 +475,7 @@
                                 </ContentControl.Style>
                             </ContentControl>
                             <StackPanel Margin="0, 5" Grid.Column="1">
-                                <TextBlock Text="{Binding GroupChat.Name}" Foreground="{StaticResource GreyBrush}" FontSize="12"/>
+                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource GreyBrush}" FontSize="12"/>
                                 <TextBlock Name="T_LastMsg" TextTrimming="CharacterEllipsis" Foreground="{StaticResource DarkGreyBrush}" FontSize="12" Text="Нет новых сообщений"/>
                             </StackPanel>
 
