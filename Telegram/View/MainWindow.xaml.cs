@@ -474,8 +474,8 @@ namespace Telegram
                     {
                         if (result.Result == AuthResult.Success)
                         {
-                            group.GroupChat.Name = Buffers.EditGroupSettings[result.GroupId].Key;
-                            group.GroupChat.Description = Buffers.EditGroupSettings[result.GroupId].Value;
+                            group.GroupChat.Name = Buffers.EditGroupSettings[result.GroupId].Key ?? group.GroupChat.Name;
+                            group.GroupChat.Description = Buffers.EditGroupSettings[result.GroupId].Value ?? group.GroupChat.Description;
                         }
                         group.OnPropertyChanged("Name");
                         group.OnPropertyChanged("Description");
@@ -1111,16 +1111,22 @@ namespace Telegram
                         MessageBox.Show("Группу нельзя переименовать в пустую.");
                         return;
                     }
+
                     Buffers.EditGroupSettings.Add(
                         CurGroup.GroupChat.Id,
                         new KeyValuePair<string, string>(
-                            TB_CurGroupDesc.Text,
-                            string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text)
+                            string.IsNullOrEmpty(TB_CurGroupName.Text) ||
+                            TB_CurGroupName.Text == CurGroup.GroupChat.Name ? null : TB_CurGroupName.Text,
+                            TB_CurGroupDesc.Text == CurGroup.GroupChat.Description ? null : TB_CurGroupDesc.Text)
                         );
+
                     Client.SendAsync(new GroupUpdateMessage()
                     {
-                        NewDescription = TB_CurGroupDesc.Text,
-                        NewName = string.IsNullOrEmpty(TB_CurGroupName.Text) ? null : TB_CurGroupName.Text,
+                        NewDescription =
+                        TB_CurGroupDesc.Text == CurGroup.GroupChat.Description ? null : TB_CurGroupDesc.Text,
+                        NewName =
+                         string.IsNullOrEmpty(TB_CurGroupName.Text) ||
+                         TB_CurGroupName.Text == CurGroup.GroupChat.Name ? null : TB_CurGroupName.Text,
                         GroupId = CurGroup.GroupChat.Id,
                     });
                 }
