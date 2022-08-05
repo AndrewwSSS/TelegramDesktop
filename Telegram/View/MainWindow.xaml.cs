@@ -237,6 +237,7 @@ namespace Telegram
                         var pair = Buffers.NewGroupSettings[result.GroupLocalId];
                         var info = new PublicGroupInfo(pair.Key, pair.Value, result.GroupId)
                         {
+                            GroupType = GroupType.Public, 
                             MembersId = new List<int>() { Me.Id },
                             AdministratorsId = new List<int> { }
                         };
