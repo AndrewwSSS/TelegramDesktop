@@ -146,10 +146,11 @@ namespace Telegram
             MeWrap = CachedUsers.FirstOrDefault(wrap => wrap.User.Id == me.Id);
             if (MeWrap == null)
             {
-                MeWrap = MeWrap;
+                MeWrap = new UserItemWrap(me);
                 CachedUsers.Add(MeWrap);
-            } 
-                InitializeComponent();
+            }
+            
+            InitializeComponent();
             HideRightMenu();
 
             RightMenuState = MenuState.Hidden;
