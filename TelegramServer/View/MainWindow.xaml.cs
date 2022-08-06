@@ -135,14 +135,22 @@ namespace TelegramServer
 
             if (!isOnline)
             {
-                 SendMessageToUsers(new UserUpdateMessage()
-                 {
-                     OnlineStatus = false,
-                     UserId = disconnectedUser.Id
-                 },
-                 disconnectedUser.Id,
-                 disconnectedClient.Id,
-                 disconnectedUser.UniqueRelations);
+                UserUpdateMessage msg = new UserUpdateMessage()
+                {
+                    OnlineStatus = false,
+                    UserId = disconnectedUser.Id
+                };
+
+                foreach(var user in disconnectedUser.UniqueRelations.Where(u => u.Id != disconnectedUser.Id))
+                {
+                    foreach (var userClient in user.Clients)
+                    {
+                        if (isClientOnline(userClient))
+                            TcpClientByUserClient(userClient).SendAsync(msg);
+                    }
+                }
+
+                 
             }
           
 
@@ -220,7 +228,6 @@ namespace TelegramServer
                             {
                                 DbTelegram.SaveChanges();
                             }
-                         
                         }
                 }
                 else {
