@@ -193,7 +193,7 @@ namespace Telegram
             //    }
             //}));
 
-            Client.SendAsync();
+            Client.SendAsync(new SystemMessage(SystemMessageType.GetOfflineMessages));
             
             SaveCache();
         }

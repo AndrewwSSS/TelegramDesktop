@@ -157,27 +157,14 @@ namespace TelegramServer
 
                         if (sender != null)
                         {
-                            UserClient userClient = sender.Clients.FirstOrDefault(c => c.MachineName == fastLoginMessage.MachineName);
+                            UserClient senderClient = sender.Clients.FirstOrDefault(c => c.MachineName == fastLoginMessage.MachineName);
 
-                            if (userClient != null && userClient.Guid == fastLoginMessage.Guid)
+                            if (senderClient != null && senderClient.Guid == fastLoginMessage.Guid)
                             {
                                 client.SendAsync(new FastLoginResultMessage(AuthResult.Success));
                                 client.Disconnected += OnClientDisconnected;
-                                ClientsOnline[client] = userClient;
+                                ClientsOnline[client] = senderClient;
 
-
-                                if (userClient.MessagesToSend.Count > 0)
-                                {
-                                    onMessagesSent = (cl, message) =>
-                                    {
-                                        userClient.MessagesToSend.Clear();
-                                        client.MessageSent -= onMessagesSent;
-                                    };
-
-                                    client.MessageSent += onMessagesSent;
-                                    client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
-
-                                }
 
 
 
@@ -189,28 +176,18 @@ namespace TelegramServer
                             }
                             else
                             {
-                                userClient = sender.Clients.FirstOrDefault(c => c.Guid == fastLoginMessage.Guid);
+                                senderClient = sender.Clients.FirstOrDefault(c => c.Guid == fastLoginMessage.Guid);
 
-                                if (userClient != null)
+                                if (senderClient != null)
                                 {
                                     //tmp
-                                    userClient.MachineName = fastLoginMessage.MachineName;
+                                    senderClient.MachineName = fastLoginMessage.MachineName;
                                     client.SendAsync(new FastLoginResultMessage(AuthResult.Success));
                                     client.Disconnected += OnClientDisconnected;
-                                    ClientsOnline[client] = userClient;
+                                    ClientsOnline[client] = senderClient;
 
 
-                                    if (userClient.MessagesToSend.Count > 0)
-                                    {
-                                        onMessagesSent = (cl, message) =>
-                                        {
-                                            userClient.MessagesToSend.Clear();
-                                            client.MessageSent -= onMessagesSent;
-                                        };
-
-                                        client.SendAsync(new ArrayMessage<BaseMessage>(userClient.MessagesToSend));
-                                        client.MessageSent += onMessagesSent;
-                                    }
+                                   
 
                                     Dispatcher.Invoke(() =>
                                     {
@@ -594,6 +571,22 @@ namespace TelegramServer
                                     sender.Clients.Remove(senderClient);
                                     break;
                                 }
+                            case SystemMessageType.GetOfflineMessages:
+                                {
+                                    ClientMessageEventHandler onMessagesSent = null;
+                                    if (senderClient.MessagesToSend.Count > 0)
+                                    {
+                                        onMessagesSent = (cl, message) =>
+                                        {
+                                            senderClient.MessagesToSend.Clear();
+                                            client.MessageSent -= onMessagesSent;
+                                        };
+
+                                        client.SendAsync(new ArrayMessage<BaseMessage>(senderClient.MessagesToSend));
+                                        client.MessageSent += onMessagesSent;
+                                    }
+                                    break;
+                                }
                         }
 
 
@@ -801,6 +794,7 @@ namespace TelegramServer
                         }
                         break;
                     }
+                
 
 
 
