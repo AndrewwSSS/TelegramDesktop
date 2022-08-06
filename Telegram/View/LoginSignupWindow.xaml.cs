@@ -46,7 +46,7 @@ namespace Telegram.View
                 client.MessageReceived += Client_MessageReceived;
                 if (!string.IsNullOrEmpty(App.MyGuid))
                 {
-                    myId = CacheManager.Instance.LoadUserId();
+                    myId = CacheManager.Instance.LoadMyUserId();
                     if (myId != -1)
                         client.SendAsync(new FastLoginMessage(Environment.MachineName, App.MyGuid, myId));
                 }

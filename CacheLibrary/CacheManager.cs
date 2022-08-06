@@ -13,6 +13,22 @@ namespace CacheLibrary
 {
     public class CacheManager
     {
+        [Serializable]
+        public class CachedGroupInfo : PublicGroupInfo
+        {
+            public int AssociatedUserId { get; set; }
+
+            public CachedGroupInfo(int associatedUserId, PublicGroupInfo info)
+            {
+                AssociatedUserId = associatedUserId;
+                Id = info.Id;
+                GroupType = info.GroupType;
+                AdministratorsId = info.AdministratorsId;
+                MembersId = info.MembersId;
+                Messages = info.Messages;
+            }
+        }
+
 
         private static CacheManager instance;
         public static CacheManager Instance => instance ?? (instance = new CacheManager()); 
@@ -55,16 +71,19 @@ namespace CacheLibrary
         #endregion
 
         #region Groups
-        public void SaveGroup(PublicGroupInfo group) => Save(Path.Combine(DIR_GROUPS, $"{group.Id}.bin"), group);
+        public void SaveGroup(GroupItemWrap group)
+        {
+            Save(Path.Combine(DIR_GROUPS, $"{group.GroupChat.Id}.bin"), new CachedGroupInfo(group.AssociatedUserId, group.GroupChat));
+        }
         public UserItemWrap LoadGroup(int id)
         {
             var fileName = Path.Combine(DIR_GROUPS, $"{id}.bin");
             return Load<UserItemWrap>(fileName);
         }
-        private PublicGroupInfo LoadGroup(string path) => Load<PublicGroupInfo>(Path.Combine(DIR_GROUPS, path));
-        public List<PublicGroupInfo> LoadAllGroups()
+        private CachedGroupInfo LoadGroup(string path) => Load<CachedGroupInfo>(Path.Combine(DIR_GROUPS, path));
+        public List<CachedGroupInfo> LoadAllGroups()
         {
-            var result = new List<PublicGroupInfo>();
+            var result = new List<CachedGroupInfo>();
             foreach (var fileName in Directory.GetFiles(Path.Combine(CachePath, DIR_GROUPS), "*.bin"))
                 result.Add(LoadGroup(Path.GetFileName(fileName)));
             return result;
@@ -114,7 +133,7 @@ namespace CacheLibrary
             using (StreamWriter writer = new StreamWriter(Path.Combine(CachePath, DIR_LOGIN, "user_id.txt")))
                 writer.Write(id);
         }
-        public int LoadUserId()
+        public int LoadMyUserId()
         {
             int result = -1;
             if (!File.Exists(Path.Combine(CachePath, DIR_LOGIN, "user_id.txt")))

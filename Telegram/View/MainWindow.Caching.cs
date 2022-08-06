@@ -22,7 +22,7 @@ namespace Telegram
         
         private void LoadUsers() => CachedUsers.AddRange(CacheManager.Instance.LoadAllUsers());
         private void LoadGroups() {
-            List<PublicGroupInfo> list = CacheManager.Instance.LoadAllGroups();
+            List<CacheManager.CachedGroupInfo> list = CacheManager.Instance.LoadAllGroups();
             foreach(var info in list)
             {
                 GroupItemWrap item = new GroupItemWrap(info);
@@ -32,6 +32,7 @@ namespace Telegram
                     if (user != null)
                         item.Members.Add(user);
                 }
+                item.AssociatedUserId = info.AssociatedUserId;
                 Groups.Add(item);
                 CachedGroups.Add(item);
             }
@@ -45,8 +46,8 @@ namespace Telegram
         {
             foreach (var user in CachedUsers)
                 CacheManager.Instance.SaveUser(user);
-            foreach (var group in Groups)
-                CacheManager.Instance.SaveGroup(group.GroupChat);
+            foreach (var group in CachedGroups)
+                CacheManager.Instance.SaveGroup(group);
         }
     }
 }
