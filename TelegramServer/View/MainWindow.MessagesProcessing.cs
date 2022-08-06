@@ -521,10 +521,7 @@ namespace TelegramServer
                                     }
 
                                     client.SendAsync(new DataRequestResultMessage<KeyValuePair<int, bool>>(UsersOnlineStatus));
-
-                                
-                                    
-                           
+                         
                                     break;
                                 }
                         }
