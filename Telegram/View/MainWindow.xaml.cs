@@ -422,18 +422,18 @@ namespace Telegram
                         }
                     }
                 }
-                else if (msg is MetadataSyncMessage)
-                {
-                    var syncMsg = msg as MetadataSyncMessage;
-                    var md = PendingMetadata[syncMsg.LocalReturnId];
-                    PendingMetadata.Remove(syncMsg.LocalReturnId);
-                    if (md.FilesLocalId != null)
-                        for (int i = 0; i < md.FilesLocalId.Count; i++)
-                            FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i]);
-                    if (md.ImagesLocalId != null)
-                        for (int i = 0; i < md.ImagesLocalId.Count; i++)
-                            FileClient.SendFileAsync(md.ImagesName[i], md.FilesLocalId[i], true);
-                }
+                //else if (msg is MetadataSyncMessage)
+                //{
+                //    var syncMsg = msg as MetadataSyncMessage;
+                //    var md = PendingMetadata[syncMsg.LocalReturnId];
+                //    PendingMetadata.Remove(syncMsg.LocalReturnId);
+                //    if (md.FilesLocalId != null)
+                //        for (int i = 0; i < md.FilesLocalId.Count; i++)
+                //            FileClient.SendFileAsync(md.FilesName[i], md.FilesLocalId[i]);
+                //    if (md.ImagesLocalId != null)
+                //        for (int i = 0; i < md.ImagesLocalId.Count; i++)
+                //            FileClient.SendFileAsync(md.ImagesName[i], md.FilesLocalId[i], true);
+                //}
                 else if (msg is GroupJoinResultMessage)
                 {
                     var result = msg as GroupJoinResultMessage;
@@ -528,6 +528,7 @@ namespace Telegram
                     group.GroupChat.Id = result.GroupId;
                     group.Members.Add(MeWrap);
                     TemporaryUserGroups.Remove(result.LocalId);
+                    CachedGroups.Add(group);
                     Groups.Add(group);
                     ShowGroupMessages(CurGroup);
                 }
@@ -535,8 +536,6 @@ namespace Telegram
                 {
                     var personalChatCreated = msg as PersonalChatCreatedMessage;
                     GroupItemWrap newGroup = new GroupItemWrap(personalChatCreated.Group);
-
-                    CachedGroups.Add(newGroup);
 
                     foreach (var userId in personalChatCreated.Group.MembersId)
                     {
@@ -547,6 +546,7 @@ namespace Telegram
                         else
                             newGroup.Members.Add(user);
                     }
+                    CachedGroups.Add(newGroup);
                     Groups.Add(newGroup);
                 }
                 else if (msg is ChatMessageSendResult)
@@ -979,72 +979,72 @@ namespace Telegram
                     {
                         MessageToGroupMessage msgToGroup = new MessageToGroupMessage(msg, App.MessageLocalIdCounter++);
                         // отправляем файлы
-                        if (
-                            (MsgFiles.ContainsKey(CurGroup) &&
-                            MsgFiles[CurGroup].Count != 0)
-                            ||
-                            (MsgImages.ContainsKey(CurGroup) &&
-                            MsgImages[CurGroup].Count != 0))
-                        {
-                            List<FileMetadata> fileMdList = null;
-                            MsgFiles.TryGetValue(CurGroup, out fileMdList);
-                            if (fileMdList == null)
-                                fileMdList = new List<FileMetadata>();
+                        //if (
+                        //    (MsgFiles.ContainsKey(CurGroup) &&
+                        //    MsgFiles[CurGroup].Count != 0)
+                        //    ||
+                        //    (MsgImages.ContainsKey(CurGroup) &&
+                        //    MsgImages[CurGroup].Count != 0))
+                        //{
+                        //    List<FileMetadata> fileMdList = null;
+                        //    MsgFiles.TryGetValue(CurGroup, out fileMdList);
+                        //    if (fileMdList == null)
+                        //        fileMdList = new List<FileMetadata>();
 
-                            List<ImageMetadata> imgMdList = null;
-                            MsgImages.TryGetValue(CurGroup, out imgMdList);
-                            if (imgMdList == null)
-                                imgMdList = new List<ImageMetadata>();
+                        //    List<ImageMetadata> imgMdList = null;
+                        //    MsgImages.TryGetValue(CurGroup, out imgMdList);
+                        //    if (imgMdList == null)
+                        //        imgMdList = new List<ImageMetadata>();
 
-                            PendingMsgWithAttachments.Add(msgToGroup.LocalMessageId, msgToGroup);
-                            List<int> filesLocalId = new List<int>();
-                            List<int> imagesLocalId = new List<int>();
-                            var mdMsg = new MetadataMessage(
-                                    msgToGroup.LocalMessageId,
-                                    App.MessageLocalIdCounter++,
-                                    files:
-                                    fileMdList?.Select(
-                                        file =>
-                                        {
-                                            PendingFiles.Add(App.MetadataLocalIdCounter, file);
-                                            filesLocalId.Add(App.MetadataLocalIdCounter);
-                                            return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
-                                        }
-                                        ),
-                                    images:
-                                    imgMdList?.Select(
-                                        img =>
-                                        {
-                                            PendingImages.Add(App.MetadataLocalIdCounter, img.Name);
-                                            imagesLocalId.Add(App.MetadataLocalIdCounter);
-                                            return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
-                                        }
-                                        )
-                                    );
+                        //    PendingMsgWithAttachments.Add(msgToGroup.LocalMessageId, msgToGroup);
+                        //    List<int> filesLocalId = new List<int>();
+                        //    List<int> imagesLocalId = new List<int>();
+                        //    var mdMsg = new MetadataMessage(
+                        //            msgToGroup.LocalMessageId,
+                        //            App.MessageLocalIdCounter++,
+                        //            files:
+                        //            fileMdList?.Select(
+                        //                file =>
+                        //                {
+                        //                    PendingFiles.Add(App.MetadataLocalIdCounter, file);
+                        //                    filesLocalId.Add(App.MetadataLocalIdCounter);
+                        //                    return new KeyValuePair<int, FileMetadata>(App.MetadataLocalIdCounter++, file);
+                        //                }
+                        //                ),
+                        //            images:
+                        //            imgMdList?.Select(
+                        //                img =>
+                        //                {
+                        //                    PendingImages.Add(App.MetadataLocalIdCounter, img.Name);
+                        //                    imagesLocalId.Add(App.MetadataLocalIdCounter);
+                        //                    return new KeyValuePair<int, ImageMetadata>(App.MetadataLocalIdCounter++, img);
+                        //                }
+                        //                )
+                        //            );
 
-                            var state = new MetadataState();
-                            if (imgMdList != null)
-                            {
-                                state.ImagesName = new List<string>(imgMdList.Select(img => img.Name));
-                                state.ImagesLocalId = imagesLocalId;
-                            }
-                            if (fileMdList != null)
-                            {
-                                state.FilesName = new List<string>(fileMdList.Select(file =>
-                                {
-                                    string result = file.Name;
-                                    file.Name = Path.GetFileName(file.Name);
-                                    return result;
-                                }));
-                                state.FilesLocalId = filesLocalId;
-                            }
-                            PendingMetadata[mdMsg.LocalReturnId] = state;
+                        //    var state = new MetadataState();
+                        //    if (imgMdList != null)
+                        //    {
+                        //        state.ImagesName = new List<string>(imgMdList.Select(img => img.Name));
+                        //        state.ImagesLocalId = imagesLocalId;
+                        //    }
+                        //    if (fileMdList != null)
+                        //    {
+                        //        state.FilesName = new List<string>(fileMdList.Select(file =>
+                        //        {
+                        //            string result = file.Name;
+                        //            file.Name = Path.GetFileName(file.Name);
+                        //            return result;
+                        //        }));
+                        //        state.FilesLocalId = filesLocalId;
+                        //    }
+                        //    PendingMetadata[mdMsg.LocalReturnId] = state;
 
-                            Client.SendAsync(mdMsg);
-                            Dispatcher.Invoke(ResetMessageForm);
-                            return;
-                        }
-                        else
+                        //    Client.SendAsync(mdMsg);
+                        //    Dispatcher.Invoke(ResetMessageForm);
+                        //    return;
+                        //}
+                        //else
                             Client.SendAsync(msgToGroup);
                     }
 
