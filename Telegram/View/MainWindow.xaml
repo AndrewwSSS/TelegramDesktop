@@ -583,10 +583,10 @@
                                                 <Grid Margin="9">
                                                     <Grid.RowDefinitions>
                                                         <!--Имя пользователя, от которого переслано сообщение(может не быть)-->
-                                                        <RowDefinition Name="resend" Height="Auto"></RowDefinition>
+                                                        <RowDefinition Name="resend" Height="Auto"/>
                                                         <!--Имя пользователя, пославшего сообщение(может не быть)-->
-                                                        <RowDefinition Name="author" Height="0"></RowDefinition>
-                                                        <RowDefinition Name="response" Height="Auto"></RowDefinition>
+                                                        <RowDefinition Name="author"/>
+                                                        <RowDefinition Name="response" Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Name="files" Height="Auto"/>
                                                         <RowDefinition Name="img" Height="Auto"/>
@@ -626,11 +626,7 @@
                                                         </StackPanel>
                                                     </Grid>
                                                     <StackPanel Grid.Column="1" Grid.Row="3">
-
                                                         <TextBlock FontSize="13" Foreground="{StaticResource GreyBrush}" TextWrapping="Wrap" Text="{Binding Message.Text}"></TextBlock>
-
-
-
                                                     </StackPanel>
                                                     <ItemsControl
                                                              Margin="0, 5"

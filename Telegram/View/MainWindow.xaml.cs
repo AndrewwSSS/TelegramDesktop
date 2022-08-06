@@ -544,6 +544,7 @@ namespace Telegram
                     var group = TemporaryUserGroups[result.LocalId];
                     group.GroupChat.Id = result.GroupId;
                     group.Members.Add(MeWrap);
+                    group.AssociatedUserId = group.GroupChat.MembersId.First(id => id != MeWrap.User.Id);
                     TemporaryUserGroups.Remove(result.LocalId);
                     CachedGroups.Add(group);
                     Groups.Add(group);
