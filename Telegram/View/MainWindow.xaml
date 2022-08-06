@@ -387,20 +387,64 @@
                                 <ColumnDefinition  Width="200"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Margin="10 4 4 4" Orientation="Vertical" Grid.Column="0">
-
-                                <TextBlock 
+                            <Grid Margin="10 4 4 4" Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="0">
+                                        <RowDefinition.Style>
+                                            <Style TargetType="RowDefinition">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CurGroup.IsUserOnline}" Value="{x:Null}">
+                                                        <Setter Property="Height" Value="Auto"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </RowDefinition.Style>
+                                    </RowDefinition>
+                                    <RowDefinition Height="Auto">
+                                        <RowDefinition.Style>
+                                            <Style TargetType="RowDefinition">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CurGroup.IsUserOnline}" Value="{x:Null}">
+                                                        <Setter Property="Height" Value="0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </RowDefinition.Style>
+                                    </RowDefinition>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0"
                                            FontSize="14"
                                            Foreground="{StaticResource GreyBrush}"
                                            x:Name="T_CurGroupName"
                                            Text="{Binding CurGroup.Name}"/>
 
-                                <TextBlock 
+                                <TextBlock Grid.Row="1"
                                            Foreground="{StaticResource DarkGreyBrush}"
                                            x:Name="T_CurGroupBottomInfo"
                                            Text="{Binding CurGroup.Members.Count, StringFormat={}{0} участников}"/>
 
-                            </StackPanel>
+
+                                <TextBlock Grid.Row="1"
+                                           x:Name="T_CurGroupUserStatus">
+                                    <TextBlock.Style>
+
+                                        <Style TargetType="TextBlock">
+                                            <Style.Setters>
+                                                <Setter Property="Foreground" Value="IndianRed" />
+                                                <Setter Property="Text" Value="Не в сети" />
+                                            </Style.Setters>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CurGroup.IsUserOnline}" Value="True">
+                                                    <Setter Property="Text" Value="В сети" />
+                                                    <Setter Property="Foreground" Value="LightGreen" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                            </Grid>
 
                             <UniformGrid Grid.Column="2" Columns="4">
 

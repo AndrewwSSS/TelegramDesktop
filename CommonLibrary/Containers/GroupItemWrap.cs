@@ -17,6 +17,8 @@ namespace CommonLibrary.Containers
     {
         private PublicGroupInfo group;
         private bool joined = true;
+        private int associatedUserId = -1;
+        private bool? isUserOnline;
 
         public ObservableCollection<UserItemWrap> Members { get; set; } = new ObservableCollection<UserItemWrap>();
         public ObservableCollection<UserItemWrap> Admins { get; set; } = new ObservableCollection<UserItemWrap>();
@@ -31,6 +33,27 @@ namespace CommonLibrary.Containers
             }
         }
 
+        /// <summary>
+        /// Если группа обычная, то это поле становится null
+        /// </summary>
+        public bool? IsUserOnline
+        {
+            get => isUserOnline;
+            set
+            {
+                isUserOnline = value;
+                OnPropertyChanged();
+            }
+        }
+        public int AssociatedUserId
+        {
+            get => associatedUserId;
+            set
+            {
+                associatedUserId = value;
+                OnPropertyChanged();
+            }
+        }
         public bool Joined
         {
             get => joined;
@@ -51,6 +74,9 @@ namespace CommonLibrary.Containers
         public GroupItemWrap(PublicGroupInfo group)
         {
             GroupChat = group;
+            if (GroupChat.GroupType == GroupType.Personal)
+                IsUserOnline = true;
+            else IsUserOnline = null;
             Members.CollectionChanged += Members_CollectionChanged;
         }
 

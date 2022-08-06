@@ -268,7 +268,7 @@ namespace Telegram
                             if (group.GroupChat.MembersId.Contains(user.User.Id))
                             {
                                 group.Members.Add(user);
-                                if (group.GroupChat.GroupType == GroupType.Personal)
+                                if (group.AssociatedUserId == user.User.Id)
                                 {
                                     group.GroupChat.Name = user.User.Name;
                                     group.GroupChat.Description = user.User.Description;
@@ -284,7 +284,7 @@ namespace Telegram
                         foreach (var pair in TemporaryUserGroups)
                         {
                             var group = pair.Value;
-                            if (group.GroupChat.MembersId.Contains(user.User.Id))
+                            if (group.AssociatedUserId == user.User.Id)
                             {
                                 group.Members.Add(user);
                                 group.GroupChat.Name = user.User.Name;
@@ -329,9 +329,10 @@ namespace Telegram
                         user.User.Description = upd.NewDescription;
                         user.OnPropertyChanged("User");
 
-                        var userGroup = CachedGroups.FirstOrDefault(g => g.GroupChat.MembersId.Contains(user.User.Id) && g.GroupChat.GroupType == GroupType.Personal);
+                        var userGroup = CachedGroups.FirstOrDefault(g => g.AssociatedUserId == user.User.Id);
                         if (userGroup != null)
                         {
+                            userGroup.IsUserOnline = upd.OnlineStatus ?? userGroup.IsUserOnline;
                             userGroup.GroupChat.Name = user.User.Name;
                             userGroup.GroupChat.Description = user.User.Description;
                             userGroup.OnPropertyChanged("Name");
@@ -535,7 +536,7 @@ namespace Telegram
                 {
                     var personalChatCreated = msg as PersonalChatCreatedMessage;
                     GroupItemWrap newGroup = new GroupItemWrap(personalChatCreated.Group);
-
+                    newGroup.AssociatedUserId = personalChatCreated.Group.MembersId.First(id => id != MeWrap.User.Id);
                     foreach (var userId in personalChatCreated.Group.MembersId)
                     {
                         UserItemWrap user = CachedUsers.FirstOrDefault(u => u.User.Id == userId);
