@@ -425,7 +425,7 @@
                                            Text="{Binding CurGroup.Members.Count, StringFormat={}{0} участников}"/>
 
 
-                                <TextBlock Grid.Row="1"
+                                <TextBlock Grid.Row="2"
                                            x:Name="T_CurGroupUserStatus">
                                     <TextBlock.Style>
 
