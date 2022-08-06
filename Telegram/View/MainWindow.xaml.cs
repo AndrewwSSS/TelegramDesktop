@@ -110,7 +110,6 @@ namespace Telegram
         public MainWindow() :
             this(
                 new PublicUserInfo(999, "existeddim4", "Дмитрий Осипов", "Description"),
-                null,
                 null)
         { }
 
@@ -118,7 +117,7 @@ namespace Telegram
 
         public UICommand MsgFileClick { get; set; }
 
-        public MainWindow(PublicUserInfo me, TcpClientWrap client, ArrayMessage<BaseMessage> offlineMessages)
+        public MainWindow(PublicUserInfo me, TcpClientWrap client)
         {
             Client = client;
             CacheManager.Instance.CachePath = "Cache\\";
@@ -164,7 +163,7 @@ namespace Telegram
             CloseLeftMenuAnim.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(300);
 
-
+            
 
             Messages = new ObservableCollection<MessageItemWrap>();
             //FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, MeWrap.User.Id, App.MyGuid);
@@ -174,8 +173,6 @@ namespace Telegram
             //FileClient.Disconnected += FileClient_Disconnected;
             //FileClient.ConnectAsync();
 
-            if (offlineMessages != null)
-                Client_MessageReceived(Client, offlineMessages);
 
             Closing += OnClosed;
             //CachedImages.Add(-1, @"G:\VS Repo\Project2\Project2\Textures\rat.png");
@@ -196,6 +193,8 @@ namespace Telegram
             //    }
             //}));
 
+            Client.SendAsync();
+            
             SaveCache();
         }
 
@@ -235,7 +234,7 @@ namespace Telegram
                         var pair = Buffers.NewGroupSettings[result.GroupLocalId];
                         var info = new PublicGroupInfo(pair.Key, pair.Value, result.GroupId)
                         {
-                            GroupType = GroupType.Public, 
+                            GroupType = GroupType.Public,
                             MembersId = new List<int>() { MeWrap.User.Id },
                             AdministratorsId = new List<int> { }
                         };
@@ -571,7 +570,18 @@ namespace Telegram
                 {
                     var msgDel = msg as ChatMessageDeleteMessage;
                     Groups.First(g => g.GroupChat.Id == msgDel.GroupId).Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
-                    Messages.Remove(Messages.First(m => m.Message.Id == msgDel.DeletedMessageId));
+                    var toDel = Messages.First(m => m.Message.Id == msgDel.DeletedMessageId);
+                    if (toDel != null)
+                    {
+                        if (Messages.Count > 1)
+                        {
+                            int index = Messages.IndexOf(toDel);
+                            if (index != Messages.Count - 1 && Messages[index + 1].FromUser.User.Id == toDel.FromUser.User.Id)
+                                Messages[index + 1].ShowUsername = true;
+                            if (index != 0 && Messages[index - 1].FromUser.User.Id == toDel.FromUser.User.Id)
+                                Messages[index - 1].ShowAvatar = true;
+                        }
+                    }
                 }
                 //else if (msg is MetadataResultMessage)
                 //{
@@ -1045,7 +1055,7 @@ namespace Telegram
                         //    return;
                         //}
                         //else
-                            Client.SendAsync(msgToGroup);
+                        Client.SendAsync(msgToGroup);
                     }
 
                     CurGroup.GroupChat.Messages.Add(msg);

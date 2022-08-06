@@ -101,16 +101,12 @@ namespace Telegram.View
                         GoToMainWnd(CacheManager.Instance.LoadUser(myId).User);
                     
                 });
-            }  else if(msg is ArrayMessage<BaseMessage>)
-            {
-                OfflineMessages = msg as ArrayMessage<BaseMessage>;
             }
         }
 
-        ArrayMessage<BaseMessage> OfflineMessages;
         private void GoToMainWnd(PublicUserInfo info)
         {
-            wnd = new MainWindow(info, App.Client, OfflineMessages);
+            wnd = new MainWindow(info, App.Client);
             wnd.Show();
             Close();
         }
