@@ -163,7 +163,7 @@ namespace Telegram
             CloseLeftMenuAnim.To = new Thickness(-LeftMenuWidth, 0, 0, 0);
             CloseLeftMenuAnim.Duration = TimeSpan.FromMilliseconds(300);
 
-            
+
 
             Messages = new ObservableCollection<MessageItemWrap>();
             //FileClient = new TcpFileClientWrap(IPAddress.Parse("26.87.230.148"), 5001, MeWrap.User.Id, App.MyGuid);
@@ -194,7 +194,13 @@ namespace Telegram
             //}));
 
             Client.SendAsync(new SystemMessage(SystemMessageType.GetOfflineMessages));
-            
+            var f = from g in CachedGroups select g.GroupChat.MembersId;
+            f.Aggregate((a, b) =>
+            {
+                a.AddRange(b);
+                return a;
+            });
+            Client.SendAsync(new DataRequestMessage());
             SaveCache();
         }
 
