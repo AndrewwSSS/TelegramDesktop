@@ -25,6 +25,7 @@ namespace CommonLibrary.Messages.Users
         public virtual ICollection<int> BlockedUsersId { get; set; } 
         public virtual ICollection<GroupChat> Chats { get; set; }
         public virtual ICollection<ChatMessage> Messages { get; set; }
+        public virtual ICollection<BaseMessage> MessagesToSend { get; set; }
 
         [NotMapped]
         public DateTime LocalRegistrationDate => RegistrationDate.ToLocalTime();
@@ -48,6 +49,7 @@ namespace CommonLibrary.Messages.Users
             BlockedUsersId = new HashSet<int>();
             Chats = new HashSet<GroupChat>();
             Clients = new HashSet<UserClient>();
+            MessagesToSend = new HashSet<BaseMessage>();
             Banned = false;
             Messages = new HashSet<ChatMessage>();
         }

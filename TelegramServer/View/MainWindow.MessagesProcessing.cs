@@ -65,6 +65,11 @@ namespace TelegramServer
                         break;
 
                     }
+                case "SignUpStage2Message":
+                    {
+
+                        break;
+                    }
                 case "LoginMessage":
                     {
                         LoginMessage loginMessage = (LoginMessage)msg;
@@ -109,38 +114,26 @@ namespace TelegramServer
                             }
 
 
-                            if (senderClient.MessagesToSend.Count != 0)
-                            {
-                                ClientMessageEventHandler onMessagesSent = null;
-                                onMessagesSent = (cl, message) =>
-                                {
-                                    senderClient.MessagesToSend.Clear();
-                                    client.MessageSent -= onMessagesSent;
-                                };
 
-                                client.MessageSent += onMessagesSent;
-                                client.SendAsync(new ArrayMessage<BaseMessage>(senderClient.MessagesToSend));
+                            if(sender.MessagesToSend.Count > 0)
+                            {
+                         
+                                foreach (var messageToSend in sender.MessagesToSend)
+                                    senderClient.MessagesToSend.Add(messageToSend);
+                             
+      
+                                sender.MessagesToSend.Clear();
+
+                                lock(DbTelegram) {
+                                    DbTelegram.SaveChanges();
+                                }
+                              
                             }
 
                             SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = true },
                                                sender.Id,
                                                senderClient.Id,
                                                sender.UniqueRelations);
-
-
-                            //if (sender.MessagesToSend.Count > 0)
-                            //{
-
-                            //    client.SendAsync(new ArrayMessage<BaseMessage>(sender.MessagesToSend));
-
-                            //    ClientMessageHandler OnMessageSent = null;
-                            //    OnMessageSent = (c, m) =>
-                            //    {
-                            //        sender.MessagesToSend.Clear();
-                            //        client.MessageSent -= OnMessageSent;
-                            //    };
-                            //    client.MessageSent += OnMessageSent;
-                            //}
                         }
                         else
                             client.SendAsync(new LoginResultMessage(AuthResult.Denied,
@@ -574,13 +567,17 @@ namespace TelegramServer
                             case SystemMessageType.GetOfflineMessages:
                                 {
                                     ClientMessageEventHandler onMessagesSent = null;
+
+           
                                     if (senderClient.MessagesToSend.Count > 0)
                                     {
                                         onMessagesSent = (cl, message) =>
                                         {
                                             senderClient.MessagesToSend.Clear();
+                                            DbTelegram.SaveChanges();
+
                                             client.MessageSent -= onMessagesSent;
-                                        };
+                                        };  
 
                                         client.SendAsync(new ArrayMessage<BaseMessage>(senderClient.MessagesToSend));
                                         client.MessageSent += onMessagesSent;

@@ -74,22 +74,7 @@ namespace TelegramServer
             foreach (var user in DbTelegram.Users)
                 UsersOffline.Add(user);
 
-            //MailAddress from = new MailAddress("telegramdesktopbyadat@gmail.com");
-            //MailAddress to = new MailAddress("");
 
-
-            //MailMessage message = new MailMessage(from, to);
-            //message.IsBodyHtml = false;
-            //message.Subject = "test";
-            //message.Body = "some code...";
-
-
-            //SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
-            //{
-            //    Credentials = new NetworkCredential("telegramdesktopbyadat@gmail.com", ""),
-            //    EnableSsl = true
-            //};
-            //smtp.Send(message);
 
 
         }
@@ -150,10 +135,14 @@ namespace TelegramServer
 
             if (!isOnline)
             {
-                 SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = false },
-                                               disconnectedUser.Id,
-                                               disconnectedClient.Id,
-                                               disconnectedUser.UniqueRelations);
+                 SendMessageToUsers(new UserUpdateMessage()
+                 {
+                     OnlineStatus = false,
+                     UserId = disconnectedUser.Id
+                 },
+                 disconnectedUser.Id,
+                 disconnectedClient.Id,
+                 disconnectedUser.UniqueRelations);
             }
           
 
@@ -218,9 +207,7 @@ namespace TelegramServer
         #endregion WpfEvents
 
         private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, ICollection<User> usersToSend)
-        {
-            bool changesExist = false;
-           
+        {  
             foreach (var user in usersToSend)
             {
                 if(user.Id == senderId)
@@ -233,37 +220,44 @@ namespace TelegramServer
                             {
                                 DbTelegram.SaveChanges();
                             }
-                            //changesExist = true;
+                         
                         }
                 }
                 else {
-                    foreach (var userClient in user.Clients) {
-                        if (isClientOnline(userClient))
-                            TcpClientByUserClient(userClient).SendAsync(msg);
-                        else {
-                            userClient.MessagesToSend.Add(msg);
-
-                            lock (DbTelegram)       {
-                                DbTelegram.SaveChanges();
-                            }
-
-                            //changesExist = true;
-                      
+                    if (user.Clients.Count == 0)
+                    {
+                        user.MessagesToSend.Add(msg);
+                        lock (DbTelegram) {
+                            DbTelegram.SaveChanges();
                         }
-                            
                     }
+                    else
+                    {
+                        foreach (var userClient in user.Clients) {
+                            if (isClientOnline(userClient))
+                                TcpClientByUserClient(userClient).SendAsync(msg);
+                            else {
+
+                            
+
+                                userClient.MessagesToSend.Add(msg);
+
+                                lock (DbTelegram)       {
+                                    DbTelegram.SaveChanges();
+                                }
+
+                                //changesExist = true;
+                      
+                            }
+                            
+                        }
+                    }
+
+                    
                 }
             }
 
-            //if (changesExist) {
-              
-            //    lock (DbTelegram) {
-            //        DbTelegram.SaveChanges();
-            //    }
-                
-             
 
-            //}
                
         }
 
