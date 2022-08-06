@@ -28,6 +28,11 @@ namespace CommonLibrary.Containers
             set
             {
                 group = value;
+
+                if (GroupChat.GroupType == GroupType.Personal)
+                    IsUserOnline = true;
+                else IsUserOnline = null;
+
                 OnPropertyChanged();
                 OnPropertyChanged("LastMessage");
             }
@@ -74,9 +79,6 @@ namespace CommonLibrary.Containers
         public GroupItemWrap(PublicGroupInfo group)
         {
             GroupChat = group;
-            if (GroupChat.GroupType == GroupType.Personal)
-                IsUserOnline = true;
-            else IsUserOnline = null;
             Members.CollectionChanged += Members_CollectionChanged;
         }
 
