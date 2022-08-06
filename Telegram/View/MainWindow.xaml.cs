@@ -324,9 +324,9 @@ namespace Telegram
                     var user = CachedUsers.FirstOrDefault(u => u.User.Id == upd.UserId);
                     if (user != null)
                     {
-                        user.User.Name = upd.NewName;
-                        user.User.Login = upd.NewLogin;
-                        user.User.Description = upd.NewDescription;
+                        user.User.Name = upd.NewName ?? user.User.Name;
+                        user.User.Login = upd.NewLogin ?? user.User.Login;
+                        user.User.Description = upd.NewDescription ?? user.User.Description;
                         user.OnPropertyChanged("User");
 
                         var userGroup = CachedGroups.FirstOrDefault(g => g.AssociatedUserId == user.User.Id);
