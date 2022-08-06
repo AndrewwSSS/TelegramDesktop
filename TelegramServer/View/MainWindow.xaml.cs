@@ -132,16 +132,31 @@ namespace TelegramServer
                 FileClientsOnline.Remove(disconnectedClient);
             });
 
-        
 
-            SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = false },
-                                disconnectedUser.Id,
-                                disconnectedClient.Id,
-                                disconnectedUser.UniqueRelations);
-
-            lock (DbTelegram) {
+            lock (DbTelegram)
+            {
                 DbTelegram.SaveChanges();
             }
+
+            bool isOnline = false;
+            foreach(var userClient in disconnectedUser.Clients)
+            {
+                if (isClientOnline(userClient))
+                {
+                    isOnline = true;
+                    break;
+                }
+            }
+
+            if (!isOnline)
+            {
+                 SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = false },
+                                               disconnectedUser.Id,
+                                               disconnectedClient.Id,
+                                               disconnectedUser.UniqueRelations);
+            }
+          
+
 
 
         }
@@ -205,7 +220,7 @@ namespace TelegramServer
         private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, ICollection<User> usersToSend)
         {
             bool changesExist = false;
-
+           
             foreach (var user in usersToSend)
             {
                 if(user.Id == senderId)
@@ -214,34 +229,45 @@ namespace TelegramServer
                         if(userClient.Id != senderClientId)
                         {
                             userClient.MessagesToSend.Add(msg);
-                            changesExist = true;
+                            lock (DbTelegram)
+                            {
+                                DbTelegram.SaveChanges();
+                            }
+                            //changesExist = true;
                         }
                 }
                 else {
                     foreach (var userClient in user.Clients) {
-                        if (isUserOnline(userClient))
+                        if (isClientOnline(userClient))
                             TcpClientByUserClient(userClient).SendAsync(msg);
                         else {
                             userClient.MessagesToSend.Add(msg);
-                            changesExist = true;
+
+                            lock (DbTelegram)       {
+                                DbTelegram.SaveChanges();
+                            }
+
+                            //changesExist = true;
+                      
                         }
                             
                     }
                 }
             }
 
-            if (changesExist) {
-                lock (DbTelegram) {
-                    DbTelegram.SaveChanges();
-                }
+            //if (changesExist) {
+              
+            //    lock (DbTelegram) {
+            //        DbTelegram.SaveChanges();
+            //    }
                 
              
 
-            }
+            //}
                
         }
 
-        private bool isUserOnline(UserClient userClient) => ClientsOnline.ContainsValue(userClient);
+        private bool isClientOnline(UserClient userClient) => ClientsOnline.ContainsValue(userClient);
 
         private TcpClientWrap TcpClientByUserClient(UserClient client){
             return ClientsOnline.FirstOrDefault(c => c.Value == client).Key;

@@ -9,7 +9,8 @@ namespace CommonLibrary.Messages
 {
     public enum SystemMessageType
     {
-        Logout
+        Logout,
+        GetOfflineMessages
     }
 
     [Serializable]
