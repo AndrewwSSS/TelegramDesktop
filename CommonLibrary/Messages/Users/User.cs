@@ -22,7 +22,7 @@ namespace CommonLibrary.Messages.Users
         public DateTime VisitDate { get; set; }
 
         public virtual ICollection<UserClient> Clients { get; set; }
-        public virtual ICollection<int> BlockedUsersId { get; set; } 
+        public virtual ICollection<int> BlockedUsersId { get; set; }
         public virtual ICollection<GroupChat> Chats { get; set; }
         public virtual ICollection<ChatMessage> Messages { get; set; }
         public virtual ICollection<BaseMessage> MessagesToSend { get; set; }
@@ -43,6 +43,10 @@ namespace CommonLibrary.Messages.Users
                 return tmp.Distinct().ToList();
             }
         }
+
+
+
+
 
         public User()
         {

@@ -118,39 +118,19 @@ namespace TelegramServer
             });
 
 
-            lock (DbTelegram)
-            {
+            lock (DbTelegram)    {
                 DbTelegram.SaveChanges();
             }
 
-            bool isOnline = false;
-            foreach(var userClient in disconnectedUser.Clients)
-            {
-                if (isClientOnline(userClient))
-                {
-                    isOnline = true;
-                    break;
-                }
-            }
-
-            if (!isOnline)
-            {
+       
+            if (!isUserOnline(disconnectedUser)) {
                 UserUpdateMessage msg = new UserUpdateMessage()
                 {
                     OnlineStatus = false,
                     UserId = disconnectedUser.Id
                 };
 
-                foreach(var user in disconnectedUser.UniqueRelations.Where(u => u.Id != disconnectedUser.Id))
-                {
-                    foreach (var userClient in user.Clients)
-                    {
-                        if (isClientOnline(userClient))
-                            TcpClientByUserClient(userClient).SendAsync(msg);
-                    }
-                }
-
-                 
+                SendMessageToOnlineUsers(msg, disconnectedUser.Id, disconnectedClient.Id, disconnectedUser.UniqueRelations);
             }
           
 
@@ -214,6 +194,17 @@ namespace TelegramServer
 
         #endregion WpfEvents
 
+        private void SendMessageToOnlineUsers(Message msg, int senderId, int senderClientId, ICollection<User> usersToSend)
+        {
+          
+            foreach (var user in usersToSend.Where(u => u.Id != senderId)) {
+                foreach (var userClient in user.Clients) {
+                    if (isClientOnline(userClient))
+                        TcpClientByUserClient(userClient).SendAsync(msg);
+                }
+            }
+        }
+
         private void SendMessageToUsers(BaseMessage msg, int senderId, int senderClientId, ICollection<User> usersToSend)
         {  
             foreach (var user in usersToSend)
@@ -266,6 +257,19 @@ namespace TelegramServer
 
 
                
+        }
+
+        private bool isUserOnline(User user)
+        {
+            if(user == null)
+                throw new ArgumentNullException("user");
+
+            foreach(UserClient client in user.Clients)
+            {
+                if (isClientOnline(client))
+                    return true;
+            }
+            return false;
         }
 
         private bool isClientOnline(UserClient userClient) => ClientsOnline.ContainsValue(userClient);

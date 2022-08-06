@@ -130,7 +130,7 @@ namespace TelegramServer
                               
                             }
 
-                            SendMessageToUsers(new UserUpdateMessage() { OnlineStatus = true },
+                            SendMessageToOnlineUsers(new UserUpdateMessage() { OnlineStatus = true },
                                                sender.Id,
                                                senderClient.Id,
                                                sender.UniqueRelations);
@@ -158,14 +158,16 @@ namespace TelegramServer
                                 client.Disconnected += OnClientDisconnected;
                                 ClientsOnline[client] = senderClient;
 
-
-
-
                                 Dispatcher.Invoke(() =>
                                 {
                                     UsersOffline.Remove(sender);
                                     UsersOnline.Add(sender);
                                 });
+
+                                SendMessageToOnlineUsers(new UserUpdateMessage() { OnlineStatus = true, UserId = sender.Id },
+                                              sender.Id,
+                                              senderClient.Id,
+                                              sender.UniqueRelations);
                             }
                             else
                             {
@@ -173,14 +175,11 @@ namespace TelegramServer
 
                                 if (senderClient != null)
                                 {
-                                    //tmp
+
                                     senderClient.MachineName = fastLoginMessage.MachineName;
                                     client.SendAsync(new FastLoginResultMessage(AuthResult.Success));
                                     client.Disconnected += OnClientDisconnected;
                                     ClientsOnline[client] = senderClient;
-
-
-                                   
 
                                     Dispatcher.Invoke(() =>
                                     {
@@ -188,6 +187,10 @@ namespace TelegramServer
                                         UsersOnline.Add(sender);
                                     });
 
+                                    SendMessageToOnlineUsers(new UserUpdateMessage() { OnlineStatus = true, UserId = sender.Id },
+                                              sender.Id,
+                                              senderClient.Id,
+                                              sender.UniqueRelations);
                                 }
                                 else
                                     client.SendAsync(new FastLoginResultMessage(AuthResult.Denied));
@@ -502,6 +505,26 @@ namespace TelegramServer
                                     }
 
                                     client.Send(new DataRequestResultMessage<UserContainer>(results));
+                                    break;
+                                }
+                            case DataRequestType.UsersOnlineStatus:
+                                {
+                                    List<User> Users = DbTelegram.Users.Where(u => dataRequestMessage.ItemsId.Any(i => i == u.Id)).ToList();
+                                    List<KeyValuePair<int, bool>> UsersOnlineStatus = new List<KeyValuePair<int, bool>>();
+
+                                    foreach (var user in Users)
+                                    {
+                                        if(isUserOnline(user))
+                                            UsersOnlineStatus.Add(new KeyValuePair<int, bool>(user.Id, true));
+                                        else
+                                            UsersOnlineStatus.Add(new KeyValuePair<int, bool>(user.Id, false));
+                                    }
+
+                                    client.SendAsync(new DataRequestResultMessage<KeyValuePair<int, bool>>(UsersOnlineStatus));
+
+                                
+                                    
+                           
                                     break;
                                 }
                         }
