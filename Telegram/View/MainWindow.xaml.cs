@@ -194,13 +194,13 @@ namespace Telegram
             //}));
 
             Client.SendAsync(new SystemMessage(SystemMessageType.GetOfflineMessages));
-            var f = from g in CachedGroups select g.GroupChat.MembersId;
-            f.Aggregate((a, b) =>
+            var userStatusQuery = from g in CachedGroups select g.GroupChat.MembersId;
+            var userStatusQueryArray = userStatusQuery.Aggregate((a, b) =>
             {
                 a.AddRange(b);
                 return a;
             });
-            Client.SendAsync(new DataRequestMessage());
+            Client.SendAsync(new DataRequestMessage(userStatusQueryArray, DataRequestType.UsersOnlineStatus));
             SaveCache();
         }
 
@@ -258,6 +258,16 @@ namespace Telegram
                     var arrMsg = msg as ArrayMessage<BaseMessage>;
                     foreach (var obj in arrMsg.Array)
                         Client_MessageReceived(client, obj);
+                }
+                else if (msg is DataRequestResultMessage<KeyValuePair<int, bool>>)
+                {
+                    var map = msg as DataRequestResultMessage<KeyValuePair<int, bool>>;
+                    foreach (var pair in map.Result)
+                    {
+                        var userGroup = CachedGroups.FirstOrDefault(g=>g.AssociatedUserId == pair.Key);
+                        if(userGroup != null)
+                            userGroup.IsUserOnline = pair.Value;
+                    }
                 }
                 else if (msg is DataRequestResultMessage<UserContainer>)
                 {
