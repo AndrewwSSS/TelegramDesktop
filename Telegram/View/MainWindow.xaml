@@ -369,14 +369,27 @@
                         </TextBlock>
                     </Grid>
 
-                    <Grid Grid.Column="2"
+                    <Grid  Grid.Column="2"
                       Background="#282E33"
                       x:Name="MainContent"
                       SizeChanged="MainContent_SizeChanged"
                       MinWidth="300">
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="45"/>
+                            <RowDefinition >
+                                <RowDefinition.Style>
+                                    <Style TargetType="RowDefinition">
+                                        <Style.Setters>
+                                            <Setter Property="Height" Value="45" />
+                                        </Style.Setters>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CurGroup}" Value="{x:Null}">
+                                                <Setter Property="Height" Value="0" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </RowDefinition.Style>
+                            </RowDefinition>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
@@ -387,7 +400,7 @@
                                 <ColumnDefinition  Width="200"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
-                            <Grid Margin="10 4 4 4" Grid.Column="0">
+                            <Grid  Margin="10 4 4 4" Grid.Column="0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="0">

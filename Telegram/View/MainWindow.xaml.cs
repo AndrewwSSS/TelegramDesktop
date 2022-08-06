@@ -195,12 +195,13 @@ namespace Telegram
 
             Client.SendAsync(new SystemMessage(SystemMessageType.GetOfflineMessages));
             var userStatusQuery = from g in CachedGroups select g.GroupChat.MembersId;
-            var userStatusQueryArray = userStatusQuery.Aggregate((a, b) =>
+            var userStatusQueryArray = userStatusQuery.Any() ? userStatusQuery.Aggregate((a, b) =>
             {
                 a.AddRange(b);
                 return a;
-            });
-            Client.SendAsync(new DataRequestMessage(userStatusQueryArray, DataRequestType.UsersOnlineStatus));
+            }) : null;
+            if(userStatusQueryArray != null)
+                Client.SendAsync(new DataRequestMessage(userStatusQueryArray, DataRequestType.UsersOnlineStatus));
             SaveCache();
         }
 
