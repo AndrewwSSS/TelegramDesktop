@@ -461,8 +461,8 @@
                                                                             CornerRadius="360"
                                                                             Background="HotPink">
                                                                 <TextBlock 
-                                                                                VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                                                Text="{Binding Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
+                                                                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                            Text="{Binding Name[0]}" Foreground="{StaticResource GreyBrush}" FontSize="20">
                                                                 </TextBlock>
                                                             </Border>
                                                         </ControlTemplate>
