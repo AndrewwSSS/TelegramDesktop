@@ -18,7 +18,7 @@ namespace CommonLibrary.Containers
         private PublicGroupInfo group;
         private bool joined = true;
         private int associatedUserId = -1;
-        private bool? isUserOnline;
+        private bool? isUserOnline = null;
 
         public ObservableCollection<UserItemWrap> Members { get; set; } = new ObservableCollection<UserItemWrap>();
         public ObservableCollection<UserItemWrap> Admins { get; set; } = new ObservableCollection<UserItemWrap>();
