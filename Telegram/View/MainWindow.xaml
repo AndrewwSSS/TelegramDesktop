@@ -402,9 +402,12 @@
                             <Grid  Margin="10 4 4 4" Grid.Column="0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="0">
+                                    <RowDefinition>
                                         <RowDefinition.Style>
                                             <Style TargetType="RowDefinition">
+                                                <Style.Setters>
+                                                    <Setter Property="Height" Value="0" />
+                                                </Style.Setters>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding CurGroup.IsUserOnline}" Value="{x:Null}">
                                                         <Setter Property="Height" Value="Auto"/>
@@ -413,9 +416,12 @@
                                             </Style>
                                         </RowDefinition.Style>
                                     </RowDefinition>
-                                    <RowDefinition Height="Auto">
+                                    <RowDefinition >
                                         <RowDefinition.Style>
                                             <Style TargetType="RowDefinition">
+                                                <Style.Setters>
+                                                    <Setter Property="Height" Value="Auto" />
+                                                </Style.Setters>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding CurGroup.IsUserOnline}" Value="{x:Null}">
                                                         <Setter Property="Height" Value="0"/>
@@ -851,7 +857,7 @@
                                 <TextBox x:Name="TB_CurGroupName" Style="{StaticResource TBGroupInfo}" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"/>
                                 <TextBox x:Name="TB_CurGroupDesc" Style="{StaticResource TBGroupInfo}" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"/>
 
-                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick"  Height="30" Margin="5">
+                                <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick" IsEnabled="{Binding CurGroup.IsEditable}" Height="30" Margin="5">
                                     EDIT
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource BLight}">

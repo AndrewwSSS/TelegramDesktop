@@ -19,6 +19,7 @@ namespace CommonLibrary.Containers
         private bool joined = true;
         private int associatedUserId = -1;
         private bool? isUserOnline = null;
+        private bool isEditable = true;
 
         public ObservableCollection<UserItemWrap> Members { get; set; } = new ObservableCollection<UserItemWrap>();
         public ObservableCollection<UserItemWrap> Admins { get; set; } = new ObservableCollection<UserItemWrap>();
@@ -75,7 +76,15 @@ namespace CommonLibrary.Containers
 
         public string Name => GroupChat.Name;
         public string Description => GroupChat.Description;
-
+        public bool IsEditable
+        {
+            get => isEditable;
+            set
+            {
+                isEditable = value;
+                OnPropertyChanged();
+            }
+            }
         public GroupItemWrap()
         {
 

@@ -542,6 +542,7 @@ namespace Telegram
                     }
 
                     Buffers.EditGroupSettings.Remove(result.GroupId);
+                    group.IsEditable = true;
                 }
                 else if (msg is FirstPersonalResultMessage)
                 {
@@ -1206,6 +1207,7 @@ namespace Telegram
                             TB_CurGroupName.Text == CurGroup.GroupChat.Name ? null : TB_CurGroupName.Text,
                             TB_CurGroupDesc.Text == CurGroup.GroupChat.Description ? null : TB_CurGroupDesc.Text)
                         );
+                    CurGroup.IsEditable = false;
 
                     Client.SendAsync(new GroupUpdateMessage()
                     {
