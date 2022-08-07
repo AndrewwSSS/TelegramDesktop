@@ -11,6 +11,8 @@ namespace CommonLibrary.Messages.Users
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        public static int MaxAttempts = 3;
+
         public string Name { get; set; }
         public string Password { get; set; }
         public string Login { get; set; }
@@ -18,8 +20,15 @@ namespace CommonLibrary.Messages.Users
         public DateTime StartTime { get; set; }
 
         public string ExpectedCode { get; set; }
+        public int CurrAttamt { get; set; }
+        [NotMapped]
+        public int RemainingAttampt => MaxAttempts - CurrAttamt;
 
-        public PreparatoryUser() { }
+
+        public PreparatoryUser()
+        {
+            CurrAttamt = 0;
+        }
 
 
     }

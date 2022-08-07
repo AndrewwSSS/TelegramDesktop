@@ -83,6 +83,63 @@ namespace TelegramServer
                     }
                 case "SignUpStage2Message":
                     {
+                        SignUpStage2Message signUpMessage = (SignUpStage2Message)msg;
+
+                        PreparatoryUser user = DbTelegram.PreparatoryUsers.FirstOrDefault(pu => pu.Login == signUpMessage.Login);
+
+                        if (user != null)
+                        {
+                            if(user.ExpectedCode == signUpMessage.CodeFromEmail)
+                            {
+                                User newUser = new User()
+                                {
+                                    Login = user.Login,
+                                    Email = user.Email,
+                                    Password = user.Password,
+                                    RegistrationDate = DateTime.UtcNow,
+                                    VisitDate = DateTime.UtcNow
+                                };
+
+                                Dispatcher.Invoke(() =>
+                                {
+                                    LB_UsersOffline.Items.Add(newUser);
+                                });
+
+                                DbTelegram.Users.Add(newUser);
+
+                                lock (DbTelegram) {
+                                    DbTelegram.SaveChanges();
+                                }
+
+                                client.SendAsync(new SignUpStage2ResultMessage(AuthResult.Success, newUser.Id));
+                            }
+                            else
+                            {
+                                user.CurrAttamt += 1;
+
+                                int remainingAttampt = user.RemainingAttampt;
+
+                                if (remainingAttampt == 0){
+                                    DbTelegram.PreparatoryUsers.Remove(user);
+                                }
+
+                                lock (DbTelegram) {
+                                    DbTelegram.SaveChanges();
+                                }
+
+                                client.SendAsync(new SignUpStage2ResultMessage(AuthResult.Denied)
+                                                {
+                                                    RemainingAttempts = remainingAttampt
+                                                });
+
+                            }
+
+                        }
+                        else {
+                            client.SendAsync(new SignUpStage2ResultMessage(AuthResult.Denied));
+                        }
+                            
+
 
                         break;
                     }

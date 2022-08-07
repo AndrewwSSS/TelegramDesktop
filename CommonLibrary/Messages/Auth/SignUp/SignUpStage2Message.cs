@@ -7,7 +7,12 @@ namespace CommonLibrary.Messages.Auth.SignUp
     public class SignUpStage2Message : Message
     {
         public string CodeFromEmail { get; set; }
+        public string Login { get; set; }
 
-        public SignUpStage2Message(string code) => CodeFromEmail = code;
+        public SignUpStage2Message(string code, string login)
+        {
+            CodeFromEmail = code;
+            Login = login;
+        }
     }
 }
