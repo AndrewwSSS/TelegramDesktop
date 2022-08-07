@@ -1,4 +1,5 @@
-﻿using CommonLibrary.Messages;
+﻿using CommonLibrary;
+using CommonLibrary.Messages;
 using CommonLibrary.Messages.Files;
 using CommonLibrary.Messages.Groups;
 using CommonLibrary.Messages.Users;
@@ -77,10 +78,12 @@ namespace TelegramServer
 
             var random = new Random();
 
-            for (int j = 0; j < 10; j++)
+            for (int i = 0; i < 10; i++)
             {
-               
+                Console.WriteLine(PasswordGenerator.GeneratePassword(10));
             }
+           
+       
 
 
         }

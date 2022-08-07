@@ -8,12 +8,14 @@ namespace CommonLibrary
 {
     public static class PasswordGenerator
     {
+        private static Random random = new Random();
+
         public static string GeneratePassword(int length = 6)
         {
             if (length <= 0)
                 throw new InvalidOperationException("attribute lenght invalid");
 
-            var random = new Random();
+  
             StringBuilder sb = new StringBuilder();
 
             for (int i = 0; i < length; i++)
