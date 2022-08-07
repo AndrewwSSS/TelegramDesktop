@@ -502,12 +502,10 @@ namespace Telegram
 
                     if (info.NewUserId != -1)
                     {
+                            group.GroupChat.MembersId.Add(info.NewUserId);
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
                         if (user == null)
-                        {
                             Client.SendAsync(new DataRequestMessage(info.NewUserId, DataRequestType.User));
-                            group.GroupChat.MembersId.Add(info.NewUserId);
-                        }
                         else
                             group.Members.Add(user);
                     }

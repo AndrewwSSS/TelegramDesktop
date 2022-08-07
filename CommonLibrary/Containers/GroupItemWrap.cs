@@ -76,6 +76,11 @@ namespace CommonLibrary.Containers
         public string Name => GroupChat.Name;
         public string Description => GroupChat.Description;
 
+        public GroupItemWrap()
+        {
+
+            Members.CollectionChanged += Members_CollectionChanged;
+        }
         public GroupItemWrap(PublicGroupInfo group)
         {
             GroupChat = group;
