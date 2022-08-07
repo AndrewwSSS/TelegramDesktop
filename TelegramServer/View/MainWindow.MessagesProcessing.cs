@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -51,6 +52,22 @@ namespace TelegramServer
                                 DbTelegram.SaveChanges();
                             }
 
+                            //MailAddress from = new MailAddress("telegramdesktopbyadat@gmail.com");
+                            //MailAddress to = new MailAddress("");
+
+
+                            //MailMessage message = new MailMessage(from, to);
+                            //message.IsBodyHtml = false;
+                            //message.Subject = "test";
+                            //message.Body = "some code...";
+
+
+                            //SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+                            //{
+                            //    Credentials = new NetworkCredential("telegramdesktopbyadat@gmail.com", "AdatTelegram2022"),
+                            //    EnableSsl = true
+                            //};
+                            //smtp.Send(message);
 
 
                             client.SendAsync(new SignUpStage1ResultMessage(AuthResult.Success));
@@ -60,7 +77,6 @@ namespace TelegramServer
                         {
                             client.SendAsync(new SignUpStage1ResultMessage(AuthResult.Denied,
                                             "Email or login already used to create an account"));
-
                         }
                         break;
 
@@ -811,10 +827,6 @@ namespace TelegramServer
                         }
                         break;
                     }
-                
-
-
-
             }
         }
 

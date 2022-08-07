@@ -82,6 +82,7 @@
     <Compile Include="Messages\Users\UserDownloads.cs" />
     <Compile Include="Messages\Users\UserUpdateMessage.cs" />
     <Compile Include="Messages\Users\UserUpdateResultMessage.cs" />
+    <Compile Include="PasswordGenerator.cs" />
     <Compile Include="PreparingFileData.cs" />
     <Compile Include="Messages\Files\TcpFileClientWrap.cs" />
     <Compile Include="Messages\Files\TcpFileServerWrap.cs" />

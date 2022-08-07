@@ -10,6 +10,7 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -74,7 +75,12 @@ namespace TelegramServer
             foreach (var user in DbTelegram.Users)
                 UsersOffline.Add(user);
 
+            var random = new Random();
 
+            for (int j = 0; j < 10; j++)
+            {
+               
+            }
 
 
         }
