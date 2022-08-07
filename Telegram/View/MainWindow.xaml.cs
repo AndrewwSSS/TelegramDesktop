@@ -200,7 +200,7 @@ namespace Telegram
                 a.AddRange(b);
                 return a;
             }) : null;
-            if(userStatusQueryArray != null)
+            if (userStatusQueryArray != null)
                 Client.SendAsync(new DataRequestMessage(userStatusQueryArray, DataRequestType.UsersOnlineStatus));
             SaveCache();
         }
@@ -265,8 +265,8 @@ namespace Telegram
                     var map = msg as DataRequestResultMessage<KeyValuePair<int, bool>>;
                     foreach (var pair in map.Result)
                     {
-                        var userGroup = CachedGroups.FirstOrDefault(g=>g.AssociatedUserId == pair.Key);
-                        if(userGroup != null)
+                        var userGroup = CachedGroups.FirstOrDefault(g => g.AssociatedUserId == pair.Key);
+                        if (userGroup != null)
                             userGroup.IsUserOnline = pair.Value;
                     }
                 }
@@ -580,27 +580,20 @@ namespace Telegram
                     {
                         var group = Groups.First(g => g.GroupChat.Id == result.GroupId);
                         group.Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
+                        RemoveMessageFromUI(result.DeletedMessageId);
                         group.OnPropertyChanged("LastMessage");
                     }
-                    Messages.Remove(Messages.First(m => m.Message.Id == result.DeletedMessageId));
-
                 }
                 else if (msg is ChatMessageDeleteMessage)
                 {
                     var msgDel = msg as ChatMessageDeleteMessage;
-                    Groups.First(g => g.GroupChat.Id == msgDel.GroupId).Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
-                    var toDel = Messages.First(m => m.Message.Id == msgDel.DeletedMessageId);
-                    if (toDel != null)
+                    var group = Groups.First(g => g.GroupChat.Id == msgDel.GroupId);
+                    if (group != null)
                     {
-                        if (Messages.Count > 1)
-                        {
-                            int index = Messages.IndexOf(toDel);
-                            if (index != Messages.Count - 1 && Messages[index + 1].FromUser.User.Id == toDel.FromUser.User.Id)
-                                Messages[index + 1].ShowUsername = true;
-                            if (index != 0 && Messages[index - 1].FromUser.User.Id == toDel.FromUser.User.Id)
-                                Messages[index - 1].ShowAvatar = true;
-                        }
+                        group.Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
+                        RemoveMessageFromUI(msgDel.DeletedMessageId);
                     }
+
                 }
                 //else if (msg is MetadataResultMessage)
                 //{
@@ -738,6 +731,26 @@ namespace Telegram
 
             return item;
         }
+        private void RemoveMessageFromUI(int msgId)
+        {
+            var toDel = Messages.FirstOrDefault(m => m.Message.Id == msgId);
+            if (toDel != null)
+            {
+                if (Messages.Count > 1)
+                {
+                    int index = Messages.IndexOf(toDel);
+                    // Следующее сообщение должно показывать имя пользователя(если оно им отправлено)
+                    // Если удалено своё сообщение, то имя не будет показываться
+                    if (index != Messages.Count - 1 && Messages[index + 1].FromUser.User.Id == toDel.FromUser.User.Id)
+                        if (Messages[index + 1].FromUser.User.Id != MeWrap.User.Id)
+                            Messages[index + 1].ShowUsername = true;
+                    if (index != 0 && Messages[index - 1].FromUser.User.Id == toDel.FromUser.User.Id)
+                        Messages[index - 1].ShowAvatar = true;
+                    
+                }
+                Messages.Remove(toDel);
+            }
+        }
         private void AddMessageToUI(ChatMessage msg)
         {
             var item = MakeMsgWrap(msg);
@@ -767,6 +780,7 @@ namespace Telegram
                 WindowState.Maximized;
 
         }
+
 
 
         private void ShowOrOpenRightMenu_Click(object sender, RoutedEventArgs e)
