@@ -395,7 +395,9 @@
         <Style.Resources>
             <BooleanToVisibilityConverter x:Key="boolToVis"/>
         </Style.Resources>
+       
         <Style.Setters>
+            <Setter Property="Margin" Value="0" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
             <Setter Property="Visibility" Value="{Binding HasItems, 
@@ -407,6 +409,7 @@
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Margin" Value="0"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                     </Style>
                 </Setter.Value>
             </Setter>
@@ -418,7 +421,7 @@
                         <DataTemplate.Resources>
                             <entities:NotNullConverter x:Key="notnull"></entities:NotNullConverter>
                         </DataTemplate.Resources>
-                        <Grid Name="border"  Background="{StaticResource BgBrush}">
+                        <Grid Name="border" Background="{StaticResource BgBrush}">
                             <!--Аватар группы-->
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -504,7 +507,19 @@
         </Style.Setters>
 
     </Style>
-
+    <Style TargetType="TextBox" x:Key="TBGroupInfo" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Style.Setters>
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="IsReadOnly" Value="False">
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{StaticResource DarkGreyBrush}" />
+                <Setter Property="Background" Value="{StaticResource BgBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     <Style TargetType="TextBox" x:Key="SearchBoxStyle">
         <Style.Setters>
             <Setter Property="CaretBrush" Value="White"/>

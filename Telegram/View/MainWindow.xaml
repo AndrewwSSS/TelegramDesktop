@@ -291,32 +291,8 @@
                             FontSize="30"
                             x:Name="BTNOpenLeftMenu"
                             Click="BTNOpenLeftMenu_Click"
-                            Content="8"/>
+                            Content="☰"/>
 
-                        <Button Height="60"
-                            Width="70"
-                            FontSize="30"
-                            Content="9"/>
-
-                        <Button Height="60"
-                            Width="70"
-                            FontSize="30"
-                            Content="10"/>
-
-                        <Button Height="60"
-                            Width="70"
-                            FontSize="30"
-                            Content="11"/>
-
-                        <Button Height="60"
-                            Width="70"
-                            FontSize="30"
-                            Content="12"/>
-
-                        <Button Height="60"
-                            Width="70"
-                            FontSize="30"
-                            Content="13"/>
 
                     </StackPanel>
 
@@ -868,18 +844,21 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="40"/>
                             </Grid.RowDefinitions>
-                            <StackPanel Visibility="{Binding CurGroup.Joined, Converter={StaticResource boolToVis}}">
+                            <StackPanel >
                                 <StackPanel.Resources>
                                     <entities:NotConverter x:Key="not"/>
                                 </StackPanel.Resources>
-                                <TextBox x:Name="TB_CurGroupName" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"/>
-                                <TextBox x:Name="TB_CurGroupDesc" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"/>
+                                <TextBox x:Name="TB_CurGroupName" Style="{StaticResource TBGroupInfo}" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="20"  Text="{Binding CurGroup.Name,Mode=OneWay}" Foreground="{StaticResource GreyBrush}"/>
+                                <TextBox x:Name="TB_CurGroupDesc" Style="{StaticResource TBGroupInfo}" IsReadOnly="{Binding EditingGroup, Converter={StaticResource not}}" FontSize="16" Text="{Binding CurGroup.Description,Mode=OneWay}" Foreground="{StaticResource DarkGreyBrush}"/>
 
                                 <Button x:Name="B_EditGroup" Click="B_EditGroup_OnClick"  Height="30" Margin="5">
                                     EDIT
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource BLight}">
                                             <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CurGroup.Joined}" Value="False">
+                                                    <Setter Property="Visibility" Value="Hidden" />
+                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding CurGroup.GroupChat.GroupType}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
                                                     <Setter Property="Visibility" Value="Hidden" />
                                                 </DataTrigger>
@@ -889,6 +868,15 @@
                                 </Button>
                             </StackPanel>
                             <StackPanel Grid.Row="1">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CurGroup.GroupChat.GroupType}" Value="{x:Static cl_messages_groups:GroupType.Personal}">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
                                 <ListBox 
                                 Style="{StaticResource LBUsers}"
                                 ItemsSource="{Binding CurGroup.Admins}">

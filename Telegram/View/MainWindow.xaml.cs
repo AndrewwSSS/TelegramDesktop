@@ -278,6 +278,7 @@ namespace Telegram
                 else if (msg is DataRequestResultMessage<UserContainer>)
                 {
                     var drr = msg as DataRequestResultMessage<UserContainer>;
+                    Client.SendAsync(new DataRequestMessage(drr.Result.Select(u => u.User.Id), DataRequestType.UsersOnlineStatus));
                     foreach (var container in drr.Result)
                     {
                         UserItemWrap user = new UserItemWrap(container.User);
@@ -502,7 +503,7 @@ namespace Telegram
 
                     if (info.NewUserId != -1)
                     {
-                            group.GroupChat.MembersId.Add(info.NewUserId);
+                        group.GroupChat.MembersId.Add(info.NewUserId);
                         var user = CachedUsers.FirstOrDefault(u => u.User.Id == info.NewUserId);
                         if (user == null)
                             Client.SendAsync(new DataRequestMessage(info.NewUserId, DataRequestType.User));
