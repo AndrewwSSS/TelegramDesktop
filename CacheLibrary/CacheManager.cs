@@ -26,6 +26,8 @@ namespace CacheLibrary
                 AdministratorsId = info.AdministratorsId;
                 MembersId = info.MembersId;
                 Messages = info.Messages;
+                Name = info.Name;
+                Description = info.Description;
             }
         }
 

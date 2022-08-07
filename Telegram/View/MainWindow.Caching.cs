@@ -34,14 +34,14 @@ namespace Telegram
                         item.Members.Add(user);
                 }
                 item.AssociatedUserId = info.AssociatedUserId;
-                var associatedUser = CachedUsers.FirstOrDefault(u => u.User.Id == item.AssociatedUserId);
-                if (associatedUser != null)
-                {
-                    if (item.Name == null)
-                        item.GroupChat.Name = associatedUser.User.Name;
-                    if (item.Description == null)
-                        item.GroupChat.Description = associatedUser.User.Description;
-                }
+                //var associatedUser = CachedUsers.FirstOrDefault(u => u.User.Id == item.AssociatedUserId);
+                //if (associatedUser != null)
+                //{
+                //    if (item.Name == null)
+                //        item.GroupChat.Name = associatedUser.User.Name;
+                //    if (item.Description == null)
+                //        item.GroupChat.Description = associatedUser.User.Description;
+                //}
                 Groups.Add(item);
                 CachedGroups.Add(item);
             }

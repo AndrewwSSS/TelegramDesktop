@@ -9,13 +9,25 @@ namespace CommonLibrary.Containers
     [Serializable]
     public class UserItemWrap : INotifyPropertyChanged
     {
+        public bool IsUserOnline
+        {
+            get => isUserOnline;
+            set
+            {
+                isUserOnline = value;
+                OnPropertyChanged();
+            }
+        }
+
         private ObservableCollection<ImageContainer> images = new ObservableCollection<ImageContainer>();
         private PublicUserInfo user;
+        private bool isUserOnline;
 
         public PublicUserInfo User
         {
             get => user;
-            set {
+            set
+            {
                 user = value;
                 OnPropertyChanged();
             }

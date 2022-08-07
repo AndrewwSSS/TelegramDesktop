@@ -105,13 +105,36 @@
                                             </Style>
                                         </ContentControl.Style>
                                     </ContentControl>
-                                    <TextBlock Grid.Column="1" 
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                    <StackPanel Grid.Column="1">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="{x:Type TextBox}">
+                                                <Setter Property="Margin" Value="0,6,0,0"/>
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <TextBlock 
+                                       HorizontalAlignment="left" VerticalAlignment="Center" 
                                        Text="{Binding User.Name}" 
                                        Foreground="{StaticResource GreyBrush}" 
                                        FontSize="20"
                                        />
-
+                                        <TextBlock FontSize="16"
+                                       HorizontalAlignment="left" VerticalAlignment="Center" >
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Setters>
+                                                        <Setter Property="Foreground" Value="IndianRed" />
+                                                        <Setter Property="Text" Value="Не в сети" />
+                                                    </Style.Setters>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsUserOnline}" Value="True">
+                                                            <Setter Property="Text" Value="В сети" />
+                                                            <Setter Property="Foreground" Value="LightGreen" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
 
                                 </Grid>
 

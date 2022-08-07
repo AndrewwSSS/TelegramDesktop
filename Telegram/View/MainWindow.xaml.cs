@@ -265,9 +265,14 @@ namespace Telegram
                     var map = msg as DataRequestResultMessage<KeyValuePair<int, bool>>;
                     foreach (var pair in map.Result)
                     {
-                        var userGroup = CachedGroups.FirstOrDefault(g => g.AssociatedUserId == pair.Key);
-                        if (userGroup != null)
-                            userGroup.IsUserOnline = pair.Value;
+                        var user = CachedUsers.FirstOrDefault(g => g.User.Id == pair.Key);
+                        if (user != null)
+                        {
+                            user.IsUserOnline = pair.Value;
+                            var userGroup = CachedGroups.FirstOrDefault(g => g.AssociatedUserId == pair.Key);
+                            if (userGroup != null)
+                                userGroup.IsUserOnline = pair.Value;
+                        }
                     }
                 }
                 else if (msg is DataRequestResultMessage<UserContainer>)
@@ -341,6 +346,7 @@ namespace Telegram
                     var user = CachedUsers.FirstOrDefault(u => u.User.Id == upd.UserId);
                     if (user != null)
                     {
+                        user.IsUserOnline = upd.OnlineStatus ?? user.IsUserOnline;
                         user.User.Name = upd.NewName ?? user.User.Name;
                         user.User.Login = upd.NewLogin ?? user.User.Login;
                         user.User.Description = upd.NewDescription ?? user.User.Description;
@@ -746,7 +752,7 @@ namespace Telegram
                             Messages[index + 1].ShowUsername = true;
                     if (index != 0 && Messages[index - 1].FromUser.User.Id == toDel.FromUser.User.Id)
                         Messages[index - 1].ShowAvatar = true;
-                    
+
                 }
                 Messages.Remove(toDel);
             }
