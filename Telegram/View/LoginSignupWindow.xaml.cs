@@ -29,6 +29,7 @@ namespace Telegram.View
 
             client.Connected += Client_Connected;
             client.ConnectFailed += Client_ConnectFailed;
+            client.Disconnected += Client_ConnectFailed;
             client.ConnectAsync();
         }
 
@@ -37,7 +38,13 @@ namespace Telegram.View
             if (wnd == null && client.IsConnected) 
                 client?.Disconnect();
         }
-        private void Client_ConnectFailed(TcpClientWrap obj) => client.ConnectAsync();
+        private void Client_ConnectFailed(TcpClientWrap obj)
+        {
+            var answer = MessageBox.Show("Не удалось подключиться к серверу. Попробовать снова?", "Ошибка", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            if (answer == MessageBoxResult.Yes)
+                client.ConnectAsync();
+            else Dispatcher.Invoke(Close);
+        }
         int myId { get; set; } = -1;
         private void Client_Connected(TcpClientWrap client)
         {

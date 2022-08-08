@@ -120,6 +120,7 @@ namespace Telegram
         public MainWindow(PublicUserInfo me, TcpClientWrap client)
         {
             Client = client;
+            Client.Disconnected += Client_Disconnected;
             CacheManager.Instance.CachePath = "Cache\\";
             MsgFileClick = new UICommand((o) => true, (obj) =>
             {
@@ -203,6 +204,12 @@ namespace Telegram
             if (userStatusQueryArray != null)
                 Client.SendAsync(new DataRequestMessage(userStatusQueryArray, DataRequestType.UsersOnlineStatus));
             SaveCache();
+        }
+
+        private void Client_Disconnected(TcpClientWrap client)
+        {
+            MessageBox.Show("Подключение к серверу потеряно. Попробуйте перезапустить приложение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            Dispatcher.Invoke(Close);
         }
 
         private void FileClient_Disconnected(TcpFileClientWrap client)
