@@ -464,39 +464,27 @@
 
                             </Grid>
 
-                            <UniformGrid Grid.Column="2" Columns="4">
-
-                                <Button Grid.Column="0"
-                                        Foreground="White"
-                                        FontSize="30"
-                                        Content="1"
-                                        Width="45"/>
-
-
-                                <Button Grid.Column="1"
-                                        Foreground="White"
-                                        FontSize="30"
-                                        Content="2"
-                                        Width="45"/>
-
-
-                                <Button Grid.Column="2"
-                                        x:Name="BTN"
-                                        Foreground="White" 
-                                        FontSize="30" 
-                                        Width="45"
-                                        Content="3"/>
-
-
-                                <Button x:Name="ShowOrOpenRightMenu"
-                                        Click="ShowOrOpenRightMenu_Click"
-                                        Foreground="White"
-                                        FontSize="30"
-                                        Content="4"
-                                        Grid.Column="3"
-                                        Width="45"/>
-
-                            </UniformGrid>
+                            <Button Grid.Column="2"
+                                    x:Name="ShowOrOpenRightMenu"
+                                    Click="ShowOrOpenRightMenu_Click"
+                                    Foreground="White"
+                                    FontSize="30"
+                                    Width="45"
+                                    HorizontalAlignment="Right">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Style.Setters>
+                                            <Setter Property="Content" Value="🡆" />
+                                        </Style.Setters>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=RightMenu, Path=Visibility}" Value="Visible">
+                                                <Setter Property="Content" Value="🡄" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                
                         </Grid>
 
                         <ListBox Grid.Row="1" 
@@ -966,18 +954,6 @@
                         </StackPanel.Resources>
                         <Button Height="40"
                                 Content="Создать группу" Click="B_AddGroupMenu_OnClick"/>
-
-                        <Button Height="40"
-                                Content="Создать канал"/>
-
-                        <Button Height="40"
-                                Content="Контакты"/>
-
-                        <Button Height="40" 
-                                Content="Звонки"/>
-
-                        <Button Height="40"
-                                Content="Настройки"/>
 
                         <Button Height="40"
                                 Content="Выйти"

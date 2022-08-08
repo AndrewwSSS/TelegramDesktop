@@ -252,6 +252,7 @@ namespace Telegram
 
                         Groups.Add(newGroup);
                         CachedGroups.Add(newGroup);
+                        CacheManager.Instance.SaveGroup(newGroup);
                     }
                 }
                 else if (msg is ArrayMessage<BaseMessage>)
@@ -286,6 +287,7 @@ namespace Telegram
                         //if (container.Images != null)
                         //    user.Images = new ObservableCollection<ImageContainer>(container.Images);
                         CachedUsers.Add(user);
+                        CacheManager.Instance.SaveUser(user);
                         foreach (var group in CachedGroups)
                         {
                             if (group.GroupChat.MembersId.Contains(user.User.Id))
@@ -362,6 +364,7 @@ namespace Telegram
                             userGroup.OnPropertyChanged("Name");
                             userGroup.OnPropertyChanged("Description");
                         }
+                        CacheManager.Instance.SaveUser(user);
                     }
                 }
                 else if (msg is UserUpdateResultMessage)
@@ -374,6 +377,7 @@ namespace Telegram
                         MeWrap.User.Name = result.NewName ?? MeWrap.User.Name;
                         OnPropertyChanged("MeWrap.User");
                         MeWrap.OnPropertyChanged("User");
+                        CacheManager.Instance.SaveUser(MeWrap);
                     }
 
                 }
@@ -397,8 +401,10 @@ namespace Telegram
                                     }
                                     )
                             {
+                                AssociatedUserId = user.User.Id,
                                 Joined = false
                             };
+                            Client.SendAsync(new DataRequestMessage(user.User.Id, DataRequestType.UsersOnlineStatus));
                             FoundGroups.Add(tempGroup);
                             TemporaryUserGroups.Add(App.UserGroupLocalIdCounter++, tempGroup);
                         }
@@ -408,7 +414,11 @@ namespace Telegram
                             {
                                 Id = -1,
                                 MembersId = new List<int> { MeWrap.User.Id, userId }
-                            }));
+                            })
+                            { 
+                                AssociatedUserId = userId,
+                                Joined = false
+                            });
                             Client.SendAsync(new DataRequestMessage(userId, DataRequestType.User));
                         }
                     }
@@ -426,6 +436,7 @@ namespace Telegram
                             }
                             GroupItemWrap item = new GroupItemWrap(group);
                             CachedGroups.Add(item);
+                            CacheManager.Instance.SaveGroup(item);
                             foreach (var uId in group.MembersId.Where(
                                 id => !requestedId.Contains(id)
                                 ))
@@ -467,6 +478,7 @@ namespace Telegram
                         Groups.Add(group);
                         group.Members.Add(MeWrap);
                         group.Joined = true;
+                        CacheManager.Instance.SaveGroup(group);
                     }
                 }
                 else if (msg is ChatMessage)
@@ -525,6 +537,7 @@ namespace Telegram
                             CurGroup = FoundGroups.Count != 0 ? FoundGroups.LastOrDefault() : Groups.LastOrDefault();
                         }
                     }
+                    CacheManager.Instance.SaveGroup(group);
                 }
                 else if (msg is GroupUpdateResultMessage)
                 {
@@ -543,6 +556,7 @@ namespace Telegram
 
                     Buffers.EditGroupSettings.Remove(result.GroupId);
                     group.IsEditable = true;
+                    CacheManager.Instance.SaveGroup(group);
                 }
                 else if (msg is FirstPersonalResultMessage)
                 {
@@ -554,6 +568,7 @@ namespace Telegram
                     TemporaryUserGroups.Remove(result.LocalId);
                     CachedGroups.Add(group);
                     Groups.Add(group);
+                    CacheManager.Instance.SaveGroup(group);
                     ShowGroupMessages(CurGroup);
                 }
                 else if (msg is PersonalChatCreatedMessage)
@@ -572,6 +587,7 @@ namespace Telegram
                     }
                     CachedGroups.Add(newGroup);
                     Groups.Add(newGroup);
+                    CacheManager.Instance.SaveGroup(newGroup);
                 }
                 else if (msg is ChatMessageSendResult)
                 {
@@ -588,6 +604,7 @@ namespace Telegram
                         group.Messages.RemoveAll(m => m.Id == result.DeletedMessageId);
                         RemoveMessageFromUI(result.DeletedMessageId);
                         group.OnPropertyChanged("LastMessage");
+                        CacheManager.Instance.SaveGroup(group);
                     }
                 }
                 else if (msg is ChatMessageDeleteMessage)
@@ -598,6 +615,7 @@ namespace Telegram
                     {
                         group.Messages.RemoveAll(m => m.Id == msgDel.DeletedMessageId);
                         RemoveMessageFromUI(msgDel.DeletedMessageId);
+                        CacheManager.Instance.SaveGroup(group);
                     }
 
                 }
@@ -651,6 +669,7 @@ namespace Telegram
                                         var user = group.Members.FirstOrDefault(m => m.User.Id == result.UserId);
                                         if (user != null)
                                             group.Members.Remove(user);
+                                        CacheManager.Instance.SaveGroup(group);
                                     }
                                 }
                                 break;

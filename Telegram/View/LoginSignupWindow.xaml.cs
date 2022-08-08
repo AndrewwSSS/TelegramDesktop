@@ -24,10 +24,12 @@ namespace Telegram.View
         {
             InitializeComponent();
                 
-
-            tabControl.IsEnabled = false;
             client = App.Client;
             Closed += LoginSignupWindow_Closed;
+
+            client.Connected += Client_Connected;
+            client.ConnectFailed += Client_ConnectFailed;
+            client.ConnectAsync();
         }
 
         private void LoginSignupWindow_Closed(object sender, System.EventArgs e)
@@ -51,7 +53,10 @@ namespace Telegram.View
                         client.SendAsync(new FastLoginMessage(Environment.MachineName, App.MyGuid, myId));
                 }
                 else
-                    tabControl.IsEnabled = true;
+                {
+                    tabControl.Visibility = Visibility.Hidden;
+                    T_Loader.Visibility = Visibility.Hidden;
+                }
                 client.Connected -= Client_Connected;
                 client.ConnectFailed -= Client_ConnectFailed;
             });
@@ -70,7 +75,7 @@ namespace Telegram.View
                     else
                         MessageBox.Show("Регистрация не произошла.");
 
-                    tabControl.IsEnabled = true;
+                    tabControl.Visibility = Visibility.Visible;
                 });
             } else if(msg is LoginResultMessage)
             {
@@ -89,7 +94,7 @@ namespace Telegram.View
                         GoToMainWnd(info);
                         
                     } else
-                        tabControl.IsEnabled = true;
+                        tabControl.Visibility = Visibility.Visible;
                 });
             }
             else if(msg is FastLoginResultMessage)
@@ -121,7 +126,7 @@ namespace Telegram.View
                 return;
             }
             var msg = new LoginMessage(email, password, Environment.MachineName);
-            tabControl.IsEnabled = false;
+            tabControl.Visibility = Visibility.Hidden;
             client.SendAsync(msg);
         }
 
@@ -159,7 +164,7 @@ namespace Telegram.View
                 Email = email,
                 Name = name
             };
-            tabControl.IsEnabled = false;
+            tabControl.Visibility = Visibility.Hidden;
             client.SendAsync(msg);
         }
 

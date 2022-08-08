@@ -17,9 +17,9 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="{StaticResource DarkBgBrush}">
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" >
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" 
+                    Visibility="Hidden" >
             <Button Width="100" Height="50" 
-               
                     Content="CONNECT" Margin="10"
                     Click="ConnectButton_Click"/>
             <Button Width="100" Height="50" 
@@ -27,10 +27,14 @@
                     Click="B_ClearCache_OnClick"/>
             
         </StackPanel>
+        <TextBlock x:Name="T_Loader" Foreground="{StaticResource GreyBrush}" FontSize="24"
+                   HorizontalAlignment="Center" VerticalAlignment="Center">
+            Подключение к серверу...
+        </TextBlock>
         <TabControl 
             x:Name="tabControl"
             BorderThickness="0"
-            
+            Visibility="Hidden"
             Width="Auto" Height="Auto" 
             VerticalAlignment="Center" HorizontalAlignment="Center">
             
