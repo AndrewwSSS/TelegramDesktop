@@ -226,6 +226,7 @@ namespace Telegram
         private List<GroupItemWrap> CachedGroups { get; set; } = new List<GroupItemWrap>();
         private void OnClosed(object sender, EventArgs e)
         {
+            Client.Disconnected -= Client_Disconnected;
             Client?.Disconnect();
             SaveCache();
         }

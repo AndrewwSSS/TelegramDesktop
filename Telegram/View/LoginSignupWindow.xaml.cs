@@ -40,10 +40,8 @@ namespace Telegram.View
         }
         private void Client_ConnectFailed(TcpClientWrap obj)
         {
-            var answer = MessageBox.Show("Не удалось подключиться к серверу. Попробовать снова?", "Ошибка", MessageBoxButton.YesNo, MessageBoxImage.Error);
-            if (answer == MessageBoxResult.Yes)
-                client.ConnectAsync();
-            else Dispatcher.Invoke(Close);
+            MessageBox.Show("Подключение к серверу потеряно. Попробуйте перезапустить приложение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            Dispatcher.Invoke(Close);
         }
         int myId { get; set; } = -1;
         private void Client_Connected(TcpClientWrap client)
