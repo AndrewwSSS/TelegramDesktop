@@ -231,9 +231,38 @@
 
                     <Border Grid.ColumnSpan="5"
                             x:Name="TopPanel"
-                            Background="#3A4047"
+                            Background="{StaticResource DarkBgBrush}"
                             MouseLeftButtonDown="TopPanel_MouseLeftButtonDown_1">
+                        <Border.Resources>
+                            <Style TargetType="Button">
+                                <Style.Setters>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border  x:Name="border" Background="{StaticResource DarkBgBrush}"
+                                         BorderThickness="0">
 
+                                                    <TextBlock Text="{TemplateBinding Property=Content}"
+                                               Foreground="White" 
+                                               FontSize="{TemplateBinding FontSize}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                                </Border>
+
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter TargetName="border"
+                                                Property="Background"
+                                                Value="{StaticResource DarkBgBrush}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style.Setters>
+                            </Style>
+                        </Border.Resources>
                         <DockPanel>
                             <Button Content="✖"
                                     DockPanel.Dock="Right"
@@ -390,7 +419,7 @@
                                 </RowDefinition.Style>
                             </RowDefinition>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="0.15*"/>
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0" >
@@ -484,7 +513,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                
+
                         </Grid>
 
                         <ListBox Grid.Row="1" 
@@ -734,7 +763,7 @@
                                         </Style>
                                     </RowDefinition.Style>
                                 </RowDefinition>
-                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="*" Name="tbRow"/>
                             </Grid.RowDefinitions>
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" Foreground="{StaticResource BlueBrush}" FontSize="20">⬅️</TextBlock>
                             <StackPanel Grid.Column="1" Grid.Row="0">
@@ -743,17 +772,51 @@
                             </StackPanel>
                             <Button Grid.Column="3" Grid.Row="0" Click="CloseRespondingToPanel">❌</Button>
                             <!--<Button Grid.Column="0" Grid.Row="1" Click="B_AddFilesToMsg_OnClick">📎</Button>-->
-                            <TextBox Grid.Column="1"
-                                     Grid.Row="1"
-                                 Background="#282E33"
-                                 TextAlignment="Left"
-                                 VerticalAlignment="Center"
-                                 Padding="3"
-                                 Foreground="White"
-                                 BorderThickness="0"
-                                     x:Name="TB_Message"
-                                     KeyDown="TB_SendMsg_OnEnter"/>
 
+
+
+                            <Grid    Grid.Column="0"
+                                     Grid.ColumnSpan="3"
+                                     Grid.Row="1">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CurGroup}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <TextBox 
+                                     TextWrapping="Wrap"
+                                     Background="{StaticResource DarkBgBrush}"
+                                     TextAlignment="Left"
+                                     Padding="3"
+                                     Foreground="White"
+                                     BorderThickness="0"
+                                     
+                                     x:Name="TB_Message"
+                                     MinHeight="{Binding ElementName=tbRow, Path=Height.Value}"
+                                     KeyDown="TB_SendMsg_OnEnter">
+                                    <TextBox.Resources>
+                                        <Style TargetType="{x:Type Border}">
+                                            <Setter Property="CornerRadius" Value="3"/>
+                                        </Style>
+                                    </TextBox.Resources>
+                                </TextBox>
+                                <TextBlock Opacity="0.7" IsHitTestVisible="False" Text="Введите текст..." HorizontalAlignment="Left" Margin="11,7,0,0" Foreground="DarkGray">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=TB_Message}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
                             <!--<Border Margin="-8" 
                                     Padding="3"
                                     Width="32" Height="16" 

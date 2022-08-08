@@ -851,7 +851,11 @@ namespace Telegram
             this.DragMove();
         }
 
-        private void BTNClose_Click(object sender, RoutedEventArgs e) => Close();
+        private void BTNClose_Click(object sender, RoutedEventArgs e)
+        {
+            Client.Disconnected -= Client_Disconnected;
+            Close();
+        }
 
 
         private void BTNHiDEWindow_Click(object sender, RoutedEventArgs e)

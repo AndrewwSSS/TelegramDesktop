@@ -64,6 +64,7 @@ namespace Telegram.View
                 }
                 client.Connected -= Client_Connected;
                 client.ConnectFailed -= Client_ConnectFailed;
+                client.Disconnected -= Client_ConnectFailed;
             });
         }
 
